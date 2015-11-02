@@ -25,9 +25,9 @@ void Game::CheckForCollision() {
 	for (list<Enemy>::iterator it2 = enemy->begin(); it2 != enemy->end(); it2++) {
 		if (player->sprite->getGlobalBounds().intersects(it2->sprite->getGlobalBounds()))
 		{
-			//player->lifePlayer -= ENEMY_DAMAGE;
-			//it2->isLife = false;
-			//player->x -= 
+			if (it2->life > 0)
+				player->lifePlayer -= ENEMY_DAMAGE;
+			it2->life = 0;
 		}
 	}
 	// Обработка попадания пули по врагу

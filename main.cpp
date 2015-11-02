@@ -90,7 +90,7 @@ void update(Game & game, const Time & deltaTime)
 	for (list<Enemy>::iterator it2 = game.enemy->begin(); it2 != game.enemy->end();) {
 		//cout << game.enemy->size() << endl;
 		it2->MoveEnemy(deltaTime);
-		if (it2->life < 0)
+		if (it2->life <= 0)
 			it2->GetExplosion(deltaTime);
 		if (!it2->isLife) {
 			it2->texture->~Texture();
@@ -114,6 +114,8 @@ void render(RenderWindow & window, Game & game)
 		window.draw(*it->sprite);
 	if (player.playerState.isAlive)
 		window.draw(*player.sprite);
+	else
+		cout << "Player dead" << endl;
 	window.draw(*player.shape);
 	for (it2 = game.enemy->begin(); it2 != game.enemy->end(); it2++)
 		window.draw(*it2->sprite);
