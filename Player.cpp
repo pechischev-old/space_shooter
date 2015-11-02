@@ -21,9 +21,9 @@ void InitializePlayer(Player & player) {
 	player.shape->setFillColor(Color::White);
 	
 	player.shape->setOrigin(WIDTH / 2, HEIGTH / 2);
-	player.vX = player.sprite->getPosition().x + WIDTH / 2;
-	player.vY = player.sprite->getPosition().y - HEIGTH / 4;
-	player.shape->setPosition(player.sprite->getPosition().x, player.sprite->getPosition().y);
+	//player.vX = player.sprite->getPosition().x + WIDTH / 2;
+	//player.vY = player.sprite->getPosition().y - HEIGTH / 4;
+	//player.shape->setPosition(player.sprite->getPosition().x, player.sprite->getPosition().y);
 	//cout << player.shape->getPosition().x << " " << player.shape->getPosition().y << endl;
 }
 
@@ -38,6 +38,10 @@ Shoot::Shoot(float X, float Y, float width, float heigth, Direction direction) {
 	x = X;
 	y = Y;
 	life = true;
+}
+
+void Player::CheckPlayerLife() {
+	playerState.isAlive = lifePlayer > 0;
 }
 
 void Shoot::MoveBullet(const Time & deltaTime) {
@@ -88,19 +92,15 @@ void Shoot::MoveBullet(const Time & deltaTime) {
 	// если уходит за экран, то прекращает свое существование
 	if (sprite->getPosition().x < 0 - WIDTH_BULLET) {
 		life = false;
-		cout << "LEFT" << endl;
 	}
 	if (sprite->getPosition().y < 0 - WIDTH_BULLET) {
 		life = false;
-		cout << "UP" << endl;
 	}
 	if (sprite->getPosition().x >= SCRN_HEIGTH  + WIDTH_BULLET) {
 		life = false;
-		cout << "RIGTH" << endl;
 	}
 	if (sprite->getPosition().y >= SCRN_WIDTH + HEIGTH_BULLET) {
 		life = false;
-		cout << "DOWN" << endl;
 	}
 	//------------------------------------------------------
 	//std::cout << x << " " << y << endl;
@@ -111,6 +111,7 @@ void Player::AddBullet() {
 	
 	if (playerState.isShoot) {
 		playerState.isShoot = false;
+		//directionShoot = GetDirectionShoot(posMouse, sprite->getPosition());
 		directionShoot = RIGHT;
 		Shoot addBullet(sprite->getPosition().x, sprite->getPosition().y, WIDTH_BULLET, HEIGTH_BULLET, directionShoot);
 		bullet->push_back(addBullet); // создание пули и занесение ее в список		
@@ -170,25 +171,26 @@ void Control(Player & player) {
 	else player.dirRotation = { 0, 0 };
 }
 
-Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer, Direction direction) {
+Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer) {
+	Direction dir;
 	if (posPlayer.x > posMouse.x)
-		direction = LEFT;
+		dir = LEFT;
 	else if (posPlayer.x < posMouse.x)
-		direction = RIGHT;
+		dir = RIGHT;
 	else if (posPlayer.y > posMouse.y)
-		direction = DOWN;
+		dir = DOWN;
 	else if (posPlayer.y < posMouse.y)
-		direction = UP;
+		dir = UP;
 	else if (posPlayer.x > posMouse.x && posPlayer.y > posMouse.y)
-		direction = UP_LEFT;
+		dir = UP_LEFT;
 	else if (posPlayer.x < posMouse.x && posPlayer.y > posMouse.y)
-		direction = UP_RIGHT;
+		dir = UP_RIGHT;
 	else if (posPlayer.x > posMouse.x && posPlayer.y < posMouse.y)
-		direction = DOWN_LEFT;
+		dir = DOWN_LEFT;
 	else if (posPlayer.x < posMouse.x && posPlayer.y < posMouse.y)
-		direction = DOWN_RIGHT;
+		dir = DOWN_RIGHT;
 	cout << "2" << endl;
-	return direction;
+	return dir;
 }
 
 void MovePlayer(Player & player, const Time & deltaTime) {

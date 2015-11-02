@@ -56,9 +56,10 @@ struct Player
 	Vector2i dirRotation = { 0, 0 };
 	std::list<Shoot> *bullet;
 	void AddBullet();
+	void CheckPlayerLife();
 };
 
-Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer, Direction directionShoot);
+Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer);
 void InitializePlayer(Player & player);
 void Control(Player & player);
 void MovePlayer(Player & player, const Time & deltaTime);
