@@ -7,27 +7,16 @@
 
 using namespace sf;
 
-typedef enum
-{
-	NONE,
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	UP_LEFT,
-	UP_RIGHT,
-	DOWN_LEFT,
-	DOWN_RIGHT
-} Direction;
+
 
 struct PlayerState {
 	bool isMove = false;  // флаг движения
 	bool isShoot = false; // флаг выстрела
-	bool isAlive = false; //флаг жизни
+	bool isAlive = false;
 };
 
 struct Shoot {
-	Shoot(float X, float Y, float WIDTH, float  HEIGTH, Direction dir);
+	Shoot(float X, float Y, float WIDTH, float  HEIGTH, Direction dir, String path);
 	float x, y;
 	Direction dir, rememberDir;
 	Texture *texture;
@@ -35,10 +24,10 @@ struct Shoot {
 	float rotation = 0;
 	Vector2f movement = { 0.f, 0.f };
 	Vector2i pos_mouse;
-	bool life = true;
+	bool life = true; //флаг жизни
 	void MoveBullet(const Time & deltaTime);
-	
 };
+
 
 struct Player
 {
@@ -51,11 +40,13 @@ struct Player
 	//float vX, vY; // координаты носа
 	float rotation = 0;
 	float lifePlayer = 100;
-	bool isLife = true;
 	Vector2i posMouse;
 	Vector2i dirRotation = { 0, 0 };
+	Clock clock;
+	Time timeCreateBullet = Time::Zero;
 	std::list<Shoot> *bullet;
-	void AddBullet();
+	//Функции для игрока
+	void AddBullet(RenderWindow & window);
 	void CheckPlayerLife();
 };
 

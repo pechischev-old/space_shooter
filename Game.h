@@ -13,11 +13,13 @@ struct Game
 	RenderWindow* window;
 	Player *player;
 	std::list<Enemy> *enemy;
+	std::list<Shoot> *bulletEnemy;
 	//View *view;
-
 	Clock clock;
-	Time timeCreateEnemy = Time::Zero;
+	Time timeCreateEnemy = Time::Zero,
+		timeCreateBulletEnemy = Time::Zero;
 	void AddEnemy(); // Добавляет врагов
+	void AddBulletEnemy(Vector2f posEnemy);
 	void CheckForCollision(); // отвечает за проверку на столкновения
 };
 

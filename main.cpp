@@ -19,15 +19,16 @@ void processEvents(RenderWindow & window, Game & game)
 	{
 		Control(player);
 		//--------------------------- Выстрел --------------------------
-		/*if (Mouse::isButtonPressed(Mouse::Left)) {
-			player.posMouse = Mouse::getPosition(window);
+		if (Mouse::isButtonPressed(Mouse::Left)) {
+			//player.posMouse = Mouse::getPosition(window);
+			//cout << player.posMouse.x << "  " << player.posMouse.y << endl;
 			player.playerState.isShoot = true;
-			player.AddBullet();
-		}*/
-		if (event.type == Event::KeyPressed && event.key.code == Keyboard::Space) {
-		//if (Keyboard::isKeyPressed(Keyboard::Space)) {
+			player.AddBullet(window);
+		}
+		//if (event.type == Event::KeyPressed && event.key.code == Keyboard::Space) {
+		if (Keyboard::isKeyPressed(Keyboard::Space)) {
 			player.playerState.isShoot = true;
-			player.AddBullet();
+			player.AddBullet(window);
 
 		}
 		//--------------------------------------------------------------
@@ -41,13 +42,13 @@ Vector2f Border(float X, float Y, Vector2f posPlayer, int rotation) {
 	Vector2f limit(0.f, 0.f);
 	float heigth = HEIGTH,
 		width = WIDTH;
-	if (SCRN_HEIGTH <= posPlayer.x + heigth / 2) {
+	if (SCRN_WIDTH <= posPlayer.x + heigth / 2) {
 		X = -BORDER;
 	}
 	if (0 >= posPlayer.x - heigth / 2) {
 		X = BORDER;
 	}
-	if (SCRN_WIDTH <= posPlayer.y + width / 2) {
+	if (SCRN_HEIGTH <= posPlayer.y + width / 2) {
 		Y = -BORDER;
 	}
 	if (0 >= posPlayer.y - width / 2) {
@@ -65,8 +66,9 @@ void update(Game & game, const Time & deltaTime)
 	PlayerState & playerState = player.playerState;
 
 	Vector2i pixelPos = Mouse::getPosition(window);
+	
 	Vector2f posMouse = window.mapPixelToCoords(pixelPos);
-
+	//cout << posMouse.x << "  " << posMouse.y << endl;
 	game.AddEnemy();
 	game.CheckForCollision();
 
@@ -87,6 +89,17 @@ void update(Game & game, const Time & deltaTime)
 		}
 		else  it++;
 	}
+	for (list<Shoot>::iterator it = game.bulletEnemy->begin(); it != game.bulletEnemy->end();) {
+		//cout << game.bulletEnemy->size() << endl;
+		it->MoveBullet(deltaTime);
+
+		if (!it->life) {
+			it->texture->~Texture();
+			it = game.bulletEnemy->erase(it);
+		}
+		else  it++;
+	}
+	
 	for (list<Enemy>::iterator it2 = game.enemy->begin(); it2 != game.enemy->end();) {
 		//cout << game.enemy->size() << endl;
 		it2->MoveEnemy(deltaTime);
@@ -112,13 +125,18 @@ void render(RenderWindow & window, Game & game)
 	
 	for (it = player.bullet->begin(); it != player.bullet->end(); it++)
 		window.draw(*it->sprite);
-	if (player.playerState.isAlive)
+	if (player.playerState.isAlive) {
+		//cout << "Health: " << player.lifePlayer << endl;
 		window.draw(*player.sprite);
+	}
 	else
 		cout << "Player dead" << endl;
-	window.draw(*player.shape);
+	//window.draw(*player.shape);
+	for (it = game.bulletEnemy->begin(); it != game.bulletEnemy->end(); it++)
+		window.draw(*it->sprite);
 	for (it2 = game.enemy->begin(); it2 != game.enemy->end(); it2++)
 		window.draw(*it2->sprite);
+
 	window.display();
 }
 

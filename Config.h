@@ -1,6 +1,6 @@
 #pragma once
 
-const int SCRN_HEIGTH = 800, SCRN_WIDTH = 600;
+const int SCRN_HEIGTH = 600, SCRN_WIDTH = 800;
 
 const float BORDER = 0.3f;
 //---------------------- Для игрока ------------------------------------
@@ -31,3 +31,16 @@ const float ENEMY_DAMAGE = 15;
 //-----------------------------  ---------------------------------
 
 const int HEIGTH_EXPLOSION = 60, WIDTH_EXPLOSION = 64;
+
+typedef enum
+{
+	NONE,
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	UP_LEFT,
+	UP_RIGHT,
+	DOWN_LEFT,
+	DOWN_RIGHT
+} Direction;

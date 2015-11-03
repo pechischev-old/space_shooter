@@ -27,10 +27,10 @@ void InitializePlayer(Player & player) {
 	//cout << player.shape->getPosition().x << " " << player.shape->getPosition().y << endl;
 }
 
-Shoot::Shoot(float X, float Y, float width, float heigth, Direction direction) {
+Shoot::Shoot(float X, float Y, float width, float heigth, Direction direction, String path) {
 	texture = new Texture;
 	sprite = new Sprite;
-	texture->loadFromFile("resourse/images/laser-blue.png");
+	texture->loadFromFile(path);
 	sprite->setTexture(*texture);
 	sprite->setOrigin(WIDTH_BULLET / 2, HEIGTH_BULLET / 2);
 	sprite->setPosition(X + HEIGTH / 8, Y + WIDTH / 8);
@@ -96,10 +96,10 @@ void Shoot::MoveBullet(const Time & deltaTime) {
 	if (sprite->getPosition().y < 0 - WIDTH_BULLET) {
 		life = false;
 	}
-	if (sprite->getPosition().x >= SCRN_HEIGTH  + WIDTH_BULLET) {
+	if (sprite->getPosition().x >= SCRN_WIDTH  + WIDTH_BULLET) {
 		life = false;
 	}
-	if (sprite->getPosition().y >= SCRN_WIDTH + HEIGTH_BULLET) {
+	if (sprite->getPosition().y >= SCRN_HEIGTH + HEIGTH_BULLET) {
 		life = false;
 	}
 	//------------------------------------------------------
@@ -107,14 +107,19 @@ void Shoot::MoveBullet(const Time & deltaTime) {
 	sprite->move(x, y);
 }
 
-void Player::AddBullet() {
+void Player::AddBullet(RenderWindow & window) {
 	
 	if (playerState.isShoot) {
+		posMouse = Mouse::getPosition(window);
+		timeCreateBullet += clock.restart(); 
+		if (timeCreateBullet.asSeconds() > 0.1) { // Зависимость появления пули от времени
+			//directionShoot = GetDirectionShoot(Mouse::getPosition(window), sprite->getPosition());
+			directionShoot = RIGHT;
+			Shoot addBullet(sprite->getPosition().x, sprite->getPosition().y, WIDTH_BULLET, HEIGTH_BULLET, directionShoot, "resourse/images/laser-blue.png");
+			bullet->push_back(addBullet); // создание пули и занесение ее в список
+			timeCreateBullet = Time::Zero;
+		}
 		playerState.isShoot = false;
-		//directionShoot = GetDirectionShoot(posMouse, sprite->getPosition());
-		directionShoot = RIGHT;
-		Shoot addBullet(sprite->getPosition().x, sprite->getPosition().y, WIDTH_BULLET, HEIGTH_BULLET, directionShoot);
-		bullet->push_back(addBullet); // создание пули и занесение ее в список		
 	}
 }
 
@@ -173,23 +178,22 @@ void Control(Player & player) {
 
 Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer) {
 	Direction dir;
-	if (posPlayer.x > posMouse.x)
+	if (posPlayer.x > posMouse.x && ((posPlayer.y - 50) <= posMouse.y <= (posPlayer.y + 50)))
 		dir = LEFT;
-	else if (posPlayer.x < posMouse.x)
+	if (posPlayer.x < posMouse.x && posPlayer.y == posMouse.y)
 		dir = RIGHT;
-	else if (posPlayer.y > posMouse.y)
+	if (posPlayer.y > posMouse.y && posPlayer.x == posMouse.x)
 		dir = DOWN;
-	else if (posPlayer.y < posMouse.y)
+	if (posPlayer.y < posMouse.y && posPlayer.x == posMouse.x)
 		dir = UP;
-	else if (posPlayer.x > posMouse.x && posPlayer.y > posMouse.y)
+	if (posPlayer.x > posMouse.x && posPlayer.y > posMouse.y)
 		dir = UP_LEFT;
-	else if (posPlayer.x < posMouse.x && posPlayer.y > posMouse.y)
+	if (posPlayer.x < posMouse.x && posPlayer.y > posMouse.y)
 		dir = UP_RIGHT;
-	else if (posPlayer.x > posMouse.x && posPlayer.y < posMouse.y)
+	if (posPlayer.x > posMouse.x && posPlayer.y < posMouse.y)
 		dir = DOWN_LEFT;
-	else if (posPlayer.x < posMouse.x && posPlayer.y < posMouse.y)
+	if (posPlayer.x < posMouse.x && posPlayer.y < posMouse.y)
 		dir = DOWN_RIGHT;
-	cout << "2" << endl;
 	return dir;
 }
 
@@ -222,6 +226,7 @@ void MovePlayer(Player & player, const Time & deltaTime) {
 	}
 	player.x = movement.x * deltaTime.asSeconds();
 	player.y = movement.y * deltaTime.asSeconds();
+	
 	
 	//------------------------- Поворот персонажа -----------------------------------
 	/*player.rotation += player.dirRotation.x * ANGLE;
