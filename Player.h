@@ -39,7 +39,7 @@ struct Player
 	float x, y;
 	//float vX, vY; // координаты носа
 	float rotation = 0;
-	float lifePlayer = 100;
+	float lifePlayer = 1000;
 	Vector2i posMouse;
 	Vector2i dirRotation = { 0, 0 };
 	Clock clock;

@@ -33,34 +33,47 @@ void Game::AddBulletEnemy(Vector2f posEnemy) {
 }
 
 void Game::CheckForCollision() {
+	
+	if (player->sprite->getColor() == Color::Red)
+		player->sprite->setColor(Color::White);
 	// Обработка взаимодействия игрока и противников
 	for (list<Enemy>::iterator it2 = enemy->begin(); it2 != enemy->end(); it2++) {
-		if (player->sprite->getGlobalBounds().intersects(it2->sprite->getGlobalBounds()))
+		if (player->sprite->getGlobalBounds().intersects(it2->sprite->getGlobalBounds())) // столкновение игрока с врагом
 		{
-			/*if (it2->life > 0)
-				player->lifePlayer -= ENEMY_DAMAGE;*/
+			if (it2->life > 0) {
+				player->lifePlayer -= ENEMY_DAMAGE;
+				player->sprite->setColor(Color::Red);
+			}
 			it2->life = 0;
 		}
-		if (it2->sprite->getPosition().x - player->sprite->getPosition().x < 250  && it2->sprite->getPosition().x - player->sprite->getPosition().x > 0) {
+		if (it2->sprite->getPosition().x - player->sprite->getPosition().x < 500  && it2->sprite->getPosition().x - player->sprite->getPosition().x > 0) { // враг стреляет
 			if (it2->life > 0) {
 				AddBulletEnemy(it2->sprite->getPosition());					
 			}
 		}
 	}
+	
+	// Обработка попадания пули по игроку
 	for (list<Shoot>::iterator it = bulletEnemy->begin(); it != bulletEnemy->end(); it++) {
 		if (player->sprite->getGlobalBounds().intersects(it->sprite->getGlobalBounds())) {
 			player->lifePlayer -= ENEMY_DAMAGE;
 			it->life = false;
+			player->sprite->setColor(Color::Red);
 		}
 	}
+	
 	// Обработка попадания пули по врагу
 	for (list<Enemy>::iterator it2 = enemy->begin(); it2 != enemy->end(); it2++) {
+		if (it2->sprite->getColor() == Color::Red)
+			it2->sprite->setColor(Color::White);
 		for (list<Shoot>::iterator it = player->bullet->begin(); it != player->bullet->end(); it++) {
 			if (it->sprite->getGlobalBounds().intersects(it2->sprite->getGlobalBounds()))	{
 				it2->life -= PLAYER_DAMAGE;
 				it->life = false;
+				it2->sprite->setColor(Color::Red);
 			}
 		}
+		
 	}
 }
 
