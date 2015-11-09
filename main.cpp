@@ -29,7 +29,6 @@ void processEvents(RenderWindow & window, Game & game)
 		if (Keyboard::isKeyPressed(Keyboard::Space)) {
 			player.playerState.isShoot = true;
 			player.AddBullet(window);
-
 		}
 		//--------------------------------------------------------------
 		// Окно закрыли
@@ -38,26 +37,6 @@ void processEvents(RenderWindow & window, Game & game)
 	}
 }
 
-Vector2f Border(float X, float Y, Vector2f posPlayer, int rotation) {
-	Vector2f limit(0.f, 0.f);
-	float heigth = HEIGTH,
-		width = WIDTH;
-	if (SCRN_WIDTH <= posPlayer.x + heigth / 2) {
-		X = -BORDER;
-	}
-	if (0 >= posPlayer.x - heigth / 2) {
-		X = BORDER;
-	}
-	if (SCRN_HEIGTH <= posPlayer.y + width / 2) {
-		Y = -BORDER;
-	}
-	if (0 >= posPlayer.y - width / 2) {
-		Y = BORDER;
-	}
-	limit.x = X;
-	limit.y = Y;
-	return limit;
-}
 
 void update(Game & game, const Time & deltaTime)
 {
@@ -69,16 +48,18 @@ void update(Game & game, const Time & deltaTime)
 	
 	Vector2f posMouse = window.mapPixelToCoords(pixelPos);
 	//cout << posMouse.x << "  " << posMouse.y << endl;
-	game.AddEnemy();
+	//game.AddEnemy();
 	game.CheckForCollision();
 
+	game.enemy->AddEnemy();
 	player.CheckPlayerLife();
 
+	game.enemy->GetMoveEveryEnemy(deltaTime);
 	MovePlayer(player, deltaTime); // задает координаты движения и отвечает за поворот персонажа
 
-	Vector2f posPlayer = player.sprite->getPosition();
-	float rotation = player.sprite->getRotation();
-	player.sprite->move(Border(player.x, player.y, posPlayer, rotation));
+	Vector2f posPlayer = player.ship->sprite->getPosition();
+	float rotation = player.ship->sprite->getRotation();
+	player.ship->sprite->move(Border(player.ship->x, player.ship->y, posPlayer, rotation));
 
 	for (list<Shoot>::iterator it = player.bullet->begin(); it != player.bullet->end();) {
 		//cout << player.bullet->size() << endl;
@@ -89,54 +70,36 @@ void update(Game & game, const Time & deltaTime)
 		}
 		else  it++;
 	}
-	for (list<Shoot>::iterator it = game.bulletEnemy->begin(); it != game.bulletEnemy->end();) {
+	for (list<Shoot>::iterator it = game.enemy->bulletEnemy->begin(); it != game.enemy->bulletEnemy->end();) {
 		//cout << game.bulletEnemy->size() << endl;
 		it->MoveBullet(deltaTime);
 
 		if (!it->life) {
 			it->texture->~Texture();
-			it = game.bulletEnemy->erase(it);
+			it = game.enemy->bulletEnemy->erase(it);
 		}
 		else  it++;
-	}
-	
-	for (list<Enemy>::iterator it2 = game.enemy->begin(); it2 != game.enemy->end();) {
-		//cout << game.enemy->size() << endl;
-		it2->MoveEnemy(deltaTime);
-		if (it2->life <= 0)
-			it2->GetExplosion(deltaTime);
-		if (!it2->isLife) {
-			it2->texture->~Texture();
-			delete it2->sprite;
-			it2 = game.enemy->erase(it2);
-		}
-		else  it2++;
 	}
 }
 
 void render(RenderWindow & window, Game & game)
 {
 	list<Shoot>::iterator it;
-	list<Enemy>::iterator it2;
+	list<Entity>::iterator it3;
 	Player & player = *game.player;
 
-	
 	window.clear();
-	
+	for (it3 = game.enemy->enemyShip->begin(); it3 != game.enemy->enemyShip->end(); it3++)
+		window.draw(*it3->sprite);
 	for (it = player.bullet->begin(); it != player.bullet->end(); it++)
 		window.draw(*it->sprite);
 	if (player.playerState.isAlive) {
-		//cout << "Health: " << player.lifePlayer << endl;
-		window.draw(*player.sprite);
+		window.draw(*player.ship->sprite);
 	}
-	else
-		cout << "Player dead" << endl;
 	//window.draw(*player.shape);
-	for (it = game.bulletEnemy->begin(); it != game.bulletEnemy->end(); it++)
+	for (it = game.enemy->bulletEnemy->begin(); it != game.enemy->bulletEnemy->end(); it++)
 		window.draw(*it->sprite);
-	for (it2 = game.enemy->begin(); it2 != game.enemy->end(); it2++)
-		window.draw(*it2->sprite);
-
+	
 	window.display();
 }
 

@@ -12,17 +12,10 @@ struct Game
 {
 	RenderWindow* window;
 	Player *player;
-	std::list<Enemy> *enemy;
-	std::list<Shoot> *bulletEnemy;
+	Enemy *enemy;
 	//View *view;
-	Clock clock;
-	Time timeCreateEnemy = Time::Zero,
-		timeCreateBulletEnemy = Time::Zero;
-	void AddEnemy(); // Добавляет врагов
-	void AddBulletEnemy(Vector2f posEnemy);
 	void CheckForCollision(); // отвечает за проверку на столкновения
 };
-
 
 void InitializeGame(Game & game);
 void DestroyGame(Game & game);

@@ -1,103 +1,46 @@
 #include "Enemy.h"
-
+#include "Entity.h"
 
 using namespace std;
 using namespace sf;
 
-Enemy::Enemy(float X, float Y, float width, float heigth, String Name, Direction direction) {
-	texture = new Texture;
-	sprite = new Sprite;
-	x = X;
-	y = Y;
-	texture->loadFromFile("resourse/images/enemy1.png");
-	sprite->setTexture(*texture);
-	sprite->setTextureRect(IntRect(0, 0, WIDTH_ENEMY, HEIGTH_ENEMY));
-	sprite->setOrigin(texture->getSize().x / 2, texture->getSize().y / 2);
-	sprite->setPosition(x, y);
-	dirEnemy = direction;
-	name = Name;
-	isLife = true;
+void InitializeEnemy(Enemy & enemy) {
+	enemy.enemyShip = new list<Entity>;
+	enemy.bulletEnemy = new list<Shoot>;
 }
 
-void Enemy::GetExplosion(const Time & deltaTime) {
-	x = sprite->getPosition().x;
-	y = sprite->getPosition().y;
-	delete(texture);
-	delete(sprite);
-	texture = new Texture;
-	sprite = new Sprite;
-	CurrentFrame += 10 * deltaTime.asSeconds();
-	if (CurrentFrame <= 10) {
-		texture->loadFromFile("resourse/images/explosion.png");
-		sprite->setTexture(*texture);
-		sprite->setOrigin(WIDTH_EXPLOSION / 2, HEIGTH_EXPLOSION / 2);
-		sprite->setTextureRect(IntRect(WIDTH_EXPLOSION * int(CurrentFrame), 0, WIDTH_EXPLOSION, HEIGTH_EXPLOSION));
-		sprite->setPosition(x, y);
+void Enemy::GetMoveEveryEnemy(const Time & deltaTime) {
+	for (list<Entity>::iterator it = enemyShip->begin(); it != enemyShip->end();) {
+		MoveEnemy(deltaTime, *it);
+		if (it->health <= 0)
+			it->GetExplosion(deltaTime);
+		if (!it->isLife) {
+			it->texture->~Texture();
+			delete it->sprite;
+			it = enemyShip->erase(it);
+		}
+		else  it++;
 	}
-	else isLife = false;
-	
 }
 
-void Enemy::MoveEnemy(const Time & deltaTime) {
-	if (life > 0) {
-		Vector2f movement = sprite->getPosition();
+void Enemy::AddEnemy() {
+	timeCreateEnemy += clock.restart();
+	if (timeCreateEnemy.asSeconds() > 2 && enemyShip->size() < 2) {
+		Direction dir = LEFT;//GetDirection();
+		Vector2f getPositionEnemy = GetRandomPosition(dir);
+		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, WIDTH_ENEMY, HEIGTH_ENEMY, "enemy1");
+		addEnemy.direction = dir;
+		enemyShip->push_back(addEnemy);
+		timeCreateEnemy = Time::Zero;
+	}
+}
 
-		switch (dirEnemy) {
-			case UP: movement.y = -SPEED_ENEMY;
-				movement.x = 0;
-				sprite->setRotation(90);
-				break;
-			case DOWN: movement.y = SPEED_ENEMY;
-				movement.x = 0;
-				sprite->setRotation(-90);
-				break;
-			case LEFT: movement.x = -SPEED_ENEMY;
-				movement.y = 0;
-				break;
-			case RIGHT: movement.x = SPEED_ENEMY;
-				movement.y = 0;
-				sprite->setRotation(180);
-				break;
-			case UP_LEFT: movement.x = -SPEED_ENEMY;
-				movement.y = -SPEED_ENEMY;
-				sprite->setRotation(45);
-				break;
-			case UP_RIGHT: movement.x = SPEED_ENEMY;
-				movement.y = -SPEED_ENEMY;
-				sprite->setRotation(135);
-				break;
-			case DOWN_RIGHT: movement.x = SPEED_ENEMY;
-				movement.y = SPEED_ENEMY;
-				sprite->setRotation(-135);
-				break;
-			case DOWN_LEFT: movement.x = -SPEED_ENEMY;
-				movement.y = SPEED_ENEMY;
-				sprite->setRotation(-45);
-				break;
-		default:
-			life = false;
-			break;
-		}
-
-		x = movement.x * deltaTime.asSeconds();
-		y = movement.y * deltaTime.asSeconds();
-
-		//-----------------  оллизии --------------------------
-		// если уходит за экран, то прекращает свое существование
-		if (sprite->getPosition().x < 0 - WIDTH_ENEMY) {
-			isLife = false;
-		}
-		if (sprite->getPosition().y < 0 - HEIGTH_ENEMY) {
-			isLife = false;
-		}
-		if (sprite->getPosition().x >= SCRN_WIDTH + WIDTH_ENEMY) {
-			isLife = false;
-		}
-		if (sprite->getPosition().y >= SCRN_HEIGTH + HEIGTH_ENEMY) {
-			isLife = false;
-		}
-
-		sprite->move(x, y);
+void Enemy::AddBulletEnemy(Vector2f posEnemy) {
+	timeCreateBulletEnemy += clock.restart();
+	if (timeCreateBulletEnemy.asSeconds() > 0.1) {
+		Shoot addBullet(posEnemy.x, posEnemy.y, WIDTH_BULLET, HEIGTH_BULLET, LEFT, "resourse/images/laser-red.png");
+		bulletEnemy->push_back(addBullet); // создание пули и занесение ее в список
+		timeCreateBulletEnemy = Time::Zero;
 	}
 }
 
@@ -138,4 +81,66 @@ Vector2f GetRandomPosition(Direction & selectHand) {
 		getPosit.y = SCRN_HEIGTH;
 	}
 	return getPosit;
+}
+
+void Enemy::MoveEnemy(const Time & deltaTime, Entity & enemy) {
+	if (enemy.health > 0) {
+		Vector2f movement = enemy.sprite->getPosition();
+		switch (enemy.direction) {
+		case UP: movement.y = -SPEED_ENEMY;
+			movement.x = 0;
+			enemy.sprite->setRotation(90);
+			break;
+		case DOWN: movement.y = SPEED_ENEMY;
+			movement.x = 0;
+			enemy.sprite->setRotation(-90);
+			break;
+		case LEFT: movement.x = -SPEED_ENEMY;
+			movement.y = 0;
+			break;
+		case RIGHT: movement.x = SPEED_ENEMY;
+			movement.y = 0;
+			enemy.sprite->setRotation(180);
+			break;
+		case UP_LEFT: movement.x = -SPEED_ENEMY;
+			movement.y = -SPEED_ENEMY;
+			enemy.sprite->setRotation(45);
+			break;
+		case UP_RIGHT: movement.x = SPEED_ENEMY;
+			movement.y = -SPEED_ENEMY;
+			enemy.sprite->setRotation(135);
+			break;
+		case DOWN_RIGHT: movement.x = SPEED_ENEMY;
+			movement.y = SPEED_ENEMY;
+			enemy.sprite->setRotation(-135);
+			break;
+		case DOWN_LEFT: movement.x = -SPEED_ENEMY;
+			movement.y = SPEED_ENEMY;
+			enemy.sprite->setRotation(-45);
+			break;
+		default:
+			enemy.isLife = false;
+			break;
+		}
+
+		enemy.x = movement.x * deltaTime.asSeconds();
+		enemy.y = movement.y * deltaTime.asSeconds();
+
+		//-----------------  оллизии --------------------------
+		// если уходит за экран, то прекращает свое существование
+		if (enemy.sprite->getPosition().x < 0 - enemy.width) {
+			enemy.isLife = false;
+		}
+		if (enemy.sprite->getPosition().y < 0 - enemy.height) {
+			enemy.isLife = false;
+		}
+		if (enemy.sprite->getPosition().x >= SCRN_WIDTH + enemy.width){
+			enemy.isLife = false;
+		}
+		if (enemy.sprite->getPosition().y >= SCRN_HEIGTH + enemy.height) {
+			enemy.isLife = false;
+		}
+
+		enemy.sprite->move(enemy.x, enemy.y);
+	}
 }
