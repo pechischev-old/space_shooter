@@ -19,16 +19,18 @@ void processEvents(RenderWindow & window, Game & game)
 	{
 		Control(player);
 		//--------------------------- Выстрел --------------------------
-		if (Mouse::isButtonPressed(Mouse::Left)) {
-			//player.posMouse = Mouse::getPosition(window);
-			//cout << player.posMouse.x << "  " << player.posMouse.y << endl;
-			player.playerState.isShoot = true;
-			player.AddBullet(window);
-		}
-		//if (event.type == Event::KeyPressed && event.key.code == Keyboard::Space) {
-		if (Keyboard::isKeyPressed(Keyboard::Space)) {
-			player.playerState.isShoot = true;
-			player.AddBullet(window);
+		if (player.ship->health > 0) {
+			if (Mouse::isButtonPressed(Mouse::Left)) {
+				//player.posMouse = Mouse::getPosition(window);
+				//cout << player.posMouse.x << "  " << player.posMouse.y << endl;
+				player.playerState.isShoot = true;
+				player.AddBullet(window);
+			}
+			//if (event.type == Event::KeyPressed && event.key.code == Keyboard::Space) {
+			if (Keyboard::isKeyPressed(Keyboard::Space)) {
+				player.playerState.isShoot = true;
+				player.AddBullet(window);
+			}
 		}
 		//--------------------------------------------------------------
 		// Окно закрыли
@@ -41,65 +43,37 @@ void processEvents(RenderWindow & window, Game & game)
 void update(Game & game, const Time & deltaTime)
 {
 	Player & player = *game.player;
+	Enemy & enemy = *game.enemy;
+	Asteroid & asteroid = *game.asteroid;
 	RenderWindow & window = *game.window;
 	PlayerState & playerState = player.playerState;
 
-	Vector2i pixelPos = Mouse::getPosition(window);
-	
-	Vector2f posMouse = window.mapPixelToCoords(pixelPos);
-	//cout << posMouse.x << "  " << posMouse.y << endl;
-	//game.AddEnemy();
 	game.CheckForCollision();
 
-	game.enemy->AddEnemy();
-	player.CheckPlayerLife();
-
-	game.enemy->GetMoveEveryEnemy(deltaTime);
+	UpdateText(*game.textInfo, player);
+	
+	//---------------- Функции игрока ------------------
+	if (player.ship->health <= 0)
+		player.ship->Explosion(deltaTime);
 	MovePlayer(player, deltaTime); // задает координаты движения и отвечает за поворот персонажа
+	player.ship->sprite->move(Border(player)); 
+	player.UpdateStatePlayerBullet(deltaTime);
 
-	Vector2f posPlayer = player.ship->sprite->getPosition();
-	float rotation = player.ship->sprite->getRotation();
-	player.ship->sprite->move(Border(player.ship->x, player.ship->y, posPlayer, rotation));
+	//---------------- Функции противников -------------
+	enemy.GetMoveEveryEnemy(deltaTime, player.point);
+	enemy.AddEnemy();
+	enemy.UpdateStateEnemyBullet(deltaTime);
 
-	for (list<Shoot>::iterator it = player.bullet->begin(); it != player.bullet->end();) {
-		//cout << player.bullet->size() << endl;
-		it->MoveBullet(deltaTime);
-		if (!it->life) {
-			it->texture->~Texture();
-			it = player.bullet->erase(it);
-		}
-		else  it++;
-	}
-	for (list<Shoot>::iterator it = game.enemy->bulletEnemy->begin(); it != game.enemy->bulletEnemy->end();) {
-		//cout << game.bulletEnemy->size() << endl;
-		it->MoveBullet(deltaTime);
-
-		if (!it->life) {
-			it->texture->~Texture();
-			it = game.enemy->bulletEnemy->erase(it);
-		}
-		else  it++;
-	}
+	//---------------
+	asteroid.AddAsteroid();
+	asteroid.GetMoveEveryAsteroid(deltaTime);
 }
 
 void render(RenderWindow & window, Game & game)
 {
-	list<Shoot>::iterator it;
-	list<Entity>::iterator it3;
-	Player & player = *game.player;
-
-	window.clear();
-	for (it3 = game.enemy->enemyShip->begin(); it3 != game.enemy->enemyShip->end(); it3++)
-		window.draw(*it3->sprite);
-	for (it = player.bullet->begin(); it != player.bullet->end(); it++)
-		window.draw(*it->sprite);
-	if (player.playerState.isAlive) {
-		window.draw(*player.ship->sprite);
-	}
-	//window.draw(*player.shape);
-	for (it = game.enemy->bulletEnemy->begin(); it != game.enemy->bulletEnemy->end(); it++)
-		window.draw(*it->sprite);
-	
+	window.clear(); 
+	game.DrawObjects();
+	DrawTextToWindow(*game.textInfo, *game.window);
 	window.display();
 }
 
@@ -128,9 +102,8 @@ void startGame()
 		}
 		//ChangeView();
 		render(window, *game);
-
 	}
-	DestroyGame(*game);
+	delete game;
 }
 
 int main()

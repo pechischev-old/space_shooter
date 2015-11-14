@@ -9,7 +9,7 @@ Shoot::Shoot(float X, float Y, float width, float heigth, Direction direction, S
 	texture->loadFromFile(path);
 	sprite->setTexture(*texture);
 	sprite->setOrigin(WIDTH_BULLET / 2, HEIGTH_BULLET / 2);
-	sprite->setPosition(X + HEIGTH / 8, Y + WIDTH / 8);
+	sprite->setPosition(X + heigth / 11, Y + width / 11);
 	dir = direction;
 	x = X;
 	y = Y;

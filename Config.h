@@ -8,9 +8,6 @@ const float SPEED_HERO = 200.f, SPEED_HERO_BACK = 150.f;
 
 const float a = 1; // размер вектора направления
 
-const float HEIGTH = 50.f,
-	WIDTH = 120.f;
-
 const float ANGLE = 1.5f; // угол на который будет поворачиваться спрайт
 
 const float SPEED_BULLET = 350.f; // скорость пули

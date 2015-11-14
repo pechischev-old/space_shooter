@@ -8,12 +8,15 @@ void InitializeGame(Game & game) {
 	game.player = new Player;
 	game.enemy = new Enemy;
 	game.window = new RenderWindow(VideoMode(SCRN_WIDTH, SCRN_HEIGTH), "Main Game");
+	game.textInfo = new TextWithInfo;
+	game.asteroid = new Asteroid;
 	InitializePlayer(*game.player);
 	InitializeEnemy(*game.enemy);
+	InitializeAsteroid(*game.asteroid);
+	InitializeText(*game.textInfo);
 }
 
 void Game::CheckForCollision() {
-	
 	if (player->ship->sprite->getColor() == Color::Red)
 		player->ship->sprite->setColor(Color::White);
 	// Обработка взаимодействия игрока и противников
@@ -28,7 +31,7 @@ void Game::CheckForCollision() {
 		}
 		if (it2->sprite->getPosition().x - player->ship->sprite->getPosition().x < 500  && it2->sprite->getPosition().x - player->ship->sprite->getPosition().x > 0) { // враг стреляет
 			if (it2->health > 0) {
-				enemy->AddBulletEnemy(it2->sprite->getPosition());					
+				enemy->AddBulletEnemy(it2->sprite->getPosition(), it2->direction, *it2);
 			}
 		}
 	}
@@ -53,13 +56,49 @@ void Game::CheckForCollision() {
 				it2->sprite->setColor(Color::Red);
 			}
 		}
-		
 	}
+
+	for (list<Entity>::iterator it3 = asteroid->asteroids->begin(); it3 != asteroid->asteroids->end(); it3++) {
+		if (player->ship->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) // столкновение игрока с врагом
+		{
+			if (it3->health > 0) {
+				player->ship->health -= ENEMY_DAMAGE;
+				player->ship->sprite->setColor(Color::Red);
+			}
+			it3->health = 0;
+		}
+	}
+
+	for (list<Entity>::iterator it3 = asteroid->asteroids->begin(); it3 != asteroid->asteroids->end(); it3++) {
+		if (it3->sprite->getColor() == Color::Red)
+			it3->sprite->setColor(Color::White);
+		for (list<Shoot>::iterator it = player->bullet->begin(); it != player->bullet->end(); it++) {
+			if (it->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) {
+				it3->health -= 3 * PLAYER_DAMAGE;
+				it->life = false;
+				it3->sprite->setColor(Color::Red);
+			}
+		}
+	}
+
 }
 
-void DestroyGame(Game & game) {
-	delete &game;
-}
+void Game::DrawObjects() { // Отрисовка объектов
+	for (Entity it3 : *enemy->enemyShip)
+		window->draw(*it3.sprite);
+	for (Entity it2 : *asteroid->asteroids)
+		window->draw(*it2.sprite);
+	for (Shoot it : *player->bullet)
+		window->draw(*it.sprite);
+	if (player->ship->isLife) {
+		window->draw(*player->ship->sprite);
+	}
+	else
+		cout << "Player dead" << endl;
+	//window.draw(*player.shape);
+	for (Shoot it : *enemy->bulletEnemy)
+		window->draw(*it.sprite);
 
+}
 
 

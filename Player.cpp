@@ -5,9 +5,9 @@ using namespace std;
 
 void InitializePlayer(Player & player) {
 	player.bullet = new list<Shoot>;
-	player.ship = new Entity(250, 250, 120, 50, "heroship2");
-	player.ship->sprite->setRotation(90);
-	player.ship->health = 100;
+	player.ship = new Entity(250, 250, "sokol");
+	player.ship->health = 500;
+	player.playerState.isAlive = true;
 	/*
 	// »нициализаци€ носа корабл€ (нужно дл€ вектора направлени€)
 	Vector2f size = { a, a };
@@ -32,7 +32,7 @@ void Player::AddBullet(RenderWindow & window) {
 		if (timeCreateBullet.asSeconds() > 0.1) { // «ависимость по€влени€ пули от времени
 			//directionShoot = GetDirectionShoot(Mouse::getPosition(window), sprite->getPosition());
 			directionShoot = RIGHT;
-			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, WIDTH_BULLET, HEIGTH_BULLET, directionShoot, "resourse/images/laser-blue.png");
+			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, "resourse/images/laser-blue.png");
 			bullet->push_back(addBullet); // создание пули и занесение ее в список
 			timeCreateBullet = Time::Zero;
 		}
@@ -41,55 +41,58 @@ void Player::AddBullet(RenderWindow & window) {
 }
 
 void Control(Player & player) {
-	if (Keyboard::isKeyPressed(Keyboard::W) && Keyboard::isKeyPressed(Keyboard::A)) {
-		player.direction = UP_LEFT;
-		player.playerState.isMove = true;
-	}
-	else if (Keyboard::isKeyPressed(Keyboard::W) && Keyboard::isKeyPressed(Keyboard::D)) {
-		player.direction = UP_RIGHT;
-		player.playerState.isMove = true;
-	}
-	else if (Keyboard::isKeyPressed(Keyboard::S) && Keyboard::isKeyPressed(Keyboard::A)) {
-		player.direction = DOWN_LEFT;
-		player.playerState.isMove = true;
-	}
-	else if (Keyboard::isKeyPressed(Keyboard::S) && Keyboard::isKeyPressed(Keyboard::D)) {
-		player.direction = DOWN_RIGHT;
-		player.playerState.isMove = true;
-		//----------------------------- ѕо вертикали или горизантали ----------------------------
-	}
-	else if (Keyboard::isKeyPressed(Keyboard::W)) {
-		player.direction = UP;
-		player.playerState.isMove = true;
-	}
-	else if (Keyboard::isKeyPressed(Keyboard::S)) {
-		player.direction = DOWN;
-		player.playerState.isMove = true;
-	}
-	else if (Keyboard::isKeyPressed(Keyboard::D)) {
-		player.direction = RIGHT;
-		player.playerState.isMove = true;
-	}
-	else if (Keyboard::isKeyPressed(Keyboard::A)) {
-		player.direction = LEFT;
-		player.playerState.isMove = true;
-	}
-	else {
-		player.direction = NONE;
-		
-		player.playerState.isMove = false;
-	}	
-	//-----------------------------------------  лавиши поворота спрайта ----------------------------
+	if (player.ship->health > 0) {
+		if (Keyboard::isKeyPressed(Keyboard::W) && Keyboard::isKeyPressed(Keyboard::A)) {
+			player.direction = UP_LEFT;
+			player.playerState.isMove = true;
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::W) && Keyboard::isKeyPressed(Keyboard::D)) {
+			player.direction = UP_RIGHT;
+			player.playerState.isMove = true;
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::S) && Keyboard::isKeyPressed(Keyboard::A)) {
+			player.direction = DOWN_LEFT;
+			player.playerState.isMove = true;
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::S) && Keyboard::isKeyPressed(Keyboard::D)) {
+			player.direction = DOWN_RIGHT;
+			player.playerState.isMove = true;
+			//----------------------------- ѕо вертикали или горизантали ----------------------------
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::W)) {
+			player.direction = UP;
+			player.playerState.isMove = true;
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::S)) {
+			player.direction = DOWN;
+			player.playerState.isMove = true;
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::D)) {
+			player.direction = RIGHT;
+			player.playerState.isMove = true;
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::A)) {
+			player.direction = LEFT;
+			player.playerState.isMove = true;
+		}
+		else {
+			player.direction = NONE;
 
-	if (Keyboard::isKeyPressed(Keyboard::Left)) // против часовой
-		player.dirRotation = { -1, 0 };
-	else if (Keyboard::isKeyPressed(Keyboard::Right)) // по часовой
-		player.dirRotation = { 1, 0 };
-	else if (Keyboard::isKeyPressed(Keyboard::Up)) // пo часовой
-		player.dirRotation = { 0, 1 };
-	else if (Keyboard::isKeyPressed(Keyboard::Down)) // против часовой
-		player.dirRotation = { 0, -1 };
-	else player.dirRotation = { 0, 0 };
+			player.playerState.isMove = false;
+		}
+		//-----------------------------------------  лавиши поворота спрайта ----------------------------
+
+		if (Keyboard::isKeyPressed(Keyboard::Left)) // против часовой
+			player.dirRotation = { -1, 0 };
+		else if (Keyboard::isKeyPressed(Keyboard::Right)) // по часовой
+			player.dirRotation = { 1, 0 };
+		else if (Keyboard::isKeyPressed(Keyboard::Up)) // пo часовой
+			player.dirRotation = { 0, 1 };
+		else if (Keyboard::isKeyPressed(Keyboard::Down)) // против часовой
+			player.dirRotation = { 0, -1 };
+		else player.dirRotation = { 0, 0 };
+
+	}
 }
 
 Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer) {
@@ -115,7 +118,6 @@ Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer) {
 
 void MovePlayer(Player & player, const Time & deltaTime) {
 	Vector2f movement(0.f, 0.f);
-
 	switch (player.direction) {
 	case UP: movement.y -= SPEED_HERO;
 		break;
@@ -142,12 +144,12 @@ void MovePlayer(Player & player, const Time & deltaTime) {
 	}
 	player.ship->x = movement.x * deltaTime.asSeconds();
 	player.ship->y = movement.y * deltaTime.asSeconds();
-	
-	
+
+
 	//------------------------- ѕоворот персонажа -----------------------------------
 	/*player.rotation += player.dirRotation.x * ANGLE;
-	player.rotation += player.dirRotation.y * ANGLE;*/
-	
+		player.rotation += player.dirRotation.y * ANGLE;*/
+
 	/*player.sprite->setRotation(player.rotation);
 	player.shape->setRotation(player.rotation);
 	player.shape->setPosition(player.sprite->getPosition());
@@ -156,20 +158,36 @@ void MovePlayer(Player & player, const Time & deltaTime) {
 	player.vY = player.sprite->getPosition().y - HEIGTH / 4;*/
 }
 
-Vector2f Border(float X, float Y, Vector2f posPlayer, int rotation) {
+void Player::UpdateStatePlayerBullet(const Time & deltaTime) {
+	for (list<Shoot>::iterator it = bullet->begin(); it != bullet->end();) {
+		//cout << player.bullet->size() << endl;
+		it->MoveBullet(deltaTime);
+		if (!it->life) {
+			it->texture->~Texture();
+			it = bullet->erase(it);
+		}
+		else  it++;
+	}
+}
+
+Vector2f Border(Player & player) {
 	Vector2f limit(0.f, 0.f);
-	float heigth = HEIGTH,
-		width = WIDTH;
-	if (SCRN_WIDTH <= posPlayer.x + heigth / 2) {
+	float heigth = player.ship->height,
+		width = player.ship->width,
+		X = player.ship->x,
+		Y = player.ship->y;
+	Vector2f posPlayer = player.ship->sprite->getPosition();
+	
+	if (SCRN_WIDTH <= posPlayer.x + width / 2) {
 		X = -BORDER;
 	}
-	if (0 >= posPlayer.x - heigth / 2) {
+	if (0 >= posPlayer.x - width / 2) {
 		X = BORDER;
 	}
-	if (SCRN_HEIGTH <= posPlayer.y + width / 2) {
+	if (SCRN_HEIGTH <= posPlayer.y + heigth / 2) {
 		Y = -BORDER;
 	}
-	if (0 >= posPlayer.y - width / 2) {
+	if (0 >= posPlayer.y - heigth / 2) {
 		Y = BORDER;
 	}
 	limit.x = X;

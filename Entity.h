@@ -2,13 +2,12 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-
 #include "Config.h"
 
 using namespace sf;
 
 struct Entity {
-	Entity(float X, float Y, float Width, float Height, String Name);
+	Entity(float X, float Y, String Name);
 	float x;
 	float y;
 	float width;
@@ -22,5 +21,5 @@ struct Entity {
 	Sprite *sprite;
 	bool isLife;
 	float CurrentFrame = 0;
-	void GetExplosion(const Time & deltaTime);
+	void Explosion(const Time & deltaTime);
 };

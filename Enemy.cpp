@@ -9,11 +9,14 @@ void InitializeEnemy(Enemy & enemy) {
 	enemy.bulletEnemy = new list<Shoot>;
 }
 
-void Enemy::GetMoveEveryEnemy(const Time & deltaTime) {
+void Enemy::GetMoveEveryEnemy(const Time & deltaTime, float & point) {
 	for (list<Entity>::iterator it = enemyShip->begin(); it != enemyShip->end();) {
 		MoveEnemy(deltaTime, *it);
-		if (it->health <= 0)
-			it->GetExplosion(deltaTime);
+		if (it->health <= 0) {
+			it->Explosion(deltaTime);
+			if (it->CurrentFrame >= 9.5)
+				point += GetRandomPoint();
+		}
 		if (!it->isLife) {
 			it->texture->~Texture();
 			delete it->sprite;
@@ -25,22 +28,35 @@ void Enemy::GetMoveEveryEnemy(const Time & deltaTime) {
 
 void Enemy::AddEnemy() {
 	timeCreateEnemy += clock.restart();
-	if (timeCreateEnemy.asSeconds() > 2 && enemyShip->size() < 2) {
-		Direction dir = LEFT;//GetDirection();
+	if (timeCreateEnemy.asSeconds() > 2 ) {
+		Direction dir = LEFT; //GetDirection();
 		Vector2f getPositionEnemy = GetRandomPosition(dir);
-		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, WIDTH_ENEMY, HEIGTH_ENEMY, "enemy1");
-		addEnemy.direction = dir;
+		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, "enemy1");
+		addEnemy.speed = SPEED_ENEMY;
+		addEnemy.direction = dir; // присваивает сгенерированное направление
 		enemyShip->push_back(addEnemy);
 		timeCreateEnemy = Time::Zero;
 	}
 }
 
-void Enemy::AddBulletEnemy(Vector2f posEnemy) {
+void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy) {
 	timeCreateBulletEnemy += clock.restart();
-	if (timeCreateBulletEnemy.asSeconds() > 0.1) {
-		Shoot addBullet(posEnemy.x, posEnemy.y, WIDTH_BULLET, HEIGTH_BULLET, LEFT, "resourse/images/laser-red.png");
+	if (timeCreateBulletEnemy.asSeconds() > 0.3) {
+		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, dir, "resourse/images/laser-red.png");
 		bulletEnemy->push_back(addBullet); // создание пули и занесение ее в список
 		timeCreateBulletEnemy = Time::Zero;
+	}
+}
+
+void Enemy::UpdateStateEnemyBullet(const Time & deltaTime) {
+	for (list<Shoot>::iterator it = bulletEnemy->begin(); it != bulletEnemy->end();) {
+		//cout << game.bulletEnemy->size() << endl;
+		it->MoveBullet(deltaTime);
+		if (!it->life) {
+			it->texture->~Texture();
+			it = bulletEnemy->erase(it);
+		}
+		else  it++;
 	}
 }
 
@@ -87,35 +103,35 @@ void Enemy::MoveEnemy(const Time & deltaTime, Entity & enemy) {
 	if (enemy.health > 0) {
 		Vector2f movement = enemy.sprite->getPosition();
 		switch (enemy.direction) {
-		case UP: movement.y = -SPEED_ENEMY;
+		case UP: movement.y = -enemy.speed;
 			movement.x = 0;
 			enemy.sprite->setRotation(90);
 			break;
-		case DOWN: movement.y = SPEED_ENEMY;
+		case DOWN: movement.y = enemy.speed;
 			movement.x = 0;
 			enemy.sprite->setRotation(-90);
 			break;
-		case LEFT: movement.x = -SPEED_ENEMY;
+		case LEFT: movement.x = -enemy.speed;
 			movement.y = 0;
 			break;
-		case RIGHT: movement.x = SPEED_ENEMY;
+		case RIGHT: movement.x = enemy.speed;
 			movement.y = 0;
 			enemy.sprite->setRotation(180);
 			break;
-		case UP_LEFT: movement.x = -SPEED_ENEMY;
-			movement.y = -SPEED_ENEMY;
+		case UP_LEFT: movement.x = -enemy.speed;
+			movement.y = -enemy.speed;
 			enemy.sprite->setRotation(45);
 			break;
-		case UP_RIGHT: movement.x = SPEED_ENEMY;
-			movement.y = -SPEED_ENEMY;
+		case UP_RIGHT: movement.x = enemy.speed;
+			movement.y = -enemy.speed;
 			enemy.sprite->setRotation(135);
 			break;
-		case DOWN_RIGHT: movement.x = SPEED_ENEMY;
-			movement.y = SPEED_ENEMY;
+		case DOWN_RIGHT: movement.x = enemy.speed;
+			movement.y = enemy.speed;
 			enemy.sprite->setRotation(-135);
 			break;
-		case DOWN_LEFT: movement.x = -SPEED_ENEMY;
-			movement.y = SPEED_ENEMY;
+		case DOWN_LEFT: movement.x = -enemy.speed;
+			movement.y = enemy.speed;
 			enemy.sprite->setRotation(-45);
 			break;
 		default:
@@ -143,4 +159,10 @@ void Enemy::MoveEnemy(const Time & deltaTime, Entity & enemy) {
 
 		enemy.sprite->move(enemy.x, enemy.y);
 	}
+}
+
+int GetRandomPoint() {
+	srand(time(0));
+	int point = 1 + rand() % 3;
+	return point;
 }

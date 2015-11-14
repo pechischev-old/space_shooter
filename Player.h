@@ -9,14 +9,11 @@
 
 using namespace sf;
 
-
-
 struct PlayerState {
 	bool isMove = false;  // флаг движения
 	bool isShoot = false; // флаг выстрела
 	bool isAlive = false;
 };
-
 
 struct Player
 {
@@ -30,13 +27,15 @@ struct Player
 	Clock clock;
 	Time timeCreateBullet = Time::Zero;
 	std::list<Shoot> *bullet;
+	float point = 0;
 	//Функции для игрока
 	void AddBullet(RenderWindow & window);
 	void CheckPlayerLife();
+	void UpdateStatePlayerBullet(const Time & deltaTime);
 };
 
 Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer);
 void InitializePlayer(Player & player);
 void Control(Player & player);
 void MovePlayer(Player & player, const Time & deltaTime);
-Vector2f Border(float X, float Y, Vector2f posPlayer, int rotation);
+Vector2f Border(Player & player);

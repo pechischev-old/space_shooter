@@ -21,11 +21,13 @@ struct Enemy {
 	Time timeCreateEnemy = Time::Zero,
 		timeCreateBulletEnemy = Time::Zero;
 	void AddEnemy();
-	void AddBulletEnemy(Vector2f posEnemy);
-	void GetMoveEveryEnemy(const Time & deltaTime);
+	void AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy);
+	void GetMoveEveryEnemy(const Time & deltaTime, float & point);
 	void MoveEnemy(const Time & deltaTime, Entity & enemy);
+	void UpdateStateEnemyBullet(const Time & deltaTime);
 };
 
 void InitializeEnemy(Enemy & enemy);
 Direction GetDirection();
 Vector2f GetRandomPosition(Direction & selectHand);
+int GetRandomPoint();
