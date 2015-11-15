@@ -34,6 +34,7 @@ void Enemy::AddEnemy() {
 		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, "enemy1");
 		addEnemy.speed = SPEED_ENEMY;
 		addEnemy.direction = dir; // присваивает сгенерированное направление
+		addEnemy.damage = 20;
 		enemyShip->push_back(addEnemy);
 		timeCreateEnemy = Time::Zero;
 	}
@@ -165,4 +166,28 @@ int GetRandomPoint() {
 	srand(time(0));
 	int point = 1 + rand() % 3;
 	return point;
+}
+
+bool IsEnterField(Vector2f & playerPos, Entity & enemy) {
+	Vector2f posEnemy = enemy.sprite->getPosition(),
+		posPlayer = playerPos;
+	float widthEnemy = enemy.width;
+	float heightEnemy = enemy.height;
+	bool isEnterField = false;
+	if (posEnemy.y - heightEnemy / 2 - 40  <= posPlayer.y &&  posPlayer.y <= heightEnemy / 2 + 40 + posEnemy.y)
+		if (posEnemy.x - widthEnemy / 2 - 400  <= posPlayer.x && posPlayer.x <= widthEnemy / 2 + posEnemy.x)
+			isEnterField = true;
+	return isEnterField;
+}
+
+Vector2f Enemy::ShootByAsteroid(Vector2f posAsteroid, Vector2f enemyPos, const Time & deltaTime) {
+	float distance = sqrt((posAsteroid.x - enemyPos.x) * (posAsteroid.x - enemyPos.x) + (posAsteroid.y - enemyPos.y) * (posAsteroid.y - enemyPos.y));
+	//считаем дистанцию (длину от точки А до точки Б). формула длины вектора
+
+	if (distance > 2) {//этим условием убираем дергание во время конечной позиции спрайта
+
+		enemyPos.x += 0.1 * deltaTime.asSeconds() * (posAsteroid.x - enemyPos.x) / distance;//идем по иксу с помощью вектора нормали
+		enemyPos.y += 0.1 * deltaTime.asSeconds() * (posAsteroid.y - enemyPos.y) / distance;//идем по игреку так же
+	}
+	return enemyPos;
 }

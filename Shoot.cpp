@@ -18,7 +18,6 @@ Shoot::Shoot(float X, float Y, float width, float heigth, Direction direction, S
 
 void Shoot::MoveBullet(const Time & deltaTime) {
 	Vector2f movement = sprite->getPosition();
-
 	switch (dir) {
 	case UP: movement.y = -SPEED_BULLET;
 		movement.x = 0;
@@ -53,7 +52,6 @@ void Shoot::MoveBullet(const Time & deltaTime) {
 		break;
 	default:
 		life = false; // будет стрелять при остановке корабля
-					  // нужно будет вычислить местоположение носа корабля
 		break;
 	}
 

@@ -15,7 +15,7 @@ struct Entity {
 	float health; // здоровье сущности
 	float damage; // урон который наносит сущность
 	float speed; // скорость сущности
-	Direction direction;
+	Direction direction, rememberDir;
 	String name;
 	Texture *texture;
 	Sprite *sprite;

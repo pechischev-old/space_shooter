@@ -53,18 +53,21 @@ void update(Game & game, const Time & deltaTime)
 	UpdateText(*game.textInfo, player);
 	
 	//---------------- Функции игрока ------------------
-	if (player.ship->health <= 0)
+	if (player.ship->health <= 0) {
+		player.ship->direction = NONE;
 		player.ship->Explosion(deltaTime);
-	MovePlayer(player, deltaTime); // задает координаты движения и отвечает за поворот персонажа
-	player.ship->sprite->move(Border(player)); 
-	player.UpdateStatePlayerBullet(deltaTime);
-
+	}
+	else {
+		MovePlayer(player, deltaTime); // задает координаты движения и отвечает за поворот персонажа
+		player.ship->sprite->move(Border(player));
+		player.UpdateStatePlayerBullet(deltaTime);
+	}
 	//---------------- Функции противников -------------
 	enemy.GetMoveEveryEnemy(deltaTime, player.point);
 	enemy.AddEnemy();
 	enemy.UpdateStateEnemyBullet(deltaTime);
 
-	//---------------
+	//--------------- Функции астероидов ---------------
 	asteroid.AddAsteroid();
 	asteroid.GetMoveEveryAsteroid(deltaTime);
 }

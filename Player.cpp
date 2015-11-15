@@ -8,6 +8,7 @@ void InitializePlayer(Player & player) {
 	player.ship = new Entity(250, 250, "sokol");
 	player.ship->health = 500;
 	player.playerState.isAlive = true;
+	player.ship->damage = 30;
 	/*
 	// Инициализация носа корабля (нужно для вектора направления)
 	Vector2f size = { a, a };
@@ -33,6 +34,7 @@ void Player::AddBullet(RenderWindow & window) {
 			//directionShoot = GetDirectionShoot(Mouse::getPosition(window), sprite->getPosition());
 			directionShoot = RIGHT;
 			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, "resourse/images/laser-blue.png");
+			addBullet.damage = ship->damage;
 			bullet->push_back(addBullet); // создание пули и занесение ее в список
 			timeCreateBullet = Time::Zero;
 		}
@@ -140,6 +142,8 @@ void MovePlayer(Player & player, const Time & deltaTime) {
 		movement.y += SPEED_HERO;
 		break;
 	default:
+		movement.x = 0;
+		movement.y = 0;
 		break;
 	}
 	player.ship->x = movement.x * deltaTime.asSeconds();

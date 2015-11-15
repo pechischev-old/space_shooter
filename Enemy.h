@@ -25,9 +25,11 @@ struct Enemy {
 	void GetMoveEveryEnemy(const Time & deltaTime, float & point);
 	void MoveEnemy(const Time & deltaTime, Entity & enemy);
 	void UpdateStateEnemyBullet(const Time & deltaTime);
+	Vector2f ShootByAsteroid(Vector2f posAsteroid, Vector2f enemyPos, const Time & deltaTime);
 };
 
 void InitializeEnemy(Enemy & enemy);
 Direction GetDirection();
 Vector2f GetRandomPosition(Direction & selectHand);
 int GetRandomPoint();
+bool IsEnterField(Vector2f & playerPos, Entity & enemy);

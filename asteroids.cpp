@@ -14,22 +14,27 @@ void Asteroid::AddAsteroid() {
 		Vector2f getPosition = GetRandomPosition(dir);
 		int objectSize = SpecifySize();
 		int speed;
+		float health;
 		String name;
 		if (objectSize == 1) {
 			name = "asteroid";
 			speed = 200;
+			health = 250;
 		}
 		else if (objectSize == 2) {
 			name = "asteroid-medium";
 			speed = 230;
+			health = 150;
 		}
 		else if (objectSize == 3) {
 			name = "asteroid-small";
 			speed = 250;
+			health = 50;
 		}
 		Entity addAsteroid(getPosition.x, getPosition.y, name);
 		addAsteroid.direction = dir; // присваивает сгенерированное направление
 		addAsteroid.speed = speed;
+		addAsteroid.health = health;
 		asteroids->push_back(addAsteroid);
 		timeCreateAsteroid = Time::Zero;
 	}

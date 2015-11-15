@@ -13,6 +13,7 @@ struct Shoot {
 	Texture *texture;
 	Sprite *sprite;
 	float rotation = 0;
+	int damage;
 	Vector2f movement = { 0.f, 0.f };
 	Vector2i pos_mouse;
 	bool life = true; //флаг жизни
