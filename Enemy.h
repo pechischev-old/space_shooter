@@ -22,9 +22,9 @@ struct Enemy {
 		timeCreateBulletEnemy = Time::Zero;
 	void AddEnemy();
 	void AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy);
-	void GetMoveEveryEnemy(const Time & deltaTime, float & point);
-	void MoveEnemy(const Time & deltaTime, Entity & enemy);
-	void UpdateStateEnemyBullet(const Time & deltaTime);
+	void SetMoveEveryEnemy(const Time & deltaTime, float & point, RenderWindow & window);
+	void SetRotationEnemy(Entity & enemy); 
+	void UpdateStateEnemyBullet(const Time & deltaTime, RenderWindow & window);
 	Vector2f ShootByAsteroid(Vector2f posAsteroid, Vector2f enemyPos, const Time & deltaTime);
 };
 

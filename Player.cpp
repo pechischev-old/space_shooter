@@ -5,21 +5,11 @@ using namespace std;
 
 void InitializePlayer(Player & player) {
 	player.bullet = new list<Shoot>;
-	player.ship = new Entity(250, 250, "sokol");
-	player.ship->health = 500;
+	player.ship = new Entity(250, 250, NAME_PLAYER_SHIP);
+	player.ship->health = 300;
 	player.playerState.isAlive = true;
 	player.ship->damage = 30;
-	/*
-	// Инициализация носа корабля (нужно для вектора направления)
-	Vector2f size = { a, a };
-	player.shape->setSize(size);
-	player.shape->setFillColor(Color::White);
-	
-	player.shape->setOrigin(WIDTH / 2, HEIGTH / 2);
-	//player.vX = player.sprite->getPosition().x + WIDTH / 2;
-	//player.vY = player.sprite->getPosition().y - HEIGTH / 4;
-	//player.shape->setPosition(player.sprite->getPosition().x, player.sprite->getPosition().y);
-	//cout << player.shape->getPosition().x << " " << player.shape->getPosition().y << endl;*/
+	player.ship->speed = SPEED_HERO;
 }
 
 void Player::CheckPlayerLife() {
@@ -30,10 +20,9 @@ void Player::AddBullet(RenderWindow & window) {
 	if (playerState.isShoot) {
 		posMouse = Mouse::getPosition(window);
 		timeCreateBullet += clock.restart(); 
-		if (timeCreateBullet.asSeconds() > 0.1) { // Зависимость появления пули от времени
-			//directionShoot = GetDirectionShoot(Mouse::getPosition(window), sprite->getPosition());
+		if (timeCreateBullet.asSeconds() > TIME_CREATE_BULLET) { // Зависимость появления пули от времени
 			directionShoot = RIGHT;
-			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, "resourse/images/laser-blue.png");
+			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, PATH_TO_BLUE_BULLET);
 			addBullet.damage = ship->damage;
 			bullet->push_back(addBullet); // создание пули и занесение ее в список
 			timeCreateBullet = Time::Zero;
@@ -79,46 +68,13 @@ void Control(Player & player) {
 		}
 		else {
 			player.direction = NONE;
-
 			player.playerState.isMove = false;
 		}
-		//----------------------------------------- Клавиши поворота спрайта ----------------------------
-
-		if (Keyboard::isKeyPressed(Keyboard::Left)) // против часовой
-			player.dirRotation = { -1, 0 };
-		else if (Keyboard::isKeyPressed(Keyboard::Right)) // по часовой
-			player.dirRotation = { 1, 0 };
-		else if (Keyboard::isKeyPressed(Keyboard::Up)) // пo часовой
-			player.dirRotation = { 0, 1 };
-		else if (Keyboard::isKeyPressed(Keyboard::Down)) // против часовой
-			player.dirRotation = { 0, -1 };
-		else player.dirRotation = { 0, 0 };
-
 	}
 }
 
-Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer) {
-	Direction dir;
-	if (posPlayer.x > posMouse.x && ((posPlayer.y - 50) <= posMouse.y <= (posPlayer.y + 50)))
-		dir = LEFT;
-	if (posPlayer.x < posMouse.x && posPlayer.y == posMouse.y)
-		dir = RIGHT;
-	if (posPlayer.y > posMouse.y && posPlayer.x == posMouse.x)
-		dir = DOWN;
-	if (posPlayer.y < posMouse.y && posPlayer.x == posMouse.x)
-		dir = UP;
-	if (posPlayer.x > posMouse.x && posPlayer.y > posMouse.y)
-		dir = UP_LEFT;
-	if (posPlayer.x < posMouse.x && posPlayer.y > posMouse.y)
-		dir = UP_RIGHT;
-	if (posPlayer.x > posMouse.x && posPlayer.y < posMouse.y)
-		dir = DOWN_LEFT;
-	if (posPlayer.x < posMouse.x && posPlayer.y < posMouse.y)
-		dir = DOWN_RIGHT;
-	return dir;
-}
-
 void MovePlayer(Player & player, const Time & deltaTime) {
+	
 	Vector2f movement(0.f, 0.f);
 	switch (player.direction) {
 	case UP: movement.y -= SPEED_HERO;
@@ -149,22 +105,12 @@ void MovePlayer(Player & player, const Time & deltaTime) {
 	player.ship->x = movement.x * deltaTime.asSeconds();
 	player.ship->y = movement.y * deltaTime.asSeconds();
 
-
-	//------------------------- Поворот персонажа -----------------------------------
-	/*player.rotation += player.dirRotation.x * ANGLE;
-		player.rotation += player.dirRotation.y * ANGLE;*/
-
-	/*player.sprite->setRotation(player.rotation);
-	player.shape->setRotation(player.rotation);
-	player.shape->setPosition(player.sprite->getPosition());
-
-	player.vX = player.sprite->getPosition().x + WIDTH / 2; // Направляющая вектора
-	player.vY = player.sprite->getPosition().y - HEIGTH / 4;*/
 }
 
-void Player::UpdateStatePlayerBullet(const Time & deltaTime) {
+void Player::UpdateStatePlayerBullet(const Time & deltaTime, RenderWindow & window) {
 	for (list<Shoot>::iterator it = bullet->begin(); it != bullet->end();) {
 		//cout << player.bullet->size() << endl;
+		it->CheckForCollisions(window);
 		it->MoveBullet(deltaTime);
 		if (!it->life) {
 			it->texture->~Texture();
@@ -174,7 +120,7 @@ void Player::UpdateStatePlayerBullet(const Time & deltaTime) {
 	}
 }
 
-Vector2f Border(Player & player) {
+Vector2f Border(Player & player, RenderWindow & window) {
 	Vector2f limit(0.f, 0.f);
 	float heigth = player.ship->height,
 		width = player.ship->width,
@@ -182,13 +128,13 @@ Vector2f Border(Player & player) {
 		Y = player.ship->y;
 	Vector2f posPlayer = player.ship->sprite->getPosition();
 	
-	if (SCRN_WIDTH <= posPlayer.x + width / 2) {
+	if (window.getSize().x <= posPlayer.x + width / 2) {
 		X = -BORDER;
 	}
 	if (0 >= posPlayer.x - width / 2) {
 		X = BORDER;
 	}
-	if (SCRN_HEIGTH <= posPlayer.y + heigth / 2) {
+	if (window.getSize().y <= posPlayer.y + heigth / 2) {
 		Y = -BORDER;
 	}
 	if (0 >= posPlayer.y - heigth / 2) {

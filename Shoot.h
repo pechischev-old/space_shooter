@@ -18,4 +18,5 @@ struct Shoot {
 	Vector2i pos_mouse;
 	bool life = true; //флаг жизни
 	void MoveBullet(const Time & deltaTime);
+	void CheckForCollisions(RenderWindow & window);
 };

@@ -2,7 +2,7 @@
 
 void InitializeText(TextWithInfo & textInfo) {
 	textInfo.font = new Font;
-	textInfo.font->loadFromFile("resourse/fonts/Ubuntu-R.ttf");
+	textInfo.font->loadFromFile(PATH_TO_FONT);
 	textInfo.textPlayerHealth = new Text("", *textInfo.font, textInfo.sizeText);
 	textInfo.textPoint = new Text("", *textInfo.font, textInfo.sizeText);
 }
@@ -14,9 +14,9 @@ void UpdateText(TextWithInfo & textInfo, Player & player) {
 	else
 		countHealthStr << 0;
 	countPoint << player.point;
-	textInfo.textPlayerHealth->setString(L"Жизнь: " + countHealthStr.str());
+	textInfo.textPlayerHealth->setString(TEXT_HEALTH + countHealthStr.str());
 	textInfo.textPlayerHealth->setPosition(10, 10);
-	textInfo.textPoint->setString(L"Очки: " + countPoint.str());
+	textInfo.textPoint->setString(TEXT_POINT + countPoint.str());
 	textInfo.textPoint->setPosition(250, 10);
 }
 

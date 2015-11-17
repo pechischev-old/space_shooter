@@ -31,11 +31,11 @@ struct Player
 	//Функции для игрока
 	void AddBullet(RenderWindow & window);
 	void CheckPlayerLife();
-	void UpdateStatePlayerBullet(const Time & deltaTime);
+	void UpdateStatePlayerBullet(const Time & deltaTime, RenderWindow & window);
 };
 
 Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer);
 void InitializePlayer(Player & player);
 void Control(Player & player);
 void MovePlayer(Player & player, const Time & deltaTime);
-Vector2f Border(Player & player);
+Vector2f Border(Player & player, RenderWindow & window);

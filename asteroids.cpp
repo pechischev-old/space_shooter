@@ -9,7 +9,7 @@ void InitializeAsteroid(Asteroid & asteroid) {
 
 void Asteroid::AddAsteroid() {
 	timeCreateAsteroid += clock.restart();
-	if (timeCreateAsteroid.asSeconds() > 1.1) {
+	if (timeCreateAsteroid.asSeconds() > TIME_CREATE_ASTEROID) {
 		Direction dir = LEFT; //GetDirection();
 		Vector2f getPosition = GetRandomPosition(dir);
 		int objectSize = SpecifySize();
@@ -17,17 +17,17 @@ void Asteroid::AddAsteroid() {
 		float health;
 		String name;
 		if (objectSize == 1) {
-			name = "asteroid";
+			name = NAME_ASTEROID;
 			speed = 200;
 			health = 250;
 		}
 		else if (objectSize == 2) {
-			name = "asteroid-medium";
+			name = NAME_MEDIUM_ASTEROID;
 			speed = 230;
 			health = 150;
 		}
 		else if (objectSize == 3) {
-			name = "asteroid-small";
+			name = NAME_SMALL_ASTEROID;
 			speed = 250;
 			health = 50;
 		}
@@ -40,9 +40,11 @@ void Asteroid::AddAsteroid() {
 	}
 }
 
-void Asteroid::GetMoveEveryAsteroid(const Time & deltaTime) {
+void Asteroid::GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & window) {
 	for (list<Entity>::iterator it = asteroids->begin(); it != asteroids->end();) {
-		MoveAsteroid(deltaTime, *it);
+		it->MoveObject(deltaTime);
+		SetRotateAsteroid(*it);
+		it->CheckForCollisions(window);
 		if (it->health <= 0) {
 			it->Explosion(deltaTime);
 		}
@@ -55,67 +57,8 @@ void Asteroid::GetMoveEveryAsteroid(const Time & deltaTime) {
 	}
 }
 
-void Asteroid::MoveAsteroid(const Time & deltaTime, Entity & asteroid) {
-	if (asteroid.health > 0) {
-		Vector2f movement = asteroid.sprite->getPosition();
-		switch (asteroid.direction) {
-		case UP: movement.y = -asteroid.speed;
-			movement.x = 0;
-			asteroid.sprite->setRotation(90);
-			break;
-		case DOWN: movement.y = asteroid.speed;
-			movement.x = 0;
-			asteroid.sprite->setRotation(-90);
-			break;
-		case LEFT: movement.x = -asteroid.speed;
-			movement.y = 0;
-			break;
-		case RIGHT: movement.x = asteroid.speed;
-			movement.y = 0;
-			asteroid.sprite->setRotation(180);
-			break;
-		case UP_LEFT: movement.x = -asteroid.speed;
-			movement.y = -asteroid.speed;
-			asteroid.sprite->setRotation(45);
-			break;
-		case UP_RIGHT: movement.x = asteroid.speed;
-			movement.y = -asteroid.speed;
-			asteroid.sprite->setRotation(135);
-			break;
-		case DOWN_RIGHT: movement.x = asteroid.speed;
-			movement.y = asteroid.speed;
-			asteroid.sprite->setRotation(-135);
-			break;
-		case DOWN_LEFT: movement.x = -asteroid.speed;
-			movement.y = asteroid.speed;
-			asteroid.sprite->setRotation(-45);
-			break;
-		default:
-			asteroid.isLife = false;
-			break;
-		}
-
-		asteroid.x = movement.x * deltaTime.asSeconds();
-		asteroid.y = movement.y * deltaTime.asSeconds();
-
-		//----------------- Коллизии --------------------------
-		// если уходит за экран, то прекращает свое существование
-		if (asteroid.sprite->getPosition().x < 0 - asteroid.width) {
-			asteroid.isLife = false;
-		}
-		if (asteroid.sprite->getPosition().y < 0 - asteroid.height) {
-			asteroid.isLife = false;
-		}
-		if (asteroid.sprite->getPosition().x >= SCRN_WIDTH + asteroid.width) {
-			asteroid.isLife = false;
-		}
-		if (asteroid.sprite->getPosition().y >= SCRN_HEIGTH + asteroid.height) {
-			asteroid.isLife = false;
-		}
-		asteroid.sprite->rotate(3);
-		asteroid.sprite->move(asteroid.x, asteroid.y);
-	}
-
+void Asteroid::SetRotateAsteroid(Entity & asteroid) {
+	asteroid.sprite->rotate(3);
 }
 
 int SpecifySize() {

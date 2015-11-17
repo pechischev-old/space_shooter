@@ -9,9 +9,11 @@ void InitializeEnemy(Enemy & enemy) {
 	enemy.bulletEnemy = new list<Shoot>;
 }
 
-void Enemy::GetMoveEveryEnemy(const Time & deltaTime, float & point) {
+void Enemy::SetMoveEveryEnemy(const Time & deltaTime, float & point, RenderWindow & window) {
 	for (list<Entity>::iterator it = enemyShip->begin(); it != enemyShip->end();) {
-		MoveEnemy(deltaTime, *it);
+		it->MoveObject(deltaTime);
+		SetRotationEnemy(*it);
+		it->CheckForCollisions(window);
 		if (it->health <= 0) {
 			it->Explosion(deltaTime);
 			if (it->CurrentFrame >= 9.5)
@@ -28,10 +30,11 @@ void Enemy::GetMoveEveryEnemy(const Time & deltaTime, float & point) {
 
 void Enemy::AddEnemy() {
 	timeCreateEnemy += clock.restart();
-	if (timeCreateEnemy.asSeconds() > 2 ) {
+	if (timeCreateEnemy.asSeconds() > TIME_CREATE_ENEMY) {
 		Direction dir = LEFT; //GetDirection();
 		Vector2f getPositionEnemy = GetRandomPosition(dir);
-		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, "enemy1");
+		String typeEnemy = NAME_EASY_ENEMY;
+		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy);
 		addEnemy.speed = SPEED_ENEMY;
 		addEnemy.direction = dir; // присваивает сгенерированное направление
 		addEnemy.damage = 20;
@@ -43,21 +46,22 @@ void Enemy::AddEnemy() {
 void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy) {
 	timeCreateBulletEnemy += clock.restart();
 	if (timeCreateBulletEnemy.asSeconds() > 0.3) {
-		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, dir, "resourse/images/laser-red.png");
+		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, dir, PATH_TO_RED_BULLET);
 		bulletEnemy->push_back(addBullet); // создание пули и занесение ее в список
 		timeCreateBulletEnemy = Time::Zero;
 	}
 }
 
-void Enemy::UpdateStateEnemyBullet(const Time & deltaTime) {
+void Enemy::UpdateStateEnemyBullet(const Time & deltaTime, RenderWindow & window) {
 	for (list<Shoot>::iterator it = bulletEnemy->begin(); it != bulletEnemy->end();) {
 		//cout << game.bulletEnemy->size() << endl;
+		it->CheckForCollisions(window);
 		it->MoveBullet(deltaTime);
 		if (!it->life) {
 			it->texture->~Texture();
 			it = bulletEnemy->erase(it);
 		}
-		else  it++;
+		else  ++it;
 	}
 }
 
@@ -69,10 +73,6 @@ Direction GetDirection() {
 	if (selectHand == 2) dir = DOWN;
 	if (selectHand == 3) dir = LEFT;
 	if (selectHand == 4) dir = UP;
-	/*if (selectHand == 5) dir = UP_LEFT;
-	if (selectHand == 6) dir = UP_RIGHT;
-	if (selectHand == 7) dir = DOWN_LEFT;
-	if (selectHand == 8) dir = DOWN_RIGHT;*/
 	return dir;
 }
 
@@ -100,66 +100,23 @@ Vector2f GetRandomPosition(Direction & selectHand) {
 	return getPosit;
 }
 
-void Enemy::MoveEnemy(const Time & deltaTime, Entity & enemy) {
-	if (enemy.health > 0) {
-		Vector2f movement = enemy.sprite->getPosition();
-		switch (enemy.direction) {
-		case UP: movement.y = -enemy.speed;
-			movement.x = 0;
-			enemy.sprite->setRotation(90);
-			break;
-		case DOWN: movement.y = enemy.speed;
-			movement.x = 0;
-			enemy.sprite->setRotation(-90);
-			break;
-		case LEFT: movement.x = -enemy.speed;
-			movement.y = 0;
-			break;
-		case RIGHT: movement.x = enemy.speed;
-			movement.y = 0;
-			enemy.sprite->setRotation(180);
-			break;
-		case UP_LEFT: movement.x = -enemy.speed;
-			movement.y = -enemy.speed;
-			enemy.sprite->setRotation(45);
-			break;
-		case UP_RIGHT: movement.x = enemy.speed;
-			movement.y = -enemy.speed;
-			enemy.sprite->setRotation(135);
-			break;
-		case DOWN_RIGHT: movement.x = enemy.speed;
-			movement.y = enemy.speed;
-			enemy.sprite->setRotation(-135);
-			break;
-		case DOWN_LEFT: movement.x = -enemy.speed;
-			movement.y = enemy.speed;
-			enemy.sprite->setRotation(-45);
-			break;
-		default:
-			enemy.isLife = false;
-			break;
-		}
-
-		enemy.x = movement.x * deltaTime.asSeconds();
-		enemy.y = movement.y * deltaTime.asSeconds();
-
-		//----------------- Коллизии --------------------------
-		// если уходит за экран, то прекращает свое существование
-		if (enemy.sprite->getPosition().x < 0 - enemy.width) {
-			enemy.isLife = false;
-		}
-		if (enemy.sprite->getPosition().y < 0 - enemy.height) {
-			enemy.isLife = false;
-		}
-		if (enemy.sprite->getPosition().x >= SCRN_WIDTH + enemy.width){
-			enemy.isLife = false;
-		}
-		if (enemy.sprite->getPosition().y >= SCRN_HEIGTH + enemy.height) {
-			enemy.isLife = false;
-		}
-
-		enemy.sprite->move(enemy.x, enemy.y);
-	}
+void Enemy::SetRotationEnemy(Entity & enemy) {
+	if (enemy.direction == UP)
+		enemy.sprite->setRotation(90);
+	else if (enemy.direction == DOWN)
+		enemy.sprite->setRotation(-90);
+	else if (enemy.direction == LEFT)
+		enemy.sprite->setRotation(0);
+	else if (enemy.direction == RIGHT)
+		enemy.sprite->setRotation(180);
+	else if (enemy.direction == UP_LEFT)
+		enemy.sprite->setRotation(45);
+	else if (enemy.direction == UP_RIGHT)
+		enemy.sprite->setRotation(135);
+	else if (enemy.direction == DOWN_LEFT)
+		enemy.sprite->setRotation(-45);
+	else if (enemy.direction == DOWN_RIGHT)
+		enemy.sprite->setRotation(-135);
 }
 
 int GetRandomPoint() {
@@ -178,16 +135,4 @@ bool IsEnterField(Vector2f & playerPos, Entity & enemy) {
 		if (posEnemy.x - widthEnemy / 2 - 400  <= posPlayer.x && posPlayer.x <= widthEnemy / 2 + posEnemy.x)
 			isEnterField = true;
 	return isEnterField;
-}
-
-Vector2f Enemy::ShootByAsteroid(Vector2f posAsteroid, Vector2f enemyPos, const Time & deltaTime) {
-	float distance = sqrt((posAsteroid.x - enemyPos.x) * (posAsteroid.x - enemyPos.x) + (posAsteroid.y - enemyPos.y) * (posAsteroid.y - enemyPos.y));
-	//считаем дистанцию (длину от точки А до точки Б). формула длины вектора
-
-	if (distance > 2) {//этим условием убираем дергание во время конечной позиции спрайта
-
-		enemyPos.x += 0.1 * deltaTime.asSeconds() * (posAsteroid.x - enemyPos.x) / distance;//идем по иксу с помощью вектора нормали
-		enemyPos.y += 0.1 * deltaTime.asSeconds() * (posAsteroid.y - enemyPos.y) / distance;//идем по игреку так же
-	}
-	return enemyPos;
 }

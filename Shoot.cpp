@@ -8,12 +8,30 @@ Shoot::Shoot(float X, float Y, float width, float heigth, Direction direction, S
 	sprite = new Sprite;
 	texture->loadFromFile(path);
 	sprite->setTexture(*texture);
-	sprite->setOrigin(WIDTH_BULLET / 2, HEIGTH_BULLET / 2);
+	sprite->setOrigin(texture->getSize().x / 2, texture->getSize().y / 2);
+	sprite->setScale(2, 2);
 	sprite->setPosition(X + heigth / 11, Y + width / 11);
 	dir = direction;
 	x = X;
 	y = Y;
 	life = true;
+}
+
+void Shoot::CheckForCollisions(RenderWindow & window) {
+	//-----------------  оллизии --------------------------
+	// если уходит за экран, то прекращает свое существование
+	if (sprite->getPosition().x < 0 - WIDTH_BULLET){
+		life = false;
+	}
+	if (sprite->getPosition().y < 0 - HEIGTH_BULLET) {
+		life = false;
+	}
+	if (sprite->getPosition().x >= window.getSize().x + WIDTH_BULLET) {
+		life = false;
+	}
+	if (sprite->getPosition().y >= window.getSize().y + HEIGTH_BULLET) {
+		life = false;
+	}
 }
 
 void Shoot::MoveBullet(const Time & deltaTime) {
@@ -51,27 +69,12 @@ void Shoot::MoveBullet(const Time & deltaTime) {
 		sprite->setRotation(135);
 		break;
 	default:
-		life = false; // будет стрел€ть при остановке корабл€
+		life = false; 
 		break;
 	}
 
 	x = movement.x * deltaTime.asSeconds();
 	y = movement.y * deltaTime.asSeconds();
 
-	//-----------------  оллизии --------------------------
-	// если уходит за экран, то прекращает свое существование
-	if (sprite->getPosition().x < 0 - WIDTH_BULLET) {
-		life = false;
-	}
-	if (sprite->getPosition().y < 0 - WIDTH_BULLET) {
-		life = false;
-	}
-	if (sprite->getPosition().x >= SCRN_WIDTH + WIDTH_BULLET) {
-		life = false;
-	}
-	if (sprite->getPosition().y >= SCRN_HEIGTH + HEIGTH_BULLET) {
-		life = false;
-	}
-	//------------------------------------------------------
 	sprite->move(x, y);
 }

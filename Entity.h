@@ -7,7 +7,7 @@
 using namespace sf;
 
 struct Entity {
-	Entity(float X, float Y, String Name);
+	Entity(float x, float y, String Name);
 	float x;
 	float y;
 	float width;
@@ -22,4 +22,7 @@ struct Entity {
 	bool isLife;
 	float CurrentFrame = 0;
 	void Explosion(const Time & deltaTime);
+	void CheckForCollisions(RenderWindow & window);
+	void MoveObject(const Time & deltaTime);
 };
+

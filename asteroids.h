@@ -19,8 +19,8 @@ struct Asteroid {
 	Time timeCreateAsteroid = Time::Zero;
 	float CurrentFrame = 0;
 	void AddAsteroid();
-	void GetMoveEveryAsteroid(const Time & deltaTime);
-	void MoveAsteroid(const Time & deltaTime, Entity & asteroid);
+	void GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & window);
+	void SetRotateAsteroid(Entity & asteroid);
 };
 
 void InitializeAsteroid(Asteroid & asteroid);

@@ -17,9 +17,9 @@ struct Game
 	Enemy *enemy;
 	Asteroid *asteroid;
 	TextWithInfo *textInfo;
-	//View *view;
 	void CheckForCollision(); // отвечает за проверку на столкновения
 	void DrawObjects();
 };
 
 void InitializeGame(Game & game);
+void Delete(Game & game);
