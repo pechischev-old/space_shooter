@@ -42,13 +42,17 @@ void update(Game & game, const Time & deltaTime)
 	Player & player = *game.player;
 	Enemy & enemy = *game.enemy;
 	Asteroid & asteroid = *game.asteroid;
+	Bonus & bonus = *game.bonus;
 	RenderWindow & window = *game.window;
 	PlayerState & playerState = player.playerState;
 
-	game.CheckForCollision();
-
-	UpdateText(*game.textInfo, player);
+	//--------------- Функции игры ---------------------
 	
+	game.IncreaseCharacteristicsObjects();
+	game.CheckForCollision();
+	game.UseBonus(deltaTime);
+	//---------------- Интерфейс -----------------------
+	UpdateText(*game.textInfo, player);
 	//---------------- Функции игрока ------------------
 	if (player.ship->health <= 0) {
 		player.ship->direction = NONE;
@@ -60,12 +64,14 @@ void update(Game & game, const Time & deltaTime)
 		player.UpdateStatePlayerBullet(deltaTime, window);
 	}
 	//---------------- Функции противников -------------
-	enemy.SetMoveEveryEnemy(deltaTime, player.point, window);
+	enemy.SetMoveEveryEnemy(deltaTime, player.point, window, bonus);
 	enemy.AddEnemy();
 	enemy.UpdateStateEnemyBullet(deltaTime, window);
 	//--------------- Функции астероидов ---------------
 	asteroid.AddAsteroid();
-	asteroid.GetMoveEveryAsteroid(deltaTime, window);
+	asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus);
+	//---------------- Функции бонусов -----------------
+	bonus.GetMoveEveryBonus(deltaTime, window);
 }
 
 void render(RenderWindow & window, Game & game)
@@ -83,9 +89,10 @@ void CallGame()
 
 	Clock clock;
 	Time timeSinceLastUpdate = Time::Zero;
-
+	
 	Player & player = *game->player;
 	RenderWindow & window = *game->window;
+	game->window->setVerticalSyncEnabled(true);
 	
 	while (window.isOpen())
 	{
@@ -97,8 +104,9 @@ void CallGame()
 			processEvents(window, *game);
 			update(*game, TIME_PER_FRAME);
 		}
+		
 		render(window, *game);
-
+		
 	}
 	Delete(*game);
 	delete game;

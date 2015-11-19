@@ -9,17 +9,17 @@
 #include "Entity.h"
 #include "Enemy.h"
 #include "Config.h"
+#include "Bonus.h"
 
 using namespace sf;
 
 struct Asteroid {
 	std::list<Entity> *asteroids;
-	Vector2f movement = { 0.f, 0.f };
 	Clock clock;
 	Time timeCreateAsteroid = Time::Zero;
 	float CurrentFrame = 0;
 	void AddAsteroid();
-	void GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & window);
+	void GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & window, Bonus & bonus);
 	void SetRotateAsteroid(Entity & asteroid);
 };
 

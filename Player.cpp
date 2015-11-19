@@ -6,9 +6,9 @@ using namespace std;
 void InitializePlayer(Player & player) {
 	player.bullet = new list<Shoot>;
 	player.ship = new Entity(250, 250, NAME_PLAYER_SHIP);
-	player.ship->health = 300;
+	player.ship->health = player.maxHealth;
 	player.playerState.isAlive = true;
-	player.ship->damage = 30;
+	player.ship->damage = player.maxDamage;
 	player.ship->speed = SPEED_HERO;
 }
 
@@ -116,7 +116,7 @@ void Player::UpdateStatePlayerBullet(const Time & deltaTime, RenderWindow & wind
 			it->texture->~Texture();
 			it = bullet->erase(it);
 		}
-		else  it++;
+		else  ++it;
 	}
 }
 

@@ -9,22 +9,27 @@ void InitializeEnemy(Enemy & enemy) {
 	enemy.bulletEnemy = new list<Shoot>;
 }
 
-void Enemy::SetMoveEveryEnemy(const Time & deltaTime, float & point, RenderWindow & window) {
+void Enemy::SetMoveEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus) {
 	for (list<Entity>::iterator it = enemyShip->begin(); it != enemyShip->end();) {
 		it->MoveObject(deltaTime);
 		SetRotationEnemy(*it);
 		it->CheckForCollisions(window);
 		if (it->health <= 0) {
 			it->Explosion(deltaTime);
-			if (it->CurrentFrame >= 9.5)
+			if (it->CurrentFrame >= 9.5) {
 				point += GetRandomPoint();
+			}
 		}
 		if (!it->isLife) {
+			if (it->isKilled) {  // выпадение бонуса
+				if (CheckProbably())
+					bonus.AddBonus(Vector2f(it->x, it->y));
+			}
 			it->texture->~Texture();
 			delete it->sprite;
 			it = enemyShip->erase(it);
 		}
-		else  it++;
+		else  ++it;
 	}
 }
 
@@ -35,9 +40,10 @@ void Enemy::AddEnemy() {
 		Vector2f getPositionEnemy = GetRandomPosition(dir);
 		String typeEnemy = NAME_EASY_ENEMY;
 		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy);
+		addEnemy.health = health;
 		addEnemy.speed = SPEED_ENEMY;
 		addEnemy.direction = dir; // присваивает сгенерированное направление
-		addEnemy.damage = 20;
+		addEnemy.damage = damage;
 		enemyShip->push_back(addEnemy);
 		timeCreateEnemy = Time::Zero;
 	}

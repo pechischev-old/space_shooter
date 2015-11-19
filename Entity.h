@@ -20,6 +20,7 @@ struct Entity {
 	Texture *texture;
 	Sprite *sprite;
 	bool isLife;
+	bool isKilled = false;
 	float CurrentFrame = 0;
 	void Explosion(const Time & deltaTime);
 	void CheckForCollisions(RenderWindow & window);

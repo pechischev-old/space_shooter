@@ -13,21 +13,26 @@ struct PlayerState {
 	bool isMove = false;  // флаг движени€
 	bool isShoot = false; // флаг выстрела
 	bool isAlive = false;
+	bool isRepair = false; // флаг восстановлени€ жизни
+	bool isIncreaseDamage = false; // флаг увеличени€ урона
+	bool isInvulnerability = false; // флаг неу€звимости
+	bool isDecrease = false; // флаг уменьшени€
+	bool isBomb = false; // флаг бомбы
 };
 
 struct Player
 {
 	Entity *ship;
-	//RectangleShape *shape;
 	Direction direction, directionShoot;
 	PlayerState playerState;
-	//float vX, vY; // координаты носа
 	Vector2i posMouse;
 	Vector2i dirRotation = { 0, 0 };
 	Clock clock;
 	Time timeCreateBullet = Time::Zero;
 	std::list<Shoot> *bullet;
-	float point = 0;
+	int point = 0;
+	int maxHealth = MAX_HEALTH;
+	int maxDamage = MAX_DAMAGE;
 	//‘ункции дл€ игрока
 	void AddBullet(RenderWindow & window);
 	void CheckPlayerLife();

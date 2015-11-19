@@ -10,6 +10,7 @@
 #include "Entity.h"
 #include "Config.h"
 #include "Shoot.h"
+#include "Bonus.h"
 
 using namespace sf;
 
@@ -20,12 +21,13 @@ struct Enemy {
 	Clock clock;
 	Time timeCreateEnemy = Time::Zero,
 		timeCreateBulletEnemy = Time::Zero;
+	int damage = FIRST_EVER_DAMAGE_ENEMY;
+	int health = FIRST_EVER_HEALTH_ENEMY;
 	void AddEnemy();
 	void AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy);
-	void SetMoveEveryEnemy(const Time & deltaTime, float & point, RenderWindow & window);
+	void SetMoveEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus);
 	void SetRotationEnemy(Entity & enemy); 
 	void UpdateStateEnemyBullet(const Time & deltaTime, RenderWindow & window);
-	Vector2f ShootByAsteroid(Vector2f posAsteroid, Vector2f enemyPos, const Time & deltaTime);
 };
 
 void InitializeEnemy(Enemy & enemy);

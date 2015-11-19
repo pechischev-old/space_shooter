@@ -38,8 +38,10 @@ void Entity::Explosion(const Time & deltaTime) { // изменить название функции
 		sprite->setPosition(x, y);
 	}
 	else {
+		isKilled = true;
 		isLife = false;
 	}
+
 }
 
 void Entity::CheckForCollisions(RenderWindow & window) {
