@@ -44,6 +44,7 @@ void update(Game & game, const Time & deltaTime)
 	Asteroid & asteroid = *game.asteroid;
 	Bonus & bonus = *game.bonus;
 	RenderWindow & window = *game.window;
+	Star & star = *game.star;
 	PlayerState & playerState = player.playerState;
 
 	//--------------- Функции игры ---------------------
@@ -53,6 +54,10 @@ void update(Game & game, const Time & deltaTime)
 	game.UseBonus(deltaTime);
 	//---------------- Интерфейс -----------------------
 	UpdateText(*game.textInfo, player);
+	//---------------- Функции звезд -------------------
+	//LoadStarInList(star, deltaTime, window); // добавить загрузочный экран
+	star.AddStar();
+	star.UpdateStateStar(deltaTime, window);
 	//---------------- Функции игрока ------------------
 	if (player.ship->health <= 0) {
 		player.ship->direction = NONE;
@@ -86,7 +91,7 @@ void CallGame()
 {
 	Game *game = new Game();
 	InitializeGame(*game);
-
+	
 	Clock clock;
 	Time timeSinceLastUpdate = Time::Zero;
 	

@@ -24,6 +24,7 @@ void Player::AddBullet(RenderWindow & window) {
 			directionShoot = RIGHT;
 			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, PATH_TO_BLUE_BULLET);
 			addBullet.damage = ship->damage;
+			addBullet.sprite->setScale(scaleBullet, scaleBullet);
 			bullet->push_back(addBullet); // создание пули и занесение ее в список
 			timeCreateBullet = Time::Zero;
 		}

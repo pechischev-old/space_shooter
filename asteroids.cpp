@@ -1,5 +1,4 @@
 #include "asteroids.h"
-#include "Bonus.h"
 
 using namespace sf;
 using namespace std;

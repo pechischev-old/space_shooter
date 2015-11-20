@@ -11,11 +11,13 @@ void InitializeGame(Game & game) {
 	game.textInfo = new TextWithInfo;
 	game.asteroid = new Asteroid;
 	game.bonus = new Bonus;
+	game.star = new Star;
 	InitializePlayer(*game.player);
 	InitializeEnemy(*game.enemy);
 	InitializeAsteroid(*game.asteroid);
 	InitializeText(*game.textInfo);
 	InitializeBonus(*game.bonus);
+	InitializeStar(*game.star);
 }
 
 void Game::IncreaseCharacteristicsObjects() {
@@ -201,6 +203,7 @@ void Game::UseBonus(const Time & deltaTime){
 	if (playerState.isIncreaseDamage) { // увеличение урона
 		timeGame += 1 * deltaTime.asSeconds();
 		player->ship->sprite->setColor(Color::Magenta);
+		player->scaleBullet = 3;
 		player->ship->damage = player->maxDamage * 3;
 		if (timeGame > 20) {
 			player->ship->sprite->setColor(Color::White);
@@ -210,6 +213,7 @@ void Game::UseBonus(const Time & deltaTime){
 	}
 	else {
 		player->ship->damage = player->maxDamage;
+		player->scaleBullet = 2;
 	}
 	if (playerState.isBomb) {
 		for (list<Entity>::iterator it2 = enemy->enemyShip->begin(); it2 != enemy->enemyShip->end(); ++it2) {
@@ -224,6 +228,8 @@ void Game::UseBonus(const Time & deltaTime){
 }
 
 void Game::DrawObjects() { // Отрисовка объектов
+	for (Entity it : *star->stars)
+		window->draw(*it.sprite);
 	for (Shoot it : *player->bullet) // пули игрока
 		window->draw(*it.sprite);
 	for (Shoot it : *enemy->bulletEnemy) // отрисовка вражеских пуль
@@ -249,6 +255,8 @@ void Delete(Game & game) {
 	delete game.player->bullet;
 	delete game.asteroid->asteroids;
 	delete game.bonus->bonuses;
+	delete game.star->stars;
+	delete game.star;
 	delete game.bonus;
 	delete game.asteroid;
 	delete game.enemy;

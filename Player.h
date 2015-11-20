@@ -29,6 +29,7 @@ struct Player
 	Vector2i dirRotation = { 0, 0 };
 	Clock clock;
 	Time timeCreateBullet = Time::Zero;
+	float scaleBullet = 2;
 	std::list<Shoot> *bullet;
 	int point = 0;
 	int maxHealth = MAX_HEALTH;

@@ -8,8 +8,18 @@
 #include "Font.h"
 #include "asteroids.h"
 #include "Bonus.h"
+#include "star.h"
 
 using namespace sf;
+
+struct GameState {
+	bool isNewGame;
+	bool isContinue;
+	bool isLoading;
+	bool isExit;
+	bool isMenu;
+
+};
 
 struct Game
 {
@@ -19,8 +29,9 @@ struct Game
 	Asteroid *asteroid;
 	Bonus *bonus;
 	TextWithInfo *textInfo;
+	GameState gameState;
+	Star *star;
 	Clock clock;
-	//Time timeGame = Time::Zero;
 	float timeGame = 0;
 	int oldOrder = 0; // старший порядок числа (для усложнения игры)
 	void CheckForCollision(); // отвечает за проверку на столкновения

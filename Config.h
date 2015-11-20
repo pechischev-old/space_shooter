@@ -114,5 +114,7 @@ const sf::String PATH_TO_EXPLOSION = "resourse/images/explosion.png";
 
 const sf::String PATH_TO_BONUSES = "resourse/images/bonuses";
 
+const sf::String NAME_STAR = "star";
+
 //--------------------------------------------------------------
 

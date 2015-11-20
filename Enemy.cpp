@@ -86,8 +86,8 @@ Vector2f GetRandomPosition(Direction & selectHand) {
 	Vector2f getPosit;
 	
 	getPosit.x = SCRN_WIDTH; //WIDTH_ENEMY + rand() % (SCRN_HEIGTH - WIDTH_ENEMY);
-	getPosit.y = HEIGTH_ENEMY + rand() % (SCRN_HEIGTH - HEIGTH_ENEMY);
-	if (selectHand == RIGHT) { // слева
+	getPosit.y = HEIGTH_ENEMY + rand() % (SCRN_HEIGTH - 2 * HEIGTH_ENEMY);
+	/*if (selectHand == RIGHT) { // слева
 		getPosit.x = 0;
 		getPosit.y = HEIGTH_ENEMY + rand() % (SCRN_HEIGTH - 2 * HEIGTH_ENEMY);
 	}
@@ -97,12 +97,12 @@ Vector2f GetRandomPosition(Direction & selectHand) {
 	}
 	else if (selectHand == LEFT) { // справа
 		getPosit.x = SCRN_WIDTH;
-		getPosit.y = HEIGTH_ENEMY + rand() % (SCRN_HEIGTH - 2 * HEIGTH_ENEMY);
+		getPosit.y = HEIGTH_ENEMY + rand() % (SCRN_HEIGTH - HEIGTH_ENEMY);
 	}
 	else if (selectHand == UP || selectHand == UP_LEFT || selectHand == UP_RIGHT) { // снизу
 		getPosit.x = WIDTH_ENEMY + rand() % (SCRN_WIDTH - WIDTH_ENEMY);
 		getPosit.y = SCRN_HEIGTH;
-	}
+	}*/
 	return getPosit;
 }
 
