@@ -9,15 +9,17 @@ const int NUMBER_OF_FRAMES = 10;
 
 const sf::String TITLE_GAME = "Main Game";
 
+const int POINT_FOR_ADVANCE = 500;
+
 //---------------------- Для игрока ------------------------------------
 
-const float SPEED_HERO = 280.f;
+const int SPEED_HERO = 280;
 
-const float SPEED_BULLET = 350.f; // скорость пули
+const int SPEED_BULLET = 350; // скорость пули
 
-const float WIDTH_BULLET = 12, HEIGTH_BULLET = 4;  // размеры пули
+const int WIDTH_BULLET = 12, HEIGTH_BULLET = 4;  // размеры пули
 
-const float PLAYER_DAMAGE = 25;
+const int PLAYER_DAMAGE = 25;
 
 const float TIME_CREATE_BULLET = 0.1;
 
@@ -36,11 +38,19 @@ const int FIRST_EVER_DAMAGE_ENEMY = 15;
 
 const int FIRST_EVER_HEALTH_ENEMY = 100;
 
-const float SPEED_ENEMY = 150;
+const int SPEED_ENEMY = 150;
+
+const float SPEED_HARD_ENEMY = 1.5;
+
+const float SPEED_BOSS = 150;
 
 const int TIME_CREATE_ENEMY = 2;
 
 const sf::String NAME_EASY_ENEMY = "enemy1";
+
+const sf::String NAME_MIDDLE_ENEMY = "middleEnemy";
+
+const sf::String NAME_BOSS = "boss";
 //-----------------------------Для астероидов  ---------------------------------
 
 const float TIME_CREATE_ASTEROID = 1.1;
@@ -79,9 +89,9 @@ const sf::String INVULNERABILITY_IMAGE = "invulnerability";
 
 const sf::String REPAIR_IMAGE = "repair";
 
-const float SPEED_BONUS = 50.f;
+const int SPEED_BONUS = 50;
 
-const float TIME_CREATE_BONUS = 2;
+const int TIME_CREATE_BONUS = 2;
 
 //--------------------------------------------------------------
 

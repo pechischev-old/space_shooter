@@ -69,11 +69,12 @@ void update(Game & game, const Time & deltaTime)
 		player.UpdateStatePlayerBullet(deltaTime, window);
 	}
 	//---------------- Функции противников -------------
-	enemy.SetMoveEveryEnemy(deltaTime, player.point, window, bonus);
+	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus);
 	enemy.AddEnemy();
 	enemy.UpdateStateEnemyBullet(deltaTime, window);
 	//--------------- Функции астероидов ---------------
-	asteroid.AddAsteroid();
+	if (!enemy.isBoss)
+		asteroid.AddAsteroid();
 	asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus);
 	//---------------- Функции бонусов -----------------
 	bonus.GetMoveEveryBonus(deltaTime, window);
@@ -82,8 +83,10 @@ void update(Game & game, const Time & deltaTime)
 void render(RenderWindow & window, Game & game)
 {
 	window.clear(); 
-	game.DrawObjects();
-	DrawTextToWindow(*game.textInfo, *game.window);
+	if (!game.gameState.isLoading) {
+		game.DrawObjects();
+		DrawTextToWindow(*game.textInfo, *game.window);
+	}
 	window.display();
 }
 

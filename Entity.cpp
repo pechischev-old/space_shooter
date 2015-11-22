@@ -90,7 +90,8 @@ void Entity::MoveObject(const Time & deltaTime) {
 			movement.y = speed;
 			break;
 		default:
-			isLife = false;
+			movement.x = 0;
+			movement.y = 0;
 			break;
 		}
 

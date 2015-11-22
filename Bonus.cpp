@@ -12,8 +12,6 @@ void Bonus::AddBonus(Vector2f getPosition) {
 		Direction dir = DOWN; 
 		int objectSize = SpecifySizeBonus();
 		int speed;
-		float health;
-		int damage;
 		String name;
 		if (objectSize == 1) {
 			name = REPAIR_IMAGE;

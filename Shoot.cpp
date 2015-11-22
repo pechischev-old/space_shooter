@@ -1,4 +1,7 @@
 #include "Shoot.h"
+#include "math.h"
+
+#define PI 3.14159265    
 
 using namespace sf;
 using namespace std;
@@ -14,6 +17,8 @@ Shoot::Shoot(float X, float Y, float width, float heigth, Direction direction, S
 	dir = direction;
 	x = X;
 	y = Y;
+	dx = x;
+	dy = y;
 	life = true;
 }
 
@@ -77,4 +82,11 @@ void Shoot::MoveBullet(const Time & deltaTime) {
 	y = movement.y * deltaTime.asSeconds();
 
 	sprite->move(x, y);
+}
+
+void Shoot::MoveBulletHardEnemy(const Time & deltaTime) {
+	x += SPEED_HARD_ENEMY * deltaTime.asSeconds() * (rememPos.x - dx) ;
+	y += SPEED_HARD_ENEMY * deltaTime.asSeconds() * (rememPos.y - dy) ;
+	sprite->setPosition(x, y);
+	sprite->setRotation(atan2((rememPos.y - dy), (rememPos.x - dx)) * 180 / PI);
 }

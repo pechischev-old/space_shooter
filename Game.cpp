@@ -21,10 +21,11 @@ void InitializeGame(Game & game) {
 }
 
 void Game::IncreaseCharacteristicsObjects() {
-	if ( player->point / 500 == oldOrder + 1) { // переделать диапозон очков
+	if ( player->point / POINT_FOR_ADVANCE == oldOrder + 1) { // переделать диапозон очков
 		enemy->damage += 15;
 		enemy->health += 30;
 		oldOrder += 1;
+		enemy->isBoss = true;
 		cout << "Enemy stand hard " << endl;
 	}
 }
@@ -50,18 +51,27 @@ void Game::CheckForCollision() {
 		{
 			if (it2->health > 0) {
 				if (!player->playerState.isInvulnerability) {
-					player->ship->health -= enemy->damage;
+					player->ship->health -= it2->damage;
 					player->ship->sprite->setColor(Color::Red);
 				}
 			}
-			if (player->ship->health > 0)
-				it2->health = 0;
+			if (player->ship->health > 0) {
+				if (it2->name == NAME_BOSS)
+					player->ship->health = 0;
+				else 
+					it2->health = 0;
+			}
 		}
 		Vector2f posEnemy = it2->sprite->getPosition(),
 			posPlayer = player->ship->sprite->getPosition();
-		if (IsEnterField(posPlayer, *it2)) { // враг стрел€ет
+		if (IsEnterField(posPlayer, *it2) && it2->name == NAME_EASY_ENEMY) { // враг стрел€ет
 			if (it2->health > 0) {
-				enemy->AddBulletEnemy(posEnemy, it2->direction, *it2);
+				enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer);
+			}
+		}
+		if (IsSeePlayer(posPlayer, *it2, window->getSize()) && it2->name != NAME_EASY_ENEMY) { // враг стрел€ет
+			if (it2->health > 0) {
+				enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer);
 			}
 		}
 	}
@@ -73,8 +83,8 @@ void Game::CheckForCollision() {
 				player->ship->health -= enemy->damage;
 				player->ship->sprite->setColor(Color::Red);
 			}
-			it->life = false;
 			
+			it->life = false;
 		}
 	}
 	
@@ -86,6 +96,11 @@ void Game::CheckForCollision() {
 				if (it2->health > 0)
 					it->life = false;
 				it2->sprite->setColor(Color::Red);
+			}
+			if (it2->name == NAME_BOSS) {
+				if (IsEnterField(Vector2f(it->sprite->getPosition()), *it2)) { // ѕроверка на вхождение пули в область видимости
+					enemy->Evasion(Vector2f(it->sprite->getPosition()), *it2, window->getSize()); // ‘ункци€ уклонени€
+				}
 			}
 		}
 	}
@@ -134,7 +149,7 @@ void Game::CheckForCollision() {
 			{
 				if (it3->health > 0) {
 
-					it2->health -= enemy->damage;
+					it2->health -= it2->damage;
 					it2->sprite->setColor(Color::Red);
 				}
 				it3->health = 0;

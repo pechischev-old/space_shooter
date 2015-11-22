@@ -9,10 +9,17 @@ void InitializeEnemy(Enemy & enemy) {
 	enemy.bulletEnemy = new list<Shoot>;
 }
 
-void Enemy::SetMoveEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus) {
+void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus) {
 	for (list<Entity>::iterator it = enemyShip->begin(); it != enemyShip->end();) {
 		it->MoveObject(deltaTime);
-		SetRotationEnemy(*it);
+		
+		if (it->health <= 0 && it->name == NAME_BOSS) {
+			isBoss = false;
+		}
+		if (it->name != NAME_BOSS)
+			SetRotationEnemy(*it);
+		else
+			BorderChecks(*it, window.getSize()); //Функция движения - появления
 		it->CheckForCollisions(window);
 		if (it->health <= 0) {
 			it->Explosion(deltaTime);
@@ -35,24 +42,57 @@ void Enemy::SetMoveEveryEnemy(const Time & deltaTime, int & point, RenderWindow 
 
 void Enemy::AddEnemy() {
 	timeCreateEnemy += clock.restart();
-	if (timeCreateEnemy.asSeconds() > TIME_CREATE_ENEMY) {
-		Direction dir = LEFT; //GetDirection();
-		Vector2f getPositionEnemy = GetRandomPosition(dir);
-		String typeEnemy = NAME_EASY_ENEMY;
-		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy);
-		addEnemy.health = health;
-		addEnemy.speed = SPEED_ENEMY;
-		addEnemy.direction = dir; // присваивает сгенерированное направление
-		addEnemy.damage = damage;
+	if (!isBoss) {
+		if (timeCreateEnemy.asSeconds() > TIME_CREATE_ENEMY) {
+			int chooseEnemy = GetTypeEnemy();
+			Direction dir;
+			Vector2f getPositionEnemy;
+			String typeEnemy;
+			if (chooseEnemy == 1) {
+				dir = LEFT;
+				getPositionEnemy = GetRandomPosition(dir);
+				typeEnemy = NAME_EASY_ENEMY;
+			}
+			if (chooseEnemy == 2) {
+				dir = LEFT;
+				getPositionEnemy = GetRandomPosition(dir);
+				typeEnemy = NAME_MIDDLE_ENEMY;
+			}
+
+			Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy);
+			addEnemy.health = health;
+			addEnemy.speed = SPEED_ENEMY;
+			addEnemy.direction = dir;
+			addEnemy.damage = damage;
+			if (typeEnemy == NAME_MIDDLE_ENEMY)
+				addEnemy.health = 2 * health;
+			else
+				addEnemy.health = health;
+			enemyShip->push_back(addEnemy);
+			timeCreateEnemy = Time::Zero;
+			isOneBoss = false;
+		}
+	}
+	if (isBoss && !isOneBoss) {
+		Vector2f getPositionEnemy = { 650, 350 };
+		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, NAME_BOSS);
+		addEnemy.direction = NONE;
+		addEnemy.damage = damage * 3;
+		addEnemy.health = health * 10;
+		addEnemy.speed = SPEED_BOSS;
 		enemyShip->push_back(addEnemy);
-		timeCreateEnemy = Time::Zero;
+		isOneBoss = true;
 	}
 }
 
-void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy) {
+void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer) {
 	timeCreateBulletEnemy += clock.restart();
 	if (timeCreateBulletEnemy.asSeconds() > 0.3) {
 		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, dir, PATH_TO_RED_BULLET);
+		if (enemy.name == NAME_MIDDLE_ENEMY || enemy.name == NAME_BOSS) {
+			addBullet.isOtherBullet = true;
+			addBullet.rememPos = posPlayer;
+		}
 		bulletEnemy->push_back(addBullet); // создание пули и занесение ее в список
 		timeCreateBulletEnemy = Time::Zero;
 	}
@@ -60,9 +100,12 @@ void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy) {
 
 void Enemy::UpdateStateEnemyBullet(const Time & deltaTime, RenderWindow & window) {
 	for (list<Shoot>::iterator it = bulletEnemy->begin(); it != bulletEnemy->end();) {
-		//cout << game.bulletEnemy->size() << endl;
 		it->CheckForCollisions(window);
-		it->MoveBullet(deltaTime);
+		if (it->isOtherBullet) {
+			it->MoveBulletHardEnemy(deltaTime);
+		}
+		else
+			it->MoveBullet(deltaTime);
 		if (!it->life) {
 			it->texture->~Texture();
 			it = bulletEnemy->erase(it);
@@ -106,6 +149,37 @@ Vector2f GetRandomPosition(Direction & selectHand) {
 	return getPosit;
 }
 
+void Enemy::MoveOnSinusoid(const Time & deltaTime, Entity & entity) {
+	
+}
+
+void Enemy::BorderChecks(Entity & entity, Vector2u sizeWindow) {
+	float y = entity.sprite->getPosition().y;
+	float height = entity.height;
+	float width = entity.width;
+	Vector2f limitPos = { entity.sprite->getPosition().x , 0 };
+	if (y - height / 2 < 10) {
+		entity.direction = DOWN;
+		limitPos.y = 1;
+	}
+	else if (sizeWindow.y - y + height / 2 < 10) {
+		entity.direction = UP;
+		limitPos.y = -1;
+	}
+	else
+		entity.direction = NONE;
+}
+
+void Enemy::Evasion(Vector2f posBullet, Entity & entity, Vector2u sizeWindow) {
+	float y = entity.sprite->getPosition().y;
+	if (posBullet.y < y )
+		entity.direction = DOWN;
+	else if (posBullet.y > y)
+		entity.direction = UP;
+	else
+		entity.direction = NONE;
+}
+
 void Enemy::SetRotationEnemy(Entity & enemy) {
 	if (enemy.direction == UP)
 		enemy.sprite->setRotation(90);
@@ -127,8 +201,7 @@ void Enemy::SetRotationEnemy(Entity & enemy) {
 
 int GetRandomPoint() {
 	srand(time(0));
-	int point = 1 + rand() % 3;
-	return point;
+	return 1 + rand() % 3;
 }
 
 bool IsEnterField(Vector2f & playerPos, Entity & enemy) {
@@ -136,9 +209,24 @@ bool IsEnterField(Vector2f & playerPos, Entity & enemy) {
 		posPlayer = playerPos;
 	float widthEnemy = enemy.width;
 	float heightEnemy = enemy.height;
-	bool isEnterField = false;
 	if (posEnemy.y - heightEnemy / 2 - 40  <= posPlayer.y &&  posPlayer.y <= heightEnemy / 2 + 40 + posEnemy.y)
 		if (posEnemy.x - widthEnemy / 2 - 400  <= posPlayer.x && posPlayer.x <= widthEnemy / 2 + posEnemy.x)
-			isEnterField = true;
-	return isEnterField;
+			return true;
+	return false;
+}
+
+bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow) {
+	Vector2f posEnemy = enemy.sprite->getPosition(),
+		posPlayer = playerPos;
+	float widthEnemy = enemy.width;
+	float heightEnemy = enemy.height;
+	if (posEnemy.y - heightEnemy / 2 - sizeWindow.x <= posPlayer.y &&  posPlayer.y <= heightEnemy / 2 + sizeWindow.x + posEnemy.y)
+		if (posEnemy.x - widthEnemy / 2 - sizeWindow.x <= posPlayer.x && posPlayer.x <= widthEnemy / 2 + posEnemy.x)
+			return true;
+	return false;
+}
+
+int GetTypeEnemy() {
+	srand(time(0));
+	return 1 + rand() % 2;
 }
