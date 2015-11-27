@@ -2,7 +2,6 @@
 #include <SFML/Graphics.hpp>
 
 #include "Config.h"
-//#include "View.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "Font.h"
@@ -12,24 +11,25 @@
 
 using namespace sf;
 
-struct GameState {
-	bool isNewGame;
+struct  GameState {
+	bool isNewGame = false;
 	bool isContinue;
 	bool isLoading;
 	bool isExit;
 	bool isMenu;
-
 };
+
+
 
 struct Game
 {
 	RenderWindow *window;
+	TextureGame *textureGame;
 	Player *player;
 	Enemy *enemy;
 	Asteroid *asteroid;
 	Bonus *bonus;
 	TextWithInfo *textInfo;
-	GameState gameState;
 	Star *star;
 	Clock clock;
 	float timeGame = 0;

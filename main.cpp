@@ -9,6 +9,8 @@
 using namespace sf;
 using namespace std;
 
+bool g_isRestart = true;
+
 const Time TIME_PER_FRAME = seconds(1.f / 60.f);
 
 void processEvents(RenderWindow & window, Game & game)
@@ -18,15 +20,20 @@ void processEvents(RenderWindow & window, Game & game)
 	while (window.pollEvent(event))
 	{
 		Control(player);
+		//----------------- Restart -----------------------------------
+		if (event.type == Event::KeyPressed && event.key.code == Keyboard::N) {
+			g_isRestart = true;
+			game.window->close();
+		}
+		else
+			g_isRestart = false;
 		//--------------------------- Выстрел --------------------------
 		if (player.ship->health > 0) {
 			if (Mouse::isButtonPressed(Mouse::Left)) {
 				player.playerState.isShoot = true;
-				player.AddBullet(window);
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Space)) {
 				player.playerState.isShoot = true;
-				player.AddBullet(window);
 			}
 		}
 		//--------------------------------------------------------------
@@ -65,13 +72,14 @@ void update(Game & game, const Time & deltaTime)
 	}
 	else {
 		MovePlayer(player, deltaTime); // задает координаты движения
-		player.ship->sprite->move(Border(player, window));
-		player.UpdateStatePlayerBullet(deltaTime, window);
+		player.ship->sprite->move(Border(*player.ship, window));
+		player.AddBullet();
+		player.UpdateStateBulletPlayer(deltaTime, window);
 	}
 	//---------------- Функции противников -------------
 	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus);
 	enemy.AddEnemy();
-	enemy.UpdateStateEnemyBullet(deltaTime, window);
+	enemy.UpdateStateBullet(deltaTime, window);
 	//--------------- Функции астероидов ---------------
 	if (!enemy.isBoss)
 		asteroid.AddAsteroid();
@@ -83,21 +91,20 @@ void update(Game & game, const Time & deltaTime)
 void render(RenderWindow & window, Game & game)
 {
 	window.clear(); 
-	if (!game.gameState.isLoading) {
+	//if (!game.gameState.isLoading) {
 		game.DrawObjects();
 		DrawTextToWindow(*game.textInfo, *game.window);
-	}
+	//}
 	window.display();
 }
 
-void CallGame()
+int CallGame()
 {
 	Game *game = new Game();
 	InitializeGame(*game);
 	
 	Clock clock;
 	Time timeSinceLastUpdate = Time::Zero;
-	
 	Player & player = *game->player;
 	RenderWindow & window = *game->window;
 	game->window->setVerticalSyncEnabled(true);
@@ -112,17 +119,21 @@ void CallGame()
 			processEvents(window, *game);
 			update(*game, TIME_PER_FRAME);
 		}
-		
 		render(window, *game);
-		
 	}
 	Delete(*game);
 	delete game;
+	return 0;
 }
+
+
 
 int main()
 {
-	CallGame();
+	while (g_isRestart) {
+		CallGame();
+	}
+
 	return 0;
 }
 

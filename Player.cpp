@@ -3,9 +3,10 @@
 using namespace sf;
 using namespace std;
 
-void InitializePlayer(Player & player) {
+void InitializePlayer(Player & player, TextureGame & textureGame) {
 	player.bullet = new list<Shoot>;
-	player.ship = new Entity(250, 250, NAME_PLAYER_SHIP);
+	
+	player.ship = new Entity(250, 250, NAME_PLAYER_SHIP, *textureGame.playerTexture);
 	player.ship->health = player.maxHealth;
 	player.playerState.isAlive = true;
 	player.ship->damage = player.maxDamage;
@@ -16,9 +17,8 @@ void Player::CheckPlayerLife() {
 	playerState.isAlive = ship->health > 0;
 }
 
-void Player::AddBullet(RenderWindow & window) {
+void Player::AddBullet() { 
 	if (playerState.isShoot) {
-		posMouse = Mouse::getPosition(window);
 		timeCreateBullet += clock.restart(); 
 		if (timeCreateBullet.asSeconds() > TIME_CREATE_BULLET) { // Зависимость появления пули от времени
 			directionShoot = RIGHT;
@@ -28,7 +28,21 @@ void Player::AddBullet(RenderWindow & window) {
 			bullet->push_back(addBullet); // создание пули и занесение ее в список
 			timeCreateBullet = Time::Zero;
 		}
+		//------------------------------
 		playerState.isShoot = false;
+	}
+}
+
+void Player::UpdateStateBulletPlayer(const Time & deltaTime, RenderWindow & window) {
+	for (list<Shoot>::iterator it = bullet->begin(); it != bullet->end();) {
+		it->CheckForCollisions(window);
+		it->MoveBullet(deltaTime);
+		if (!it->life) {
+			it->texture->~Texture();
+			delete it->sprite;
+			it = bullet->erase(it);
+		}
+		else  ++it;
 	}
 }
 
@@ -106,42 +120,4 @@ void MovePlayer(Player & player, const Time & deltaTime) {
 	player.ship->x = movement.x * deltaTime.asSeconds();
 	player.ship->y = movement.y * deltaTime.asSeconds();
 
-}
-
-void Player::UpdateStatePlayerBullet(const Time & deltaTime, RenderWindow & window) {
-	for (list<Shoot>::iterator it = bullet->begin(); it != bullet->end();) {
-		//cout << player.bullet->size() << endl;
-		it->CheckForCollisions(window);
-		it->MoveBullet(deltaTime);
-		if (!it->life) {
-			it->texture->~Texture();
-			it = bullet->erase(it);
-		}
-		else  ++it;
-	}
-}
-
-Vector2f Border(Player & player, RenderWindow & window) {
-	Vector2f limit(0.f, 0.f);
-	float heigth = player.ship->height,
-		width = player.ship->width,
-		X = player.ship->x,
-		Y = player.ship->y;
-	Vector2f posPlayer = player.ship->sprite->getPosition();
-	
-	if (window.getSize().x <= posPlayer.x + width / 2) {
-		X = -BORDER;
-	}
-	if (0 >= posPlayer.x - width / 2) {
-		X = BORDER;
-	}
-	if (window.getSize().y <= posPlayer.y + heigth / 2) {
-		Y = -BORDER;
-	}
-	if (0 >= posPlayer.y - heigth / 2) {
-		Y = BORDER;
-	}
-	limit.x = X;
-	limit.y = Y;
-	return limit;
 }

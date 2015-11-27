@@ -8,6 +8,7 @@ void InitializeAsteroid(Asteroid & asteroid) {
 }
 
 void Asteroid::AddAsteroid() {
+	TextureGame textureGame;
 	timeCreateAsteroid += clock.restart();
 	if (timeCreateAsteroid.asSeconds() > TIME_CREATE_ASTEROID) {
 		Direction dir = LEFT; //GetDirection();
@@ -17,25 +18,29 @@ void Asteroid::AddAsteroid() {
 		float health;
 		int damage;
 		String name;
+		Texture texture;
 		if (objectSize == 1) {
 			name = NAME_ASTEROID;
 			speed = SPEED_ASTEROID;
 			health = HEALTH_ASTEROID;
 			damage = DAMAGE_ASTEROID;
+			texture = textureGame.asteroidTexture;
 		}
 		else if (objectSize == 2) {
 			name = NAME_MEDIUM_ASTEROID;
 			speed = SPEED_MEIUM_ASTEROID;
 			health = HEALTH_MEDIUM_ASTEROID;
 			damage = DAMAGE_MEDIUM_ASTEROID;
+			texture = textureGame.asteroidMediumTexture;
 		}
 		else if (objectSize == 3) {
 			name = NAME_SMALL_ASTEROID;
 			damage = DAMAGE_SMALL_ASTEROID;
 			speed = SPEED_SMALL_ASTEROID;
 			health = HEALTH_SMALL_ASTEROID;
+			texture = textureGame.asteroidSmallTexture;
 		}
-		Entity addAsteroid(getPosition.x, getPosition.y, name);
+		Entity addAsteroid(getPosition.x, getPosition.y, name, texture);
 		addAsteroid.direction = dir; // присваивает сгенерированное направление
 		addAsteroid.speed = speed;
 		addAsteroid.damage = damage;
@@ -59,7 +64,7 @@ void Asteroid::GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & windo
 				if (CheckProbably())
 					bonus.AddBonus(Vector2f(it->x, it->y));
 			}
-			it->texture->~Texture();
+			//it->texture->~Texture();
 			delete it->sprite;
 			it = asteroids->erase(it);
 		}

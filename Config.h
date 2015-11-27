@@ -9,7 +9,7 @@ const int NUMBER_OF_FRAMES = 10;
 
 const sf::String TITLE_GAME = "Main Game";
 
-const int POINT_FOR_ADVANCE = 500;
+const int POINT_FOR_ADVANCE = 50;
 
 //---------------------- Для игрока ------------------------------------
 
@@ -45,6 +45,8 @@ const float SPEED_HARD_ENEMY = 1.5;
 const float SPEED_BOSS = 150;
 
 const int TIME_CREATE_ENEMY = 2;
+
+const float TIME_CREATE_BULLET_ENEMY = 0.2;
 
 const sf::String NAME_EASY_ENEMY = "enemy1";
 
@@ -92,6 +94,9 @@ const sf::String REPAIR_IMAGE = "repair";
 const int SPEED_BONUS = 50;
 
 const int TIME_CREATE_BONUS = 2;
+//--------------------------- Path------------------------------
+
+
 
 //--------------------------------------------------------------
 
@@ -122,9 +127,25 @@ const sf::String PATH_TO_BLUE_BULLET = "resourse/images/laser-blue.png";
 
 const sf::String PATH_TO_EXPLOSION = "resourse/images/explosion.png";
 
-const sf::String PATH_TO_BONUSES = "resourse/images/bonuses";
-
 const sf::String NAME_STAR = "star";
+
+const sf::String PATH_BOMB = "resourse/images/bomb.png";
+const sf::String PATH_DECREASE = "resourse/images/decrease.png";
+const sf::String PATH_INCREASE_DAMAGE = "resourse/images/increaseDamage.png";
+const sf::String PATH_INVULNERABILITY = "resourse/images/invulnerability.png";
+const sf::String PATH_REPAIR = "resourse/images/repair.png";
+
+const sf::String PATH_SMALL_ASTEROID = "resourse/images/asteroid-small.png";
+const sf::String PATH_MEIUM_ASTEROID = "resourse/images/asteroid-medium.png";
+const sf::String PATH_ASTEROID = "resourse/images/asteroid.png";
+
+const sf::String PATH_MIDDLE_ENEMY = "resourse/images/middleEnemy.png";
+const sf::String PATH_EASY_ENEMY = "resourse/images/enemy1.png";
+const sf::String PATH_BOSS = "resourse/images/boss.png";
+
+const sf::String PATH_PLAYER_SHIP = "resourse/images/sokol.png";
+
+const sf::String PATH_STAR = "resourse/images/star.png";
 
 //--------------------------------------------------------------
 

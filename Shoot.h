@@ -1,25 +1,36 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <list>
 
 #include "Config.h"
+#include "Entity.h"
 
 using namespace sf; 
+using namespace std;
 
 struct Shoot {
 	Shoot(float X, float Y, float WIDTH, float  HEIGTH, Direction dir, String path);
 	float x, y, dx, dy;
-	Direction dir, rememberDir;
+	Direction dir;
 	Texture *texture;
 	Sprite *sprite;
 	float rotation = 0;
 	int damage;
 	Vector2f movement = { 0.f, 0.f };
-	Vector2f rememPos = { -1.f, -1.f };
+	Vector2f rememPos;
 	bool isOtherBullet = false;
-	float distance;
 	bool life = true; //флаг жизни
 	void MoveBullet(const Time & deltaTime);
 	void CheckForCollisions(RenderWindow & window);
 	void MoveBulletHardEnemy(const Time & deltaTime);
 };
+
+/*struct InitTime {
+	Clock clock;
+	Time timeCreateBulletEnemy = Time::Zero,
+		timeCreateBulletPlayer = Time::Zero;
+	void AddBullet(Vector2f posEnemy, Entity & object, Vector2f posPlayer, list<Shoot> & bullets);
+	void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot> & bullets);
+};
+*/

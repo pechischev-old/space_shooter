@@ -12,7 +12,9 @@ void InitializeGame(Game & game) {
 	game.asteroid = new Asteroid;
 	game.bonus = new Bonus;
 	game.star = new Star;
-	InitializePlayer(*game.player);
+	game.textureGame = new TextureGame;
+	LoadingFromFileTexture(*game.textureGame);
+	InitializePlayer(*game.player, *game.textureGame);
 	InitializeEnemy(*game.enemy);
 	InitializeAsteroid(*game.asteroid);
 	InitializeText(*game.textInfo);
@@ -31,6 +33,9 @@ void Game::IncreaseCharacteristicsObjects() {
 }
 
 void Game::CheckForCollision() {
+
+	// ОБЪЕДИНИТЬ ЦИКЛЫ 
+
 	//----------------- Окрашивает в белый цвет ----------------
 	for (list<Entity>::iterator it2 = enemy->enemyShip->begin(); it2 != enemy->enemyShip->end(); ++it2) {
 		if (it2->sprite->getColor() == Color::Red)
@@ -72,6 +77,7 @@ void Game::CheckForCollision() {
 		if (IsSeePlayer(posPlayer, *it2, window->getSize()) && it2->name != NAME_EASY_ENEMY) { // враг стреляет
 			if (it2->health > 0) {
 				enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer);
+
 			}
 		}
 	}
@@ -83,7 +89,6 @@ void Game::CheckForCollision() {
 				player->ship->health -= enemy->damage;
 				player->ship->sprite->setColor(Color::Red);
 			}
-			
 			it->life = false;
 		}
 	}
@@ -232,9 +237,9 @@ void Game::UseBonus(const Time & deltaTime){
 	}
 	if (playerState.isBomb) {
 		for (list<Entity>::iterator it2 = enemy->enemyShip->begin(); it2 != enemy->enemyShip->end(); ++it2) {
-			it2->health = 0;
+			if (it2->name != NAME_BOSS)
+				it2->health = 0;
 		}
-
 		for (list<Entity>::iterator it3 = asteroid->asteroids->begin(); it3 != asteroid->asteroids->end(); ++it3) {
 			it3->health = 0;
 		}
@@ -265,6 +270,7 @@ void Game::DrawObjects() { // Отрисовка объектов
 }
 
 void Delete(Game & game) {
+	
 	delete game.enemy->enemyShip;
 	delete game.enemy->bulletEnemy;
 	delete game.player->bullet;
@@ -278,6 +284,9 @@ void Delete(Game & game) {
 	delete game.player;
 	delete game.textInfo;
 	delete game.window;
+	DeleteTexture(*game.textureGame);
+	delete game.textureGame;
+	
 }
 
 

@@ -7,28 +7,35 @@ void InitializeBonus(Bonus & bonus) {
 }
 
 void Bonus::AddBonus(Vector2f getPosition) {
+	TextureGame textureGame;
 	timeCreateBonus += clock.restart();
 	if (timeCreateBonus.asSeconds() > TIME_CREATE_BONUS) {
 		Direction dir = DOWN; 
 		int objectSize = SpecifySizeBonus();
 		int speed;
 		String name;
+		Texture texture;
 		if (objectSize == 1) {
 			name = REPAIR_IMAGE;
+			texture = textureGame.repairTexture;
 		}
 		else if (objectSize == 2) {
 			name = DECREASE_IMAGE;
+			texture = textureGame.decreaseTexture;
 		}
 		else if (objectSize == 3) {
 			name = INCREASE_DAMAGE_IMAGE;
+			texture = textureGame.increaseTexture;
 		}
 		else if (objectSize == 4) {
 			name = INVULNERABILITY_IMAGE;
+			texture = textureGame.invulnerabilityTexture;
 		}
 		else if (objectSize == 5) {
 			name = BOMB_IMAGE;
+			texture = textureGame.bombTexture;
 		}
-		Entity addBonus(getPosition.x, getPosition.y, name);
+		Entity addBonus(getPosition.x, getPosition.y, name, texture);
 		addBonus.direction = dir; // присваивает сгенерированное направление
 		addBonus.speed = SPEED_BONUS;
 		bonuses->push_back(addBonus);
@@ -41,7 +48,7 @@ void Bonus::GetMoveEveryBonus(const Time & deltaTime, RenderWindow & window) {
 		it->MoveObject(deltaTime);
 		it->CheckForCollisions(window);
 		if (!it->isLife) {
-			it->texture->~Texture();
+			//it->texture->~Texture();
 			delete it->sprite;
 			it = bonuses->erase(it);
 		}
