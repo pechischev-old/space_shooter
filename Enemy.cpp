@@ -1,16 +1,10 @@
 #include "Enemy.h"
-#include "Entity.h"
 
 using namespace std;
 using namespace sf;
 
-void InitializeEnemy(Enemy & enemy) {
-	enemy.enemyShip = new list<Entity>;
-	enemy.bulletEnemy = new list<Shoot>;
-}
-
-void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus) {
-	for (list<Entity>::iterator it = enemyShip->begin(); it != enemyShip->end();) {
+void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus, TextureGame & textureGame) {
+	for (list<Entity>::iterator it = enemyShip.begin(); it != enemyShip.end();) {
 		it->MoveObject(deltaTime);
 		
 		if (it->health <= 0 && it->name == NAME_BOSS) {
@@ -18,11 +12,13 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWin
 		}
 		if (it->name != NAME_BOSS)
 			SetRotationEnemy(*it);
-		else
+		else {
 			BorderChecks(*it, window.getSize()); //Функция движения - появления
+			it->sprite->move(Border(*it, window));
+		}
 		it->CheckForCollisions(window);
 		if (it->health <= 0) {
-			it->Explosion(deltaTime);
+			it->Explosion(deltaTime, textureGame.explosionTexture);
 			if (it->CurrentFrame >= 9.5) {
 				point += GetRandomPoint();
 			}
@@ -30,17 +26,17 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWin
 		if (!it->isLife) {
 			if (it->isKilled) {  // выпадение бонуса
 				if (CheckProbably())
-					bonus.AddBonus(Vector2f(it->x, it->y));
+					bonus.AddBonus(Vector2f(it->x, it->y), textureGame);
 			}
-			it->texture->~Texture();
+			//it->texture->~Texture();
 			delete it->sprite;
-			it = enemyShip->erase(it);
+			it = enemyShip.erase(it);
 		}
 		else  ++it;
 	}
 }
 
-void Enemy::AddEnemy() {
+void Enemy::AddEnemy(TextureGame & textureGame) {
 	timeCreateEnemy += clock.restart();
 	if (!isBoss) {
 		if (timeCreateEnemy.asSeconds() > TIME_CREATE_ENEMY) {
@@ -48,18 +44,20 @@ void Enemy::AddEnemy() {
 			Direction dir;
 			Vector2f getPositionEnemy;
 			String typeEnemy;
+			Texture *texture = NULL;
 			if (chooseEnemy == 1) {
 				dir = LEFT;
 				getPositionEnemy = GetRandomPosition(dir);
 				typeEnemy = NAME_EASY_ENEMY;
+				texture = &textureGame.enemyEasyTexture;
 			}
 			if (chooseEnemy == 2) {
 				dir = LEFT;
 				getPositionEnemy = GetRandomPosition(dir);
 				typeEnemy = NAME_MIDDLE_ENEMY;
+				texture = &textureGame.enemyMiddleTexture;
 			}
-
-			Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy);
+			Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy, *texture);
 			addEnemy.health = health;
 			addEnemy.speed = SPEED_ENEMY;
 			addEnemy.direction = dir;
@@ -68,38 +66,38 @@ void Enemy::AddEnemy() {
 				addEnemy.health = 2 * health;
 			else
 				addEnemy.health = health;
-			enemyShip->push_back(addEnemy);
+			enemyShip.push_back(addEnemy);
 			timeCreateEnemy = Time::Zero;
 			isOneBoss = false;
 		}
 	}
 	if (isBoss && !isOneBoss) {
 		Vector2f getPositionEnemy = { 650, 350 };
-		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, NAME_BOSS);
+		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, NAME_BOSS, textureGame.enemyBossTexture);
 		addEnemy.direction = NONE;
 		addEnemy.damage = damage * 3;
 		addEnemy.health = health * 10;
 		addEnemy.speed = SPEED_BOSS;
-		enemyShip->push_back(addEnemy);
+		enemyShip.push_back(addEnemy);
 		isOneBoss = true;
 	}
 }
 
 void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer) {
 	timeCreateBulletEnemy += clock.restart();
-	if (timeCreateBulletEnemy.asSeconds() > 0.3) {
+	if (timeCreateBulletEnemy.asSeconds() > TIME_CREATE_BULLET_ENEMY) {
 		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, dir, PATH_TO_RED_BULLET);
 		if (enemy.name == NAME_MIDDLE_ENEMY || enemy.name == NAME_BOSS) {
 			addBullet.isOtherBullet = true;
 			addBullet.rememPos = posPlayer;
 		}
-		bulletEnemy->push_back(addBullet); // создание пули и занесение ее в список
+		bulletEnemy.push_back(addBullet); // создание пули и занесение ее в список
 		timeCreateBulletEnemy = Time::Zero;
 	}
 }
 
-void Enemy::UpdateStateEnemyBullet(const Time & deltaTime, RenderWindow & window) {
-	for (list<Shoot>::iterator it = bulletEnemy->begin(); it != bulletEnemy->end();) {
+void Enemy::UpdateStateBullet(const Time & deltaTime, RenderWindow & window) {
+	for (list<Shoot>::iterator it = bulletEnemy.begin(); it != bulletEnemy.end();) {
 		it->CheckForCollisions(window);
 		if (it->isOtherBullet) {
 			it->MoveBulletHardEnemy(deltaTime);
@@ -108,7 +106,8 @@ void Enemy::UpdateStateEnemyBullet(const Time & deltaTime, RenderWindow & window
 			it->MoveBullet(deltaTime);
 		if (!it->life) {
 			it->texture->~Texture();
-			it = bulletEnemy->erase(it);
+			delete it->sprite;
+			it = bulletEnemy.erase(it);
 		}
 		else  ++it;
 	}
@@ -160,11 +159,11 @@ void Enemy::BorderChecks(Entity & entity, Vector2u sizeWindow) {
 	Vector2f limitPos = { entity.sprite->getPosition().x , 0 };
 	if (y - height / 2 < 10) {
 		entity.direction = DOWN;
-		limitPos.y = 1;
+		//limitPos.y = 1;
 	}
 	else if (sizeWindow.y - y + height / 2 < 10) {
 		entity.direction = UP;
-		limitPos.y = -1;
+		//limitPos.y = -1;
 	}
 	else
 		entity.direction = NONE;
@@ -230,3 +229,5 @@ int GetTypeEnemy() {
 	srand(time(0));
 	return 1 + rand() % 2;
 }
+
+

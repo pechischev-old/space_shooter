@@ -14,12 +14,12 @@
 using namespace sf;
 
 struct Asteroid {
-	std::list<Entity> *asteroids;
+	std::list<Entity> asteroids;
 	Clock clock;
 	Time timeCreateAsteroid = Time::Zero;
 	float CurrentFrame = 0;
-	void AddAsteroid();
-	void GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & window, Bonus & bonus);
+	void AddAsteroid(TextureGame & textureGame);
+	void GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame);
 	void SetRotateAsteroid(Entity & asteroid);
 };
 

@@ -25,23 +25,20 @@ struct Player
 	Entity *ship;
 	Direction direction, directionShoot;
 	PlayerState playerState;
-	Vector2i posMouse;
-	Vector2i dirRotation = { 0, 0 };
-	Clock clock;
-	Time timeCreateBullet = Time::Zero;
+	Clock clock;                        
+	Time timeCreateBullet = Time::Zero; 
 	float scaleBullet = 2;
-	std::list<Shoot> *bullet;
+	std::list<Shoot> bullet;
 	int point = 0;
 	int maxHealth = MAX_HEALTH;
 	int maxDamage = MAX_DAMAGE;
 	//Функции для игрока
-	void AddBullet(RenderWindow & window);
+	void AddBullet(); 
 	void CheckPlayerLife();
-	void UpdateStatePlayerBullet(const Time & deltaTime, RenderWindow & window);
+	void UpdateStateBulletPlayer(const Time & deltaTime, RenderWindow & window);
 };
 
 Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer);
-void InitializePlayer(Player & player);
+void InitializePlayer(Player & player, TextureGame & textureGame);
 void Control(Player & player);
 void MovePlayer(Player & player, const Time & deltaTime);
-Vector2f Border(Player & player, RenderWindow & window);

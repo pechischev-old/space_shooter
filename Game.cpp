@@ -12,12 +12,9 @@ void InitializeGame(Game & game) {
 	game.asteroid = new Asteroid;
 	game.bonus = new Bonus;
 	game.star = new Star;
-	InitializePlayer(*game.player);
-	InitializeEnemy(*game.enemy);
-	InitializeAsteroid(*game.asteroid);
+	game.textureGame.LoadingFromFileTexture();
+	InitializePlayer(*game.player, game.textureGame);
 	InitializeText(*game.textInfo);
-	InitializeBonus(*game.bonus);
-	InitializeStar(*game.star);
 }
 
 void Game::IncreaseCharacteristicsObjects() {
@@ -31,13 +28,16 @@ void Game::IncreaseCharacteristicsObjects() {
 }
 
 void Game::CheckForCollision() {
+
+	// ОБЪЕДИНИТЬ ЦИКЛЫ 
+
 	//----------------- Окрашивает в белый цвет ----------------
-	for (list<Entity>::iterator it2 = enemy->enemyShip->begin(); it2 != enemy->enemyShip->end(); ++it2) {
+	for (list<Entity>::iterator it2 = enemy->enemyShip.begin(); it2 != enemy->enemyShip.end(); ++it2) {
 		if (it2->sprite->getColor() == Color::Red)
 			it2->sprite->setColor(Color::White);
 	}
 
-	for (list<Entity>::iterator it3 = asteroid->asteroids->begin(); it3 != asteroid->asteroids->end(); ++it3) {
+	for (list<Entity>::iterator it3 = asteroid->asteroids.begin(); it3 != asteroid->asteroids.end(); ++it3) {
 		if (it3->sprite->getColor() == Color::Red)
 			it3->sprite->setColor(Color::White);
 	}
@@ -46,7 +46,7 @@ void Game::CheckForCollision() {
 	//----------------------------------------------------------
 
 	// Обработка взаимодействия игрока и противников
-	for (list<Entity>::iterator it2 = enemy->enemyShip->begin(); it2 != enemy->enemyShip->end(); ++it2) {
+	for (list<Entity>::iterator it2 = enemy->enemyShip.begin(); it2 != enemy->enemyShip.end(); ++it2) {
 		if(player->ship->sprite->getGlobalBounds().intersects(it2->sprite->getGlobalBounds())) // столкновение игрока с врагом
 		{
 			if (it2->health > 0) {
@@ -72,25 +72,25 @@ void Game::CheckForCollision() {
 		if (IsSeePlayer(posPlayer, *it2, window->getSize()) && it2->name != NAME_EASY_ENEMY) { // враг стреляет
 			if (it2->health > 0) {
 				enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer);
+
 			}
 		}
 	}
 	
 	// Обработка попадания пули по игроку
-	for (list<Shoot>::iterator it = enemy->bulletEnemy->begin(); it != enemy->bulletEnemy->end(); ++it) {
+	for (list<Shoot>::iterator it = enemy->bulletEnemy.begin(); it != enemy->bulletEnemy.end(); ++it) {
 		if (player->ship->sprite->getGlobalBounds().intersects(it->sprite->getGlobalBounds())) {
 			if (!player->playerState.isInvulnerability) {
 				player->ship->health -= enemy->damage;
 				player->ship->sprite->setColor(Color::Red);
 			}
-			
 			it->life = false;
 		}
 	}
 	
 	// Обработка попадания пули по врагу
-	for (list<Entity>::iterator it2 = enemy->enemyShip->begin(); it2 != enemy->enemyShip->end(); ++it2) {
-		for (list<Shoot>::iterator it = player->bullet->begin(); it != player->bullet->end(); it++) {
+	for (list<Entity>::iterator it2 = enemy->enemyShip.begin(); it2 != enemy->enemyShip.end(); ++it2) {
+		for (list<Shoot>::iterator it = player->bullet.begin(); it != player->bullet.end(); it++) {
 			if (it->sprite->getGlobalBounds().intersects(it2->sprite->getGlobalBounds()))	{
 				it2->health -= player->ship->damage;
 				if (it2->health > 0)
@@ -106,7 +106,7 @@ void Game::CheckForCollision() {
 	}
 
 	// Обработка столкновения астероида с игроком
-	for (list<Entity>::iterator it3 = asteroid->asteroids->begin(); it3 != asteroid->asteroids->end(); ++it3) {
+	for (list<Entity>::iterator it3 = asteroid->asteroids.begin(); it3 != asteroid->asteroids.end(); ++it3) {
 		if (player->ship->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) // столкновение игрока с врагом
 		{
 			if (it3->health > 0) {
@@ -120,8 +120,8 @@ void Game::CheckForCollision() {
 	}
 
 	// Обработка попадания пули игрока по астероиду
-	for (list<Entity>::iterator it3 = asteroid->asteroids->begin(); it3 != asteroid->asteroids->end(); ++it3) {
-		for (list<Shoot>::iterator it = player->bullet->begin(); it != player->bullet->end(); ++it) {
+	for (list<Entity>::iterator it3 = asteroid->asteroids.begin(); it3 != asteroid->asteroids.end(); ++it3) {
+		for (list<Shoot>::iterator it = player->bullet.begin(); it != player->bullet.end(); ++it) {
 			if (it->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) {
 				it3->health -= 3 * player->ship->damage;
 				if (it3->health > 0)
@@ -132,8 +132,8 @@ void Game::CheckForCollision() {
 	}
 
 	// Обработка попадания пули врага по астероиду
-	for (list<Entity>::iterator it3 = asteroid->asteroids->begin(); it3 != asteroid->asteroids->end(); ++it3) {
-		for (list<Shoot>::iterator it = enemy->bulletEnemy->begin(); it != enemy->bulletEnemy->end(); ++it) {
+	for (list<Entity>::iterator it3 = asteroid->asteroids.begin(); it3 != asteroid->asteroids.end(); ++it3) {
+		for (list<Shoot>::iterator it = enemy->bulletEnemy.begin(); it != enemy->bulletEnemy.end(); ++it) {
 			if (it->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) {
 				it3->health -= 3 * enemy->damage;
 				it->life = false;
@@ -143,8 +143,8 @@ void Game::CheckForCollision() {
 	}
 
 	// Обработка столкновения противника с астероидом
-	for (list<Entity>::iterator it2 = enemy->enemyShip->begin(); it2 != enemy->enemyShip->end(); ++it2) {
-		for (list<Entity>::iterator it3 = asteroid->asteroids->begin(); it3 != asteroid->asteroids->end(); ++it3) {
+	for (list<Entity>::iterator it2 = enemy->enemyShip.begin(); it2 != enemy->enemyShip.end(); ++it2) {
+		for (list<Entity>::iterator it3 = asteroid->asteroids.begin(); it3 != asteroid->asteroids.end(); ++it3) {
 			if (it2->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) // столкновение врага с астероидом
 			{
 				if (it3->health > 0) {
@@ -158,7 +158,7 @@ void Game::CheckForCollision() {
 	}
 
 	// Обработка подбирания бонусов
-	for (list<Entity>::iterator it4 = bonus->bonuses->begin(); it4 != bonus->bonuses->end(); ++it4) {
+	for (list<Entity>::iterator it4 = bonus->bonuses.begin(); it4 != bonus->bonuses.end(); ++it4) {
 		if (player->ship->sprite->getGlobalBounds().intersects(it4->sprite->getGlobalBounds())) {
 			if (it4->name == REPAIR_IMAGE) {
 				player->playerState.isRepair = true;
@@ -231,11 +231,11 @@ void Game::UseBonus(const Time & deltaTime){
 		player->scaleBullet = 2;
 	}
 	if (playerState.isBomb) {
-		for (list<Entity>::iterator it2 = enemy->enemyShip->begin(); it2 != enemy->enemyShip->end(); ++it2) {
-			it2->health = 0;
+		for (list<Entity>::iterator it2 = enemy->enemyShip.begin(); it2 != enemy->enemyShip.end(); ++it2) {
+			if (it2->name != NAME_BOSS)
+				it2->health = 0;
 		}
-
-		for (list<Entity>::iterator it3 = asteroid->asteroids->begin(); it3 != asteroid->asteroids->end(); ++it3) {
+		for (list<Entity>::iterator it3 = asteroid->asteroids.begin(); it3 != asteroid->asteroids.end(); ++it3) {
 			it3->health = 0;
 		}
 		playerState.isBomb = false;
@@ -243,17 +243,17 @@ void Game::UseBonus(const Time & deltaTime){
 }
 
 void Game::DrawObjects() { // Отрисовка объектов
-	for (Entity it : *star->stars)
+	for (Entity it : star->stars)
 		window->draw(*it.sprite);
-	for (Shoot it : *player->bullet) // пули игрока
+	for (Shoot it : player->bullet) // пули игрока
 		window->draw(*it.sprite);
-	for (Shoot it : *enemy->bulletEnemy) // отрисовка вражеских пуль
+	for (Shoot it : enemy->bulletEnemy) // отрисовка вражеских пуль
 		window->draw(*it.sprite);
-	for (Entity it3 : *enemy->enemyShip) // противники
+	for (Entity it3 : enemy->enemyShip) // противники
 		window->draw(*it3.sprite);
-	for (Entity it2 : *asteroid->asteroids) // астероиды
+	for (Entity it2 : asteroid->asteroids) // астероиды
 		window->draw(*it2.sprite);
-	for (Entity it4 : *bonus->bonuses)
+	for (Entity it4 : bonus->bonuses)
 		window->draw(*it4.sprite);
 	if (player->ship->isLife) {
 		window->draw(*player->ship->sprite); // отрисовывается игрок пока он жив
@@ -265,19 +265,13 @@ void Game::DrawObjects() { // Отрисовка объектов
 }
 
 void Delete(Game & game) {
-	delete game.enemy->enemyShip;
-	delete game.enemy->bulletEnemy;
-	delete game.player->bullet;
-	delete game.asteroid->asteroids;
-	delete game.bonus->bonuses;
-	delete game.star->stars;
 	delete game.star;
 	delete game.bonus;
 	delete game.asteroid;
 	delete game.enemy;
 	delete game.player;
 	delete game.textInfo;
-	delete game.window;
+	delete game.window;	
 }
 
 

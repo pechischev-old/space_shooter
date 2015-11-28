@@ -90,3 +90,47 @@ void Shoot::MoveBulletHardEnemy(const Time & deltaTime) {
 	sprite->setPosition(x, y);
 	sprite->setRotation(atan2((rememPos.y - dy), (rememPos.x - dx)) * 180 / PI);
 }
+
+/*void InitTime::AddBullet(Vector2f posEnemy, Entity & object, Vector2f posPlayer, list<Shoot> & bullets) {
+	if (object.name == NAME_PLAYER_SHIP) {
+		timeCreateBulletPlayer += clock.restart();
+		if (timeCreateBulletPlayer.asSeconds() > TIME_CREATE_BULLET) {
+			// Пули игрока
+			Direction directionShoot = RIGHT;
+			Shoot addBullet(posPlayer.x, posPlayer.y, object.width, object.height, directionShoot, PATH_TO_BLUE_BULLET);
+			addBullet.damage = object.damage;
+			bullets.push_back(addBullet);
+			timeCreateBulletPlayer = Time::Zero;
+		}
+	}
+	else {
+		timeCreateBulletEnemy += clock.restart();
+		if (timeCreateBulletEnemy.asSeconds() > TIME_CREATE_BULLET) {
+			Direction directionShoot = LEFT;
+			Shoot addBullet(posEnemy.x, posEnemy.y, object.width, object.height, directionShoot, PATH_TO_RED_BULLET);
+			if (object.name == NAME_MIDDLE_ENEMY || object.name == NAME_BOSS) {
+				addBullet.isOtherBullet = true;
+				addBullet.rememPos = posPlayer;
+			}
+			bullets.push_back(addBullet); // создание пули и занесение ее в список
+			timeCreateBulletEnemy = Time::Zero;
+		}
+	}
+}
+
+void InitTime::UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot> & bullets) {
+	for (list<Shoot>::iterator it = bullets.begin(); it != bullets.end();) {
+		it->CheckForCollisions(window);
+		if (it->isOtherBullet) {
+			it->MoveBulletHardEnemy(deltaTime);
+		}
+		else
+			it->MoveBullet(deltaTime);
+		if (!it->life) {
+			it->texture->~Texture();
+			delete it->sprite;
+			it = bullets.erase(it);
+		}
+		else  ++it;
+	}
+}*/

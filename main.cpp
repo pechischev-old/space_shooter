@@ -9,6 +9,8 @@
 using namespace sf;
 using namespace std;
 
+bool g_isRestart = true;
+
 const Time TIME_PER_FRAME = seconds(1.f / 60.f);
 
 void processEvents(RenderWindow & window, Game & game)
@@ -18,15 +20,20 @@ void processEvents(RenderWindow & window, Game & game)
 	while (window.pollEvent(event))
 	{
 		Control(player);
+		//----------------- Restart -----------------------------------
+		if (event.type == Event::KeyPressed && event.key.code == Keyboard::N) {
+			g_isRestart = true;
+			game.window->close();
+		}
+		else
+			g_isRestart = false;
 		//--------------------------- Выстрел --------------------------
 		if (player.ship->health > 0) {
 			if (Mouse::isButtonPressed(Mouse::Left)) {
 				player.playerState.isShoot = true;
-				player.AddBullet(window);
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Space)) {
 				player.playerState.isShoot = true;
-				player.AddBullet(window);
 			}
 		}
 		//--------------------------------------------------------------
@@ -55,27 +62,28 @@ void update(Game & game, const Time & deltaTime)
 	//---------------- Интерфейс -----------------------
 	UpdateText(*game.textInfo, player);
 	//---------------- Функции звезд -------------------
-	//LoadStarInList(star, deltaTime, window); // добавить загрузочный экран
-	star.AddStar();
+	//LoadStarInList(star, deltaTime, window, *game.textureGame); // добавить загрузочный экран
+	star.AddStar(game.textureGame);
 	star.UpdateStateStar(deltaTime, window);
 	//---------------- Функции игрока ------------------
 	if (player.ship->health <= 0) {
 		player.ship->direction = NONE;
-		player.ship->Explosion(deltaTime);
+		player.ship->Explosion(deltaTime, game.textureGame.explosionTexture);
 	}
 	else {
 		MovePlayer(player, deltaTime); // задает координаты движения
-		player.ship->sprite->move(Border(player, window));
-		player.UpdateStatePlayerBullet(deltaTime, window);
+		player.ship->sprite->move(Border(*player.ship, window));
+		player.AddBullet();
+		player.UpdateStateBulletPlayer(deltaTime, window);
 	}
 	//---------------- Функции противников -------------
-	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus);
-	enemy.AddEnemy();
-	enemy.UpdateStateEnemyBullet(deltaTime, window);
+	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus, game.textureGame);
+	enemy.AddEnemy(game.textureGame);
+	enemy.UpdateStateBullet(deltaTime, window);
 	//--------------- Функции астероидов ---------------
 	if (!enemy.isBoss)
-		asteroid.AddAsteroid();
-	asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus);
+		asteroid.AddAsteroid(game.textureGame);
+	asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus, game.textureGame);
 	//---------------- Функции бонусов -----------------
 	bonus.GetMoveEveryBonus(deltaTime, window);
 }
@@ -83,21 +91,20 @@ void update(Game & game, const Time & deltaTime)
 void render(RenderWindow & window, Game & game)
 {
 	window.clear(); 
-	if (!game.gameState.isLoading) {
+	//if (!game.gameState.isLoading) {
 		game.DrawObjects();
 		DrawTextToWindow(*game.textInfo, *game.window);
-	}
+	//}
 	window.display();
 }
 
-void CallGame()
+int CallGame()
 {
 	Game *game = new Game();
 	InitializeGame(*game);
 	
 	Clock clock;
 	Time timeSinceLastUpdate = Time::Zero;
-	
 	Player & player = *game->player;
 	RenderWindow & window = *game->window;
 	game->window->setVerticalSyncEnabled(true);
@@ -112,17 +119,21 @@ void CallGame()
 			processEvents(window, *game);
 			update(*game, TIME_PER_FRAME);
 		}
-		
 		render(window, *game);
-		
 	}
 	Delete(*game);
 	delete game;
+	return 0;
 }
+
+
 
 int main()
 {
-	CallGame();
+	while (g_isRestart) {
+		CallGame();
+	}
+
 	return 0;
 }
 

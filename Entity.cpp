@@ -4,16 +4,14 @@
 using namespace sf;
 using namespace std;
 
-Entity::Entity(float x, float y, String Name) {
+Entity::Entity(float x, float y, String Name, Texture & texture) {
 	this->x = x; 
 	this->y = y;
 	name = Name;
-	texture = new Texture;
 	sprite = new Sprite;
-	texture->loadFromFile("resourse/images/" + name + ".png");
-	sprite->setTexture(*texture);
-	width = texture->getSize().x;
-	height = texture->getSize().y;
+	sprite->setTexture(texture);
+	width = texture.getSize().x;
+	height = texture.getSize().y;
 	sprite->setTextureRect(IntRect(0, 0, width, height));
 	sprite->setOrigin(width / 2, height / 2);
 	sprite->setPosition(x, y);
@@ -21,17 +19,14 @@ Entity::Entity(float x, float y, String Name) {
 	health = 100;
 }
 
-void Entity::Explosion(const Time & deltaTime) { // изменить название функции
+void Entity::Explosion(const Time & deltaTime, Texture & texture) { // изменить название функции
 	x = sprite->getPosition().x;
 	y = sprite->getPosition().y;
-	delete(texture);
 	delete(sprite);
-	texture = new Texture;
 	sprite = new Sprite;
 	CurrentFrame += NUMBER_OF_FRAMES * deltaTime.asSeconds();
 	if (CurrentFrame <= NUMBER_OF_FRAMES) {
-		texture->loadFromFile(PATH_TO_EXPLOSION);
-		sprite->setTexture(*texture);
+		sprite->setTexture(texture);
 		sprite->setOrigin(WIDTH_EXPLOSION / 2, HEIGTH_EXPLOSION / 2);
 		sprite->setScale(1.5, 1.5);
 		sprite->setTextureRect(IntRect(WIDTH_EXPLOSION * int(CurrentFrame), 0, WIDTH_EXPLOSION, HEIGTH_EXPLOSION));
@@ -102,3 +97,27 @@ void Entity::MoveObject(const Time & deltaTime) {
 	}
 }
 
+Vector2f Border(Entity & object, RenderWindow & window) {
+	Vector2f limit(0.f, 0.f);
+	float heigth = object.height,
+		width = object.width,
+		X = object.x,
+		Y = object.y;
+	Vector2f posObject = object.sprite->getPosition();
+
+	if (window.getSize().x <= posObject.x + width / 2) {
+		X = -BORDER;
+	}
+	if (0 >= posObject.x - width / 2) {
+		X = BORDER;
+	}
+	if (window.getSize().y <= posObject.y + heigth / 2) {
+		Y = -BORDER;
+	}
+	if (0 >= posObject.y - heigth / 2) {
+		Y = BORDER;
+	}
+	limit.x = X;
+	limit.y = Y;
+	return limit;
+}
