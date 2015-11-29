@@ -47,7 +47,6 @@ void Bonus::GetMoveEveryBonus(const Time & deltaTime, RenderWindow & window) {
 		it->MoveObject(deltaTime);
 		it->CheckForCollisions(window);
 		if (!it->isLife) {
-			//it->texture->~Texture();
 			delete it->sprite;
 			it = bonuses.erase(it);
 		}

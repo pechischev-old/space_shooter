@@ -28,7 +28,6 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWin
 				if (CheckProbably())
 					bonus.AddBonus(Vector2f(it->x, it->y), textureGame);
 			}
-			//it->texture->~Texture();
 			delete it->sprite;
 			it = enemyShip.erase(it);
 		}
@@ -58,14 +57,14 @@ void Enemy::AddEnemy(TextureGame & textureGame) {
 				texture = &textureGame.enemyMiddleTexture;
 			}
 			Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy, *texture);
-			addEnemy.health = health;
-			addEnemy.speed = SPEED_ENEMY;
+			addEnemy.health = float(health);
+			addEnemy.speed = float(SPEED_ENEMY);
 			addEnemy.direction = dir;
-			addEnemy.damage = damage;
+			addEnemy.damage = float(damage);
 			if (typeEnemy == NAME_MIDDLE_ENEMY)
-				addEnemy.health = 2 * health;
+				addEnemy.health = 2 * float(health);
 			else
-				addEnemy.health = health;
+				addEnemy.health = float(health);
 			enemyShip.push_back(addEnemy);
 			timeCreateEnemy = Time::Zero;
 			isOneBoss = false;
@@ -75,18 +74,18 @@ void Enemy::AddEnemy(TextureGame & textureGame) {
 		Vector2f getPositionEnemy = { 650, 350 };
 		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, NAME_BOSS, textureGame.enemyBossTexture);
 		addEnemy.direction = NONE;
-		addEnemy.damage = damage * 3;
-		addEnemy.health = health * 10;
+		addEnemy.damage = float(damage) * 3;
+		addEnemy.health = float(health) * 10;
 		addEnemy.speed = SPEED_BOSS;
 		enemyShip.push_back(addEnemy);
 		isOneBoss = true;
 	}
 }
 
-void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer) {
+void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer, TextureGame & textureGame) {
 	timeCreateBulletEnemy += clock.restart();
 	if (timeCreateBulletEnemy.asSeconds() > TIME_CREATE_BULLET_ENEMY) {
-		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, dir, PATH_TO_RED_BULLET);
+		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, dir, textureGame.redLaserTexture);
 		if (enemy.name == NAME_MIDDLE_ENEMY || enemy.name == NAME_BOSS) {
 			addBullet.isOtherBullet = true;
 			addBullet.rememPos = posPlayer;
@@ -96,26 +95,9 @@ void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, V
 	}
 }
 
-void Enemy::UpdateStateBullet(const Time & deltaTime, RenderWindow & window) {
-	for (list<Shoot>::iterator it = bulletEnemy.begin(); it != bulletEnemy.end();) {
-		it->CheckForCollisions(window);
-		if (it->isOtherBullet) {
-			it->MoveBulletHardEnemy(deltaTime);
-		}
-		else
-			it->MoveBullet(deltaTime);
-		if (!it->life) {
-			it->texture->~Texture();
-			delete it->sprite;
-			it = bulletEnemy.erase(it);
-		}
-		else  ++it;
-	}
-}
-
 Direction GetDirection() {
 	Direction dir;
-	srand(time(0));
+	srand(time(NULL));
 	int selectHand = 1 + rand() % 4;
 	if (selectHand == 1) dir = RIGHT;
 	if (selectHand == 2) dir = DOWN;
@@ -127,8 +109,8 @@ Direction GetDirection() {
 Vector2f GetRandomPosition(Direction & selectHand) {
 	Vector2f getPosit;
 	
-	getPosit.x = SCRN_WIDTH; //WIDTH_ENEMY + rand() % (SCRN_HEIGTH - WIDTH_ENEMY);
-	getPosit.y = HEIGTH_ENEMY + rand() % (SCRN_HEIGTH - 2 * HEIGTH_ENEMY);
+	getPosit.x = float(SCRN_WIDTH); //WIDTH_ENEMY + rand() % (SCRN_HEIGTH - WIDTH_ENEMY);
+	getPosit.y = float(HEIGTH_ENEMY + rand() % (SCRN_HEIGTH - 2 * HEIGTH_ENEMY));
 	/*if (selectHand == RIGHT) { // слева
 		getPosit.x = 0;
 		getPosit.y = HEIGTH_ENEMY + rand() % (SCRN_HEIGTH - 2 * HEIGTH_ENEMY);
@@ -159,11 +141,10 @@ void Enemy::BorderChecks(Entity & entity, Vector2u sizeWindow) {
 	Vector2f limitPos = { entity.sprite->getPosition().x , 0 };
 	if (y - height / 2 < 10) {
 		entity.direction = DOWN;
-		//limitPos.y = 1;
+		
 	}
 	else if (sizeWindow.y - y + height / 2 < 10) {
 		entity.direction = UP;
-		//limitPos.y = -1;
 	}
 	else
 		entity.direction = NONE;
@@ -199,7 +180,7 @@ void Enemy::SetRotationEnemy(Entity & enemy) {
 }
 
 int GetRandomPoint() {
-	srand(time(0));
+	srand(time(NULL));
 	return 1 + rand() % 3;
 }
 
@@ -226,7 +207,7 @@ bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow) {
 }
 
 int GetTypeEnemy() {
-	srand(time(0));
+	srand(time(NULL));
 	return 1 + rand() % 2;
 }
 

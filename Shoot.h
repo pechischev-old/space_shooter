@@ -10,10 +10,9 @@ using namespace sf;
 using namespace std;
 
 struct Shoot {
-	Shoot(float X, float Y, float WIDTH, float  HEIGTH, Direction dir, String path);
+	Shoot(float X, float Y, float WIDTH, float  HEIGTH, Direction dir, Texture & texture);
 	float x, y, dx, dy;
 	Direction dir;
-	Texture *texture;
 	Sprite *sprite;
 	float rotation = 0;
 	int damage;
@@ -26,11 +25,4 @@ struct Shoot {
 	void MoveBulletHardEnemy(const Time & deltaTime);
 };
 
-/*struct InitTime {
-	Clock clock;
-	Time timeCreateBulletEnemy = Time::Zero,
-		timeCreateBulletPlayer = Time::Zero;
-	void AddBullet(Vector2f posEnemy, Entity & object, Vector2f posPlayer, list<Shoot> & bullets);
-	void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot> & bullets);
-};
-*/
+void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot> & bullets);

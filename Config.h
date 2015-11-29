@@ -3,13 +3,13 @@
 
 const static int SCRN_HEIGTH = 600, SCRN_WIDTH = 800;
 
-const static float BORDER = 0.3f;
+const static double BORDER = 0.3f;
 
 const static int NUMBER_OF_FRAMES = 10;
 
 const static sf::String TITLE_GAME = "Main Game";
 
-const static int POINT_FOR_ADVANCE = 500;
+const static int POINT_FOR_ADVANCE = 50;
 
 //---------------------- Для игрока ------------------------------------
 
@@ -21,7 +21,7 @@ const static int WIDTH_BULLET = 12, HEIGTH_BULLET = 4;  // размеры пули
 
 const static int PLAYER_DAMAGE = 25;
 
-const static float TIME_CREATE_BULLET = 0.1;
+const static double TIME_CREATE_BULLET = 0.1;
 
 const static int MAX_HEALTH = 400000;
 
@@ -40,13 +40,13 @@ const static int FIRST_EVER_HEALTH_ENEMY = 100;
 
 const static int SPEED_ENEMY = 150;
 
-const static float SPEED_HARD_ENEMY = 1.5;
+const static double SPEED_HARD_ENEMY = 1.5;
 
 const static float SPEED_BOSS = 150;
 
 const static int TIME_CREATE_ENEMY = 2;
 
-const static float TIME_CREATE_BULLET_ENEMY = 0.2;
+const static double TIME_CREATE_BULLET_ENEMY = 0.2;
 
 const static sf::String NAME_EASY_ENEMY = "enemy1";
 
@@ -55,7 +55,7 @@ const static sf::String NAME_MIDDLE_ENEMY = "middleEnemy";
 const static sf::String NAME_BOSS = "boss";
 //-----------------------------Для астероидов  ---------------------------------
 
-const static float TIME_CREATE_ASTEROID = 1.1;
+const static double TIME_CREATE_ASTEROID = 1.1;
 
 const static sf::String NAME_ASTEROID = "asteroid";
 
@@ -138,7 +138,7 @@ const static sf::String PATH_ASTEROID = "resourse/images/asteroid.png";
 
 const static sf::String PATH_MIDDLE_ENEMY = "resourse/images/middleEnemy.png";
 const static sf::String PATH_EASY_ENEMY = "resourse/images/enemy1.png";
-const static sf::String PATH_BOSS = "resourse/images/boss.png";
+const static sf::String PATH_BOSS = "resourse/images/boss2.png";
 
 const static sf::String PATH_PLAYER_SHIP = "resourse/images/sokol.png";
 

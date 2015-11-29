@@ -29,10 +29,9 @@ struct Enemy {
 	int damage = FIRST_EVER_DAMAGE_ENEMY;
 	int health = FIRST_EVER_HEALTH_ENEMY;
 	void AddEnemy(TextureGame & textureGame);
-	void AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer); 
+	void AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer, TextureGame & textureGame);
 	void UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus, TextureGame & textureGame);
 	void SetRotationEnemy(Entity & enemy); 
-	void UpdateStateBullet(const Time & deltaTime, RenderWindow & window);
 	void MoveOnSinusoid(const Time & deltaTime, Entity & entity);
 	void Evasion(Vector2f posBullet, Entity & entity, Vector2u sizeWindow);
 	void BorderChecks(Entity & entity, Vector2u sizeWindow);

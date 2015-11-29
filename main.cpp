@@ -73,13 +73,13 @@ void update(Game & game, const Time & deltaTime)
 	else {
 		MovePlayer(player, deltaTime); // задает координаты движения
 		player.ship->sprite->move(Border(*player.ship, window));
-		player.AddBullet();
-		player.UpdateStateBulletPlayer(deltaTime, window);
+		player.AddBullet(game.textureGame);
+		UpdateStateBullet(deltaTime, window, player.bullet);
 	}
 	//---------------- Функции противников -------------
 	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus, game.textureGame);
 	enemy.AddEnemy(game.textureGame);
-	enemy.UpdateStateBullet(deltaTime, window);
+	UpdateStateBullet(deltaTime, window, enemy.bulletEnemy);
 	//--------------- Функции астероидов ---------------
 	if (!enemy.isBoss)
 		asteroid.AddAsteroid(game.textureGame);

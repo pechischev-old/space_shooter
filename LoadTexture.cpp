@@ -20,22 +20,3 @@ void TextureGame::LoadingFromFileTexture() {
 	enemyMiddleTexture.loadFromFile(PATH_MIDDLE_ENEMY);
 	explosionTexture.loadFromFile(PATH_TO_EXPLOSION);
 }
-
-/*void DeleteTexture(TextureGame & textureGame) {
-	delete textureGame.playerTexture;
-	delete textureGame.asteroidMediumTexture;
-	delete textureGame.asteroidSmallTexture;
-	delete textureGame.asteroidTexture;
-	delete textureGame.blueLaserTexture;
-	delete textureGame.bombTexture;
-	delete textureGame.decreaseTexture;
-	delete textureGame.enemyBossTexture;
-	delete textureGame.enemyEasyTexture;
-	delete textureGame.enemyMiddleTexture;
-	delete textureGame.explosionTexture;
-	delete textureGame.increaseTexture;
-	delete textureGame.invulnerabilityTexture;
-	delete textureGame.redLaserTexture;
-	delete textureGame.repairTexture;
-	delete textureGame.starTexture;
-}*/

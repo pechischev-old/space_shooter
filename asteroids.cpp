@@ -41,9 +41,9 @@ void Asteroid::AddAsteroid(TextureGame & textureGame) {
 		}
 		Entity addAsteroid(getPosition.x, getPosition.y, name, *texture);
 		addAsteroid.direction = dir; // присваивает сгенерированное направление
-		addAsteroid.speed = speed;
-		addAsteroid.damage = damage;
-		addAsteroid.health = health;
+		addAsteroid.speed = float(speed);
+		addAsteroid.damage = float(damage);
+		addAsteroid.health = float(health);
 		asteroids.push_back(addAsteroid);
 		timeCreateAsteroid = Time::Zero;
 	}
@@ -63,7 +63,6 @@ void Asteroid::GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & windo
 				if (CheckProbably())
 					bonus.AddBonus(Vector2f(it->x, it->y), textureGame);
 			}
-			//it->texture->~Texture();
 			delete it->sprite;
 			it = asteroids.erase(it);
 		}
@@ -76,7 +75,7 @@ void Asteroid::SetRotateAsteroid(Entity & asteroid) {
 }
 
 int SpecifySize() {
-	srand(time(0));
+	srand(time(NULL));
 	int point = 1 + rand() % 2;
 	return point;
 }

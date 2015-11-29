@@ -27,15 +27,14 @@ struct Player
 	PlayerState playerState;
 	Clock clock;                        
 	Time timeCreateBullet = Time::Zero; 
-	float scaleBullet = 2;
+	int scaleBullet = 2;
 	std::list<Shoot> bullet;
 	int point = 0;
 	int maxHealth = MAX_HEALTH;
 	int maxDamage = MAX_DAMAGE;
 	//Функции для игрока
-	void AddBullet(); 
+	void AddBullet(TextureGame & textureGame);
 	void CheckPlayerLife();
-	void UpdateStateBulletPlayer(const Time & deltaTime, RenderWindow & window);
 };
 
 Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer);

@@ -7,30 +7,27 @@ using namespace sf;
 using namespace std;
 
 struct TextureGame {
-	Texture playerTexture;// = new Texture;
+	Texture playerTexture;
 
-	Texture enemyEasyTexture;// = new Texture;
-	Texture enemyMiddleTexture;// = new Texture;
-	Texture enemyBossTexture;// = new Texture;
+	Texture enemyEasyTexture;
+	Texture enemyMiddleTexture;
+	Texture enemyBossTexture;
 
-	Texture asteroidSmallTexture;// = new Texture;
-	Texture asteroidMediumTexture;// = new Texture;
-	Texture asteroidTexture;// = new Texture;
+	Texture asteroidSmallTexture;
+	Texture asteroidMediumTexture;
+	Texture asteroidTexture;
 
-	Texture bombTexture;// = new Texture;
-	Texture decreaseTexture;// = new Texture;
-	Texture increaseTexture;// = new Texture;
-	Texture invulnerabilityTexture;// = new Texture;
-	Texture repairTexture;// = new Texture;
+	Texture bombTexture;
+	Texture decreaseTexture;
+	Texture increaseTexture;
+	Texture invulnerabilityTexture;
+	Texture repairTexture;
 
-	Texture explosionTexture;// = new Texture;
+	Texture explosionTexture;
 
-	Texture starTexture;// = new Texture;
+	Texture starTexture;
 
-	Texture redLaserTexture;// = new Texture;
-	Texture blueLaserTexture;// = new Texture;
+	Texture redLaserTexture;
+	Texture blueLaserTexture;
 	void LoadingFromFileTexture();
 };
-
-
-//void DeleteTexture(TextureGame & textureGame);

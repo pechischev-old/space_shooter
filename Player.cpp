@@ -5,9 +5,9 @@ using namespace std;
 
 void InitializePlayer(Player & player, TextureGame & textureGame) {
 	player.ship = new Entity(250, 250, NAME_PLAYER_SHIP, textureGame.playerTexture);
-	player.ship->health = player.maxHealth;
+	player.ship->health = float(player.maxHealth);
 	player.playerState.isAlive = true;
-	player.ship->damage = player.maxDamage;
+	player.ship->damage = float(player.maxDamage);
 	player.ship->speed = SPEED_HERO;
 }
 
@@ -15,32 +15,19 @@ void Player::CheckPlayerLife() {
 	playerState.isAlive = ship->health > 0;
 }
 
-void Player::AddBullet() { 
+void Player::AddBullet(TextureGame & textureGame) {
 	if (playerState.isShoot) {
 		timeCreateBullet += clock.restart(); 
 		if (timeCreateBullet.asSeconds() > TIME_CREATE_BULLET) { // Зависимость появления пули от времени
 			directionShoot = RIGHT;
-			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, PATH_TO_BLUE_BULLET);
-			addBullet.damage = ship->damage;
-			addBullet.sprite->setScale(scaleBullet, scaleBullet);
+			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, textureGame.blueLaserTexture);
+			addBullet.damage = int(ship->damage);
+			addBullet.sprite->setScale(float(scaleBullet), float(scaleBullet));
 			bullet.push_back(addBullet); // создание пули и занесение ее в список
 			timeCreateBullet = Time::Zero;
 		}
 		//------------------------------
 		playerState.isShoot = false;
-	}
-}
-
-void Player::UpdateStateBulletPlayer(const Time & deltaTime, RenderWindow & window) {
-	for (list<Shoot>::iterator it = bullet.begin(); it != bullet.end();) {
-		it->CheckForCollisions(window);
-		it->MoveBullet(deltaTime);
-		if (!it->life) {
-			it->texture->~Texture();
-			delete it->sprite;
-			it = bullet.erase(it);
-		}
-		else  ++it;
 	}
 }
 
