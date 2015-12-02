@@ -61,9 +61,11 @@ void Game::CheckForCollision() {
 			}
 		}
 		if (IsSeePlayer(posPlayer, *it2, window->getSize()) && it2->name != NAME_EASY_ENEMY) { // враг стреляет
-			if (it2->health > 0) {
-				enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame);
-
+			if (it2->health > 0) { 
+				if (!enemy->isRage)
+					enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame);
+				else
+					SpecialShootingBoss(*enemy, *it2, textureGame);
 			}
 		}
 		//------------------------------- Обработка попадания пули по врагу ----------------------------------------
@@ -73,10 +75,19 @@ void Game::CheckForCollision() {
 				if (it2->health > 0)
 					it->life = false;
 				it2->sprite->setColor(Color::Red);
+				if (it2->name == NAME_BOSS) {
+					if (enemy->rage <= POINT_FOR_RAGE) {
+						enemy->rage += 5;
+					}
+					else {
+						enemy->isRage = true;
+					}
+				}
 			}
 			if (it2->name == NAME_BOSS) {
+				cout << enemy->rage << endl;
 				if (IsEnterField(Vector2f(it->sprite->getPosition()), *it2)) { // Проверка на вхождение пули в область видимости
-					enemy->Evasion(Vector2f(it->sprite->getPosition()), *it2, window->getSize()); // Функция уклонения
+					//enemy->Evasion(Vector2f(it->sprite->getPosition()), *it2, window->getSize()); // Функция уклонения
 				}
 			}
 		}
@@ -100,6 +111,13 @@ void Game::CheckForCollision() {
 			if (!player->playerState.isInvulnerability) {
 				player->ship->health -= enemy->damage;
 				player->ship->sprite->setColor(Color::Red);
+			}
+			if (it->name == NAME_ELECTRIC_BULLET) {
+				player->playerState.isMove = false;
+				player->direction = NONE;
+				player->timeRecoveryMove = Time::Zero;
+				enemy->isRage = false;
+				enemy->rage = 0;
 			}
 			it->life = false;
 		}
@@ -246,6 +264,12 @@ void Game::DrawObjects() { // Отрисовка объектов
 }
 
 void Delete(Game & game) {
+	ClearList(game.player->bullet);
+	ClearList(game.enemy->bulletEnemy);
+	ClearListObject(game.enemy->enemyShip);
+	ClearListObject(game.asteroid->asteroids);
+	ClearListObject(game.bonus->bonuses);
+	ClearListObject(game.star->stars);
 	delete game.star;
 	delete game.bonus;
 	delete game.asteroid;

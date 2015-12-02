@@ -10,10 +10,11 @@ using namespace sf;
 using namespace std;
 
 struct Shoot {
-	Shoot(float X, float Y, float WIDTH, float  HEIGTH, Direction dir, Texture & texture);
+	Shoot(float X, float Y, float WIDTH, float  HEIGTH, Direction dir, Texture & texture, String Name);
 	float x, y, dx, dy;
 	Direction dir;
 	Sprite *sprite;
+	String name;
 	float rotation = 0;
 	int damage;
 	Vector2f movement = { 0.f, 0.f };
@@ -26,3 +27,4 @@ struct Shoot {
 };
 
 void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot> & bullets);
+void ClearList(list<Shoot> & bullets);

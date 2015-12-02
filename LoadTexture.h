@@ -29,5 +29,6 @@ struct TextureGame {
 
 	Texture redLaserTexture;
 	Texture blueLaserTexture;
+	Texture electricBullet;
 	void LoadingFromFileTexture();
 };

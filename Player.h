@@ -10,14 +10,16 @@
 using namespace sf;
 
 struct PlayerState {
-	bool isMove = false;  // флаг движени€
+	bool isMove;  // флаг движени€
 	bool isShoot = false; // флаг выстрела
-	bool isAlive = false;
+	bool isAlive;
+	//--- перенести в бонусы
 	bool isRepair = false; // флаг восстановлени€ жизни
 	bool isIncreaseDamage = false; // флаг увеличени€ урона
 	bool isInvulnerability = false; // флаг неу€звимости
 	bool isDecrease = false; // флаг уменьшени€
 	bool isBomb = false; // флаг бомбы
+	//---
 };
 
 struct Player
@@ -26,7 +28,8 @@ struct Player
 	Direction direction, directionShoot;
 	PlayerState playerState;
 	Clock clock;                        
-	Time timeCreateBullet = Time::Zero; 
+	Time timeCreateBullet = Time::Zero;
+	Time timeRecoveryMove; 
 	int scaleBullet = 2;
 	std::list<Shoot> bullet;
 	int point = 0;
@@ -35,9 +38,9 @@ struct Player
 	//‘ункции дл€ игрока
 	void AddBullet(TextureGame & textureGame);
 	void CheckPlayerLife();
+	void RecoveryMove();
 };
 
-Direction GetDirectionShoot(Vector2i posMouse, Vector2f posPlayer);
 void InitializePlayer(Player & player, TextureGame & textureGame);
 void Control(Player & player);
 void MovePlayer(Player & player, const Time & deltaTime);

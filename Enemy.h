@@ -10,9 +10,15 @@
 #include "Entity.h"
 #include "Config.h"
 #include "Shoot.h"
+#include "asteroids.h"
 #include "Bonus.h"
 
 using namespace sf;
+
+enum Selector {
+	ELECTRICAL,
+	TRIPLE_SHOT
+};
 
 struct Enemy {
 	std::list<Entity> enemyShip;
@@ -25,9 +31,13 @@ struct Enemy {
 	bool isBoss = false; 
 	bool isOneBoss = false; 
 	bool isEvasion = false; // Флаг уклонения
+	bool isShock = false;
+	bool isRage = false;
 	//--------------
 	int damage = FIRST_EVER_DAMAGE_ENEMY;
 	int health = FIRST_EVER_HEALTH_ENEMY;
+	int rage = 0;
+	Selector selector = TRIPLE_SHOT;
 	void AddEnemy(TextureGame & textureGame);
 	void AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer, TextureGame & textureGame);
 	void UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus, TextureGame & textureGame);
@@ -43,3 +53,4 @@ int GetRandomPoint();
 int GetTypeEnemy();
 bool IsEnterField(Vector2f & playerPos, Entity & enemy);
 bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow);
+void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame);

@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <list>
 
 #include "Config.h"
 #include "LoadTexture.h"
@@ -29,3 +30,4 @@ struct Entity {
 };
 
 Vector2f Border(Entity & object, RenderWindow & window);
+void ClearListObject(list<Entity> & objects);

@@ -74,6 +74,7 @@ void update(Game & game, const Time & deltaTime)
 		MovePlayer(player, deltaTime); // задает координаты движения
 		player.ship->sprite->move(Border(*player.ship, window));
 		player.AddBullet(game.textureGame);
+		player.RecoveryMove();
 		UpdateStateBullet(deltaTime, window, player.bullet);
 	}
 	//---------------- Функции противников -------------
@@ -102,7 +103,7 @@ int CallGame()
 {
 	Game *game = new Game();
 	InitializeGame(*game);
-	
+
 	Clock clock;
 	Time timeSinceLastUpdate = Time::Zero;
 	Player & player = *game->player;

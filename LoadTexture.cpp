@@ -8,6 +8,8 @@ void TextureGame::LoadingFromFileTexture() {
 
 	blueLaserTexture.loadFromFile(PATH_TO_BLUE_BULLET);
 	redLaserTexture.loadFromFile(PATH_TO_RED_BULLET);
+	electricBullet.loadFromFile(PATH_ELECTRIC_BULLET);
+
 	bombTexture.loadFromFile(PATH_BOMB);
 	decreaseTexture.loadFromFile(PATH_DECREASE);
 	increaseTexture.loadFromFile(PATH_INCREASE_DAMAGE);

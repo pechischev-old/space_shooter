@@ -9,12 +9,13 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWin
 		
 		if (it->health <= 0 && it->name == NAME_BOSS) {
 			isBoss = false;
+			isRage = false;
 		}
 		if (it->name != NAME_BOSS)
 			SetRotationEnemy(*it);
 		else {
 			BorderChecks(*it, window.getSize()); //Функция движения - появления
-			it->sprite->move(Border(*it, window));
+			//it->sprite->move(Border(*it, window));
 		}
 		it->CheckForCollisions(window);
 		if (it->health <= 0) {
@@ -73,7 +74,7 @@ void Enemy::AddEnemy(TextureGame & textureGame) {
 	if (isBoss && !isOneBoss) {
 		Vector2f getPositionEnemy = { 650, 350 };
 		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, NAME_BOSS, textureGame.enemyBossTexture);
-		addEnemy.direction = NONE;
+		addEnemy.direction = UP;
 		addEnemy.damage = float(damage) * 3;
 		addEnemy.health = float(health) * 10;
 		addEnemy.speed = SPEED_BOSS;
@@ -85,8 +86,8 @@ void Enemy::AddEnemy(TextureGame & textureGame) {
 void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer, TextureGame & textureGame) {
 	timeCreateBulletEnemy += clock.restart();
 	if (timeCreateBulletEnemy.asSeconds() > TIME_CREATE_BULLET_ENEMY) {
-		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, dir, textureGame.redLaserTexture);
-		if (enemy.name == NAME_MIDDLE_ENEMY || enemy.name == NAME_BOSS) {
+		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
+		if ((enemy.name == NAME_MIDDLE_ENEMY || enemy.name == NAME_BOSS) && !isRage) {
 			addBullet.isOtherBullet = true;
 			addBullet.rememPos = posPlayer;
 		}
@@ -115,7 +116,7 @@ Vector2f GetRandomPosition(Direction & selectHand) {
 		getPosit.x = 0;
 		getPosit.y = HEIGTH_ENEMY + rand() % (SCRN_HEIGTH - 2 * HEIGTH_ENEMY);
 	}
-	else if (selectHand == DOWN || selectHand == DOWN_LEFT || selectHand == DOWN_RIGHT) { // сверху
+	else if (selectHand == DOWN ) { // сверху
 		getPosit.x = WIDTH_ENEMY + rand() % (SCRN_WIDTH - WIDTH_ENEMY);
 		getPosit.y = 0;
 	}
@@ -135,19 +136,14 @@ void Enemy::MoveOnSinusoid(const Time & deltaTime, Entity & entity) {
 }
 
 void Enemy::BorderChecks(Entity & entity, Vector2u sizeWindow) {
-	float y = entity.sprite->getPosition().y;
 	float height = entity.height;
-	float width = entity.width;
-	Vector2f limitPos = { entity.sprite->getPosition().x , 0 };
-	if (y - height / 2 < 10) {
+	float top = entity.sprite->getGlobalBounds().top;
+	float bottom = top + height;
+	
+	if (top <= 10)
 		entity.direction = DOWN;
-		
-	}
-	else if (sizeWindow.y - y + height / 2 < 10) {
+	else if (bottom > sizeWindow.y - 10)
 		entity.direction = UP;
-	}
-	else
-		entity.direction = NONE;
 }
 
 void Enemy::Evasion(Vector2f posBullet, Entity & entity, Vector2u sizeWindow) {
@@ -177,6 +173,27 @@ void Enemy::SetRotationEnemy(Entity & enemy) {
 		enemy.sprite->setRotation(-45);
 	else if (enemy.direction == DOWN_RIGHT)
 		enemy.sprite->setRotation(-135);
+}
+
+void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame) {
+	enemy.timeCreateBulletEnemy += enemy.clock.restart();
+	double time = TIME_CREATE_BULLET_ENEMY * 2;
+	Vector2f posEnemy = boss.sprite->getPosition();
+	if (enemy.timeCreateBulletEnemy.asSeconds() > time) {
+		if (enemy.selector == ELECTRICAL) {
+			Shoot addBullet(posEnemy.x, posEnemy.y, boss.width, boss.height, LEFT, textureGame.electricBullet, NAME_ELECTRIC_BULLET);
+			enemy.bulletEnemy.push_back(addBullet);
+		}
+		else if (enemy.selector == TRIPLE_SHOT) {
+			Shoot addBullet1(posEnemy.x, posEnemy.y - 30, boss.width, boss.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
+			Shoot addBullet2(posEnemy.x, posEnemy.y, boss.width, boss.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
+			Shoot addBullet3(posEnemy.x, posEnemy.y + 30, boss.width, boss.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
+			enemy.bulletEnemy.push_back(addBullet1);
+			enemy.bulletEnemy.push_back(addBullet2);
+			enemy.bulletEnemy.push_back(addBullet3);
+		}
+		enemy.timeCreateBulletEnemy = Time::Zero;
+	}
 }
 
 int GetRandomPoint() {
@@ -210,5 +227,4 @@ int GetTypeEnemy() {
 	srand(time(NULL));
 	return 1 + rand() % 2;
 }
-
 

@@ -121,3 +121,12 @@ Vector2f Border(Entity & object, RenderWindow & window) {
 	limit.y = Y;
 	return limit;
 }
+
+void ClearListObject(list<Entity> & objects) {
+	for (list<Entity>::iterator i = objects.begin(); i != objects.end(); ++i) {
+		delete i->sprite;
+	}
+	while (objects.size() != 0) {
+		objects.pop_back();
+	}
+}

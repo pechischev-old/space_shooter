@@ -1,4 +1,5 @@
 #pragma once
+#include <SFML/Graphics.hpp>
 #include <string>
 
 const static int SCRN_HEIGTH = 600, SCRN_WIDTH = 800;
@@ -9,7 +10,7 @@ const static int NUMBER_OF_FRAMES = 10;
 
 const static sf::String TITLE_GAME = "Main Game";
 
-const static int POINT_FOR_ADVANCE = 50;
+const static int POINT_FOR_ADVANCE = 10;
 
 //---------------------- Для игрока ------------------------------------
 
@@ -29,6 +30,8 @@ const static int MAX_DAMAGE = 50;
 
 const static sf::String NAME_PLAYER_SHIP = "sokol";
 
+const static float MAX_TIME_RECOVERY_MOVE = 4;
+
 //---------------------- Для врагов -----------------------------------
 
 const static int HEIGTH_ENEMY = 50,
@@ -37,6 +40,8 @@ const static int HEIGTH_ENEMY = 50,
 const static int FIRST_EVER_DAMAGE_ENEMY = 15;
 
 const static int FIRST_EVER_HEALTH_ENEMY = 100;
+
+const static int POINT_FOR_RAGE = 30;
 
 const static int SPEED_ENEMY = 150;
 
@@ -126,6 +131,10 @@ const static sf::String PATH_TO_EXPLOSION = "resourse/images/explosion.png";
 
 const static sf::String NAME_STAR = "star";
 
+const static sf::String NAME_BULLET = "laser";
+
+const static sf::String NAME_ELECTRIC_BULLET = "electric_bulet";
+
 const static sf::String PATH_BOMB = "resourse/images/bomb.png";
 const static sf::String PATH_DECREASE = "resourse/images/decrease.png";
 const static sf::String PATH_INCREASE_DAMAGE = "resourse/images/increaseDamage.png";
@@ -143,6 +152,8 @@ const static sf::String PATH_BOSS = "resourse/images/boss2.png";
 const static sf::String PATH_PLAYER_SHIP = "resourse/images/sokol.png";
 
 const static sf::String PATH_STAR = "resourse/images/star.png";
+
+const static sf::String PATH_ELECTRIC_BULLET = "resourse/images/electricBullet.png";
 
 //--------------------------------------------------------------
 

@@ -6,13 +6,14 @@
 using namespace sf;
 using namespace std;
 
-Shoot::Shoot(float X, float Y, float width, float heigth, Direction direction, Texture & texture) {
+Shoot::Shoot(float X, float Y, float width, float heigth, Direction direction, Texture & texture, String Name) {
 	sprite = new Sprite;
 	sprite->setTexture(texture);
 	sprite->setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
 	sprite->setScale(2, 2);
 	sprite->setPosition(X + heigth / 11, Y + width / 11);
 	dir = direction;
+	name = Name;
 	x = X;
 	y = Y;
 	dx = x;
@@ -102,5 +103,14 @@ void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot
 			it = bullets.erase(it);
 		}
 		else  ++it;
+	}
+}
+
+void ClearList(list<Shoot> & bullets) {
+	for (list<Shoot>::iterator i = bullets.begin(); i != bullets.end(); ++i) {
+		delete i->sprite;
+	}
+	while (bullets.size() != 0) {
+		bullets.pop_back();
 	}
 }

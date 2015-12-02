@@ -9,6 +9,7 @@ void InitializePlayer(Player & player, TextureGame & textureGame) {
 	player.playerState.isAlive = true;
 	player.ship->damage = float(player.maxDamage);
 	player.ship->speed = SPEED_HERO;
+	player.playerState.isMove = true;
 }
 
 void Player::CheckPlayerLife() {
@@ -20,7 +21,7 @@ void Player::AddBullet(TextureGame & textureGame) {
 		timeCreateBullet += clock.restart(); 
 		if (timeCreateBullet.asSeconds() > TIME_CREATE_BULLET) { // Зависимость появления пули от времени
 			directionShoot = RIGHT;
-			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, textureGame.blueLaserTexture);
+			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, textureGame.blueLaserTexture, NAME_BULLET);
 			addBullet.damage = int(ship->damage);
 			addBullet.sprite->setScale(float(scaleBullet), float(scaleBullet));
 			bullet.push_back(addBullet); // создание пули и занесение ее в список
@@ -31,45 +32,49 @@ void Player::AddBullet(TextureGame & textureGame) {
 	}
 }
 
+void Player::RecoveryMove() {
+	if (!playerState.isMove) {
+		timeRecoveryMove += clock.restart();
+		if (timeRecoveryMove.asSeconds() > MAX_TIME_RECOVERY_MOVE) {
+			playerState.isMove = true;
+			timeRecoveryMove = Time::Zero;
+		}
+	}
+}
+
 void Control(Player & player) {
-	if (player.ship->health > 0) {
+	if (player.ship->health > 0 && player.playerState.isMove) {
 		if (Keyboard::isKeyPressed(Keyboard::W) && Keyboard::isKeyPressed(Keyboard::A)) {
 			player.direction = UP_LEFT;
-			player.playerState.isMove = true;
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::W) && Keyboard::isKeyPressed(Keyboard::D)) {
 			player.direction = UP_RIGHT;
-			player.playerState.isMove = true;
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::S) && Keyboard::isKeyPressed(Keyboard::A)) {
 			player.direction = DOWN_LEFT;
-			player.playerState.isMove = true;
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::S) && Keyboard::isKeyPressed(Keyboard::D)) {
 			player.direction = DOWN_RIGHT;
-			player.playerState.isMove = true;
 			//----------------------------- По вертикали или горизантали ----------------------------
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::W)) {
 			player.direction = UP;
-			player.playerState.isMove = true;
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::S)) {
 			player.direction = DOWN;
-			player.playerState.isMove = true;
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::D)) {
 			player.direction = RIGHT;
-			player.playerState.isMove = true;
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::A)) {
 			player.direction = LEFT;
-			player.playerState.isMove = true;
 		}
 		else {
 			player.direction = NONE;
-			player.playerState.isMove = false;
 		}
+	}
+	else {
+		player.direction = NONE;
 	}
 }
 

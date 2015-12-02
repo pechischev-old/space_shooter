@@ -19,8 +19,6 @@ struct  GameState {
 	bool isMenu;
 };
 
-
-
 struct Game
 {
 	RenderWindow *window;
