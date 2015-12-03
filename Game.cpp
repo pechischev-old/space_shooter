@@ -22,6 +22,17 @@ void Game::IncreaseCharacteristicsObjects() {
 		enemy->damage += 15;
 		enemy->health += 30;
 		oldOrder += 1;
+		switch (enemy->selector) {
+		case TRIPLE_SHOT: enemy->selector = ELECTRICAL;
+			break;
+		case ELECTRICAL: enemy->selector = POWERFUL_SHOOTING;
+			break;
+		case POWERFUL_SHOOTING: enemy->selector = CROSS_FIRE;
+			break;
+		case CROSS_FIRE: enemy->selector = TRIPLE_SHOT;
+			break;
+		}
+		
 		enemy->isBoss = true;
 		cout << "Enemy stand hard " << endl;
 	}
@@ -64,7 +75,7 @@ void Game::CheckForCollision() {
 			if (it2->health > 0) { 
 				if (!enemy->isRage)
 					enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame);
-				else
+				else if (enemy->isRage && it2->name == NAME_BOSS)
 					SpecialShootingBoss(*enemy, *it2, textureGame);
 			}
 		}
@@ -76,7 +87,7 @@ void Game::CheckForCollision() {
 					it->life = false;
 				it2->sprite->setColor(Color::Red);
 				if (it2->name == NAME_BOSS) {
-					if (enemy->rage <= POINT_FOR_RAGE) {
+					if (enemy->rage <= POINT_FOR_RAGE && !enemy->isRage) {
 						enemy->rage += 5;
 					}
 					else {
@@ -85,7 +96,6 @@ void Game::CheckForCollision() {
 				}
 			}
 			if (it2->name == NAME_BOSS) {
-				cout << enemy->rage << endl;
 				if (IsEnterField(Vector2f(it->sprite->getPosition()), *it2)) { // Проверка на вхождение пули в область видимости
 					//enemy->Evasion(Vector2f(it->sprite->getPosition()), *it2, window->getSize()); // Функция уклонения
 				}

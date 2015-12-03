@@ -80,6 +80,7 @@ void update(Game & game, const Time & deltaTime)
 	//---------------- Функции противников -------------
 	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus, game.textureGame);
 	enemy.AddEnemy(game.textureGame);
+	enemy.CalmBoss();
 	UpdateStateBullet(deltaTime, window, enemy.bulletEnemy);
 	//--------------- Функции астероидов ---------------
 	if (!enemy.isBoss)

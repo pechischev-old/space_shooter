@@ -10,7 +10,7 @@ const static int NUMBER_OF_FRAMES = 10;
 
 const static sf::String TITLE_GAME = "Main Game";
 
-const static int POINT_FOR_ADVANCE = 10;
+const static int POINT_FOR_ADVANCE = 30;
 
 //---------------------- Для игрока ------------------------------------
 
@@ -24,7 +24,7 @@ const static int PLAYER_DAMAGE = 25;
 
 const static double TIME_CREATE_BULLET = 0.1;
 
-const static int MAX_HEALTH = 400000;
+const static int MAX_HEALTH = 500000;
 
 const static int MAX_DAMAGE = 50;
 

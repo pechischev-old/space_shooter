@@ -13,7 +13,8 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWin
 		}
 		if (it->name != NAME_BOSS)
 			SetRotationEnemy(*it);
-		else {
+		else { // для босса
+			
 			BorderChecks(*it, window.getSize()); //Функция движения - появления
 			//it->sprite->move(Border(*it, window));
 		}
@@ -175,22 +176,49 @@ void Enemy::SetRotationEnemy(Entity & enemy) {
 		enemy.sprite->setRotation(-135);
 }
 
+void Enemy::CalmBoss() {
+	if (isRage) {
+		timeForCalm += clock.restart();
+		//cout << timeForCalm.asMicroseconds() << endl;
+		if (timeForCalm.asMicroseconds() > 100) {
+			rage -= 5;
+			isRage = rage > 0;
+			timeForCalm = Time::Zero;
+		}
+	}
+}
+
 void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame) {
 	enemy.timeCreateBulletEnemy += enemy.clock.restart();
 	double time = TIME_CREATE_BULLET_ENEMY * 2;
 	Vector2f posEnemy = boss.sprite->getPosition();
 	if (enemy.timeCreateBulletEnemy.asSeconds() > time) {
-		if (enemy.selector == ELECTRICAL) {
+		switch (enemy.selector) {
+		case ELECTRICAL: {
 			Shoot addBullet(posEnemy.x, posEnemy.y, boss.width, boss.height, LEFT, textureGame.electricBullet, NAME_ELECTRIC_BULLET);
 			enemy.bulletEnemy.push_back(addBullet);
-		}
-		else if (enemy.selector == TRIPLE_SHOT) {
+			break; }
+		case TRIPLE_SHOT: {	
 			Shoot addBullet1(posEnemy.x, posEnemy.y - 30, boss.width, boss.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
 			Shoot addBullet2(posEnemy.x, posEnemy.y, boss.width, boss.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
 			Shoot addBullet3(posEnemy.x, posEnemy.y + 30, boss.width, boss.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
 			enemy.bulletEnemy.push_back(addBullet1);
 			enemy.bulletEnemy.push_back(addBullet2);
 			enemy.bulletEnemy.push_back(addBullet3);
+			break; }
+		case POWERFUL_SHOOTING: {
+			Shoot addBullet(posEnemy.x, posEnemy.y, boss.width, boss.height, LEFT, textureGame.blueLaserTexture, NAME_BULLET);
+			addBullet.sprite->setScale(4, 4);
+			enemy.bulletEnemy.push_back(addBullet);
+			break; }
+		case CROSS_FIRE: {
+			Shoot addBullet1(posEnemy.x, posEnemy.y, boss.width, boss.height, UP_LEFT, textureGame.redLaserTexture, NAME_BULLET);
+			Shoot addBullet2(posEnemy.x, posEnemy.y, boss.width, boss.height, DOWN_LEFT, textureGame.redLaserTexture, NAME_BULLET);
+			Shoot addBullet3(posEnemy.x, posEnemy.y, boss.width, boss.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
+			enemy.bulletEnemy.push_back(addBullet1);
+			enemy.bulletEnemy.push_back(addBullet2);
+			enemy.bulletEnemy.push_back(addBullet3);
+			break; }
 		}
 		enemy.timeCreateBulletEnemy = Time::Zero;
 	}

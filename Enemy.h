@@ -17,7 +17,9 @@ using namespace sf;
 
 enum Selector {
 	ELECTRICAL,
-	TRIPLE_SHOT
+	TRIPLE_SHOT,
+	POWERFUL_SHOOTING,
+	CROSS_FIRE
 };
 
 struct Enemy {
@@ -26,7 +28,8 @@ struct Enemy {
 	Vector2f movement = { 0.f, 0.f };
 	Clock clock;
 	Time timeCreateEnemy = Time::Zero,
-		timeCreateBulletEnemy = Time::Zero; 
+		timeCreateBulletEnemy = Time::Zero,
+		timeForCalm = Time::Zero; 
 	//--- Занести в отдельную структуру
 	bool isBoss = false; 
 	bool isOneBoss = false; 
@@ -38,13 +41,16 @@ struct Enemy {
 	int health = FIRST_EVER_HEALTH_ENEMY;
 	int rage = 0;
 	Selector selector = TRIPLE_SHOT;
+	int selectorShooting = 0;
 	void AddEnemy(TextureGame & textureGame);
 	void AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer, TextureGame & textureGame);
 	void UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus, TextureGame & textureGame);
 	void SetRotationEnemy(Entity & enemy); 
+
 	void MoveOnSinusoid(const Time & deltaTime, Entity & entity);
 	void Evasion(Vector2f posBullet, Entity & entity, Vector2u sizeWindow);
 	void BorderChecks(Entity & entity, Vector2u sizeWindow);
+	void CalmBoss();
 };
 
 Direction GetDirection();
