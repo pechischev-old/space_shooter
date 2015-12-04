@@ -4,11 +4,10 @@
 using namespace sf;
 using namespace std;
 
-Entity::Entity(float x, float y, String Name, Texture texture1) {
+Entity::Entity(float x, float y, String Name, Texture & texture) {
 	this->x = x; 
 	this->y = y;
 	name = Name;
-	texture = texture1;
 	sprite = new Sprite;
 	sprite->setTexture(texture);
 	width = texture.getSize().x;
@@ -20,12 +19,10 @@ Entity::Entity(float x, float y, String Name, Texture texture1) {
 	health = 100;
 }
 
-void Entity::Explosion(const Time & deltaTime) { // изменить название функции
+void Entity::Explosion(const Time & deltaTime, Texture & texture) { // изменить название функции
 	x = sprite->getPosition().x;
 	y = sprite->getPosition().y;
 	delete(sprite);
-	TextureGame textureGame;
-	texture = textureGame.explosionTexture;
 	sprite = new Sprite;
 	CurrentFrame += NUMBER_OF_FRAMES * deltaTime.asSeconds();
 	if (CurrentFrame <= NUMBER_OF_FRAMES) {
@@ -123,4 +120,13 @@ Vector2f Border(Entity & object, RenderWindow & window) {
 	limit.x = X;
 	limit.y = Y;
 	return limit;
+}
+
+void ClearListObject(list<Entity> & objects) {
+	for (list<Entity>::iterator i = objects.begin(); i != objects.end(); ++i) {
+		delete i->sprite;
+	}
+	while (objects.size() != 0) {
+		objects.pop_back();
+	}
 }

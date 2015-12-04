@@ -19,12 +19,10 @@ struct  GameState {
 	bool isMenu;
 };
 
-
-
 struct Game
 {
 	RenderWindow *window;
-	TextureGame *textureGame;
+	TextureGame textureGame;
 	Player *player;
 	Enemy *enemy;
 	Asteroid *asteroid;

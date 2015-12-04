@@ -7,7 +7,7 @@ using namespace sf;
 using namespace std;
 
 struct TextureGame {
-	Texture *playerTexture;
+	Texture playerTexture;
 
 	Texture enemyEasyTexture;
 	Texture enemyMiddleTexture;
@@ -29,7 +29,10 @@ struct TextureGame {
 
 	Texture redLaserTexture;
 	Texture blueLaserTexture;
-};
+	Texture electricBullet;
 
-void LoadingFromFileTexture(TextureGame & textureGame);
-void DeleteTexture(TextureGame & textureGame);
+	Texture healthBar;
+	Texture emptyBar;
+	Texture rageBar;
+	void LoadingFromFileTexture();
+};

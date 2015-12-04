@@ -62,28 +62,30 @@ void update(Game & game, const Time & deltaTime)
 	//---------------- Интерфейс -----------------------
 	UpdateText(*game.textInfo, player);
 	//---------------- Функции звезд -------------------
-	//LoadStarInList(star, deltaTime, window); // добавить загрузочный экран
-	star.AddStar();
+	//LoadStarInList(star, deltaTime, window, *game.textureGame); // добавить загрузочный экран
+	star.AddStar(game.textureGame);
 	star.UpdateStateStar(deltaTime, window);
 	//---------------- Функции игрока ------------------
 	if (player.ship->health <= 0) {
 		player.ship->direction = NONE;
-		player.ship->Explosion(deltaTime);
+		player.ship->Explosion(deltaTime, game.textureGame.explosionTexture);
 	}
 	else {
 		MovePlayer(player, deltaTime); // задает координаты движения
 		player.ship->sprite->move(Border(*player.ship, window));
-		player.AddBullet();
-		player.UpdateStateBulletPlayer(deltaTime, window);
+		player.AddBullet(game.textureGame);
+		player.RecoveryMove();
+		UpdateStateBullet(deltaTime, window, player.bullet);
 	}
 	//---------------- Функции противников -------------
-	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus);
-	enemy.AddEnemy();
-	enemy.UpdateStateBullet(deltaTime, window);
+	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus, game.textureGame);
+	enemy.AddEnemy(game.textureGame);
+	enemy.CalmBoss();
+	UpdateStateBullet(deltaTime, window, enemy.bulletEnemy);
 	//--------------- Функции астероидов ---------------
 	if (!enemy.isBoss)
-		asteroid.AddAsteroid();
-	asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus);
+		asteroid.AddAsteroid(game.textureGame);
+	asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus, game.textureGame);
 	//---------------- Функции бонусов -----------------
 	bonus.GetMoveEveryBonus(deltaTime, window);
 }
@@ -102,7 +104,7 @@ int CallGame()
 {
 	Game *game = new Game();
 	InitializeGame(*game);
-	
+
 	Clock clock;
 	Time timeSinceLastUpdate = Time::Zero;
 	Player & player = *game->player;
