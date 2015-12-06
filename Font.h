@@ -28,7 +28,8 @@ void InitString(Text & text, String & str, Font & font, int sizeText);
 void UpdateText(TextWithInfo & textInfo, Player & player);
 
 void ReferenceLinePosition(Vector2u sizeWindow, Text & text, Vector2f & posPrevText, int sizeText);
-void SelectTextWithMouse(RenderWindow & window, Text & text);
+void SelectTextWithMouse(RenderWindow & window, Text & text, MenuSelector & selector, MenuSelector selectMenu);
+void SelectButtons(RenderWindow & window, TextWithInfo & textInfo, MenuSelector & selector);
 void UpdateTextMenu(RenderWindow & window, TextWithInfo & textInfo);
 void DrawTextToWindow(TextWithInfo & textInfo, RenderWindow & window);
 void DrawTextToMenu(TextWithInfo & textInfo, RenderWindow & window);

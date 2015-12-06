@@ -25,7 +25,6 @@ enum Selector {
 struct Enemy {
 	std::list<Entity> enemyShip;
 	std::list<Shoot> bulletEnemy;
-	Vector2f movement = { 0.f, 0.f };
 	Clock clock;
 	Time timeCreateEnemy = Time::Zero,
 		timeCreateBulletEnemy = Time::Zero,
@@ -60,3 +59,4 @@ int GetTypeEnemy();
 bool IsEnterField(Vector2f & playerPos, Entity & enemy);
 bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow);
 void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame);
+void ResetEnemy(Enemy & enemy);

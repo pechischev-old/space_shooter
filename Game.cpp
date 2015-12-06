@@ -260,14 +260,10 @@ void Game::DrawObjects(RenderWindow & window) { // Отрисовка объектов
 		window.draw(*it3.sprite);
 	for (Entity it2 : asteroid->asteroids) // астероиды
 		window.draw(*it2.sprite);
-	for (Entity it4 : bonus->bonuses)
+	for (Entity it4 : bonus->bonuses) // бонусы
 		window.draw(*it4.sprite);
 	if (player->ship->isLife) {
 		window.draw(*player->ship->sprite); // отрисовывается игрок пока он жив
-	}
-	else {  // это на время, пока не сделаю меню
-		cout << "Player dead" << endl;
-		window.close();
 	}
 }
 
@@ -289,7 +285,7 @@ void processEventsGame(Game & game, GlobalBool & globalBool, Event & event)
 		globalBool.g_isMenu = true;
 }
 
-void updateGame(Game & game, const Time & deltaTime, RenderWindow & window)
+void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, GlobalBool & globalBool)
 {
 	Player & player = *game.player;
 	Enemy & enemy = *game.enemy;
@@ -321,6 +317,12 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window)
 		player.RecoveryMove();
 		UpdateStateBullet(deltaTime, window, player.bullet);
 	}
+	if (!player.ship->isLife && !globalBool.g_isRestart) {
+		globalBool.g_isPause = true;
+	}
+	else {
+		globalBool.g_isPause = false;
+	}
 	//---------------- Функции противников -------------
 	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus, game.textureGame);
 	enemy.AddEnemy(game.textureGame);
@@ -342,6 +344,18 @@ void renderGame(RenderWindow & window, Game & game)
 	DrawTextToWindow(*game.textInfo, window);
 	//}
 	window.display();
+}
+
+void ResetGame(Game & game) {
+	ClearList(game.player->bullet);
+	ClearList(game.enemy->bulletEnemy);
+	ClearListObject(game.enemy->enemyShip);
+	ClearListObject(game.asteroid->asteroids);
+	ClearListObject(game.bonus->bonuses);
+	ResetPlayer(*game.player, game.textureGame);
+	ResetEnemy(*game.enemy);
+	game.timeGame = 0;
+	game.oldOrder = 0;
 }
 
 void Delete(Game & game) {

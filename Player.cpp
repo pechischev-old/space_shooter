@@ -111,3 +111,17 @@ void MovePlayer(Player & player, const Time & deltaTime) {
 	player.ship->y = movement.y * deltaTime.asSeconds();
 
 }
+
+void ResetPlayer(Player & player, TextureGame & textureGame) {
+	player.point = 0;
+	player.maxHealth = MAX_HEALTH;
+	player.maxDamage = MAX_DAMAGE;
+	player.ship->sprite->setPosition(250, 250);
+	player.ship->sprite->setTexture(textureGame.playerTexture);
+	player.ship->health = float(player.maxHealth);
+	player.playerState.isAlive = true;
+	player.ship->damage = float(player.maxDamage);
+	player.ship->isLife = true;
+	player.playerState.isMove = true;
+	player.ship->isKilled = false;
+}

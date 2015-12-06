@@ -5,7 +5,7 @@
 struct GlobalBool {
 	bool g_isRestart = true;
 	bool g_isMenu = true;
-	bool g_isNewGame = true;
+	bool g_isNewGame = false;
 	bool g_isExit = false;
 	bool g_isPause = false;
 };
@@ -18,7 +18,7 @@ const static int NUMBER_OF_FRAMES = 10;
 
 const static sf::String TITLE_GAME = "Main Game";
 
-const static int POINT_FOR_ADVANCE = 30;
+const static int POINT_FOR_ADVANCE = 300;
 
 //---------------------- Для игрока ------------------------------------
 
@@ -32,7 +32,7 @@ const static int PLAYER_DAMAGE = 25;
 
 const static double TIME_CREATE_BULLET = 0.1;
 
-const static int MAX_HEALTH = 500000;
+const static int MAX_HEALTH = 50;
 
 const static int MAX_DAMAGE = 50;
 
@@ -121,6 +121,16 @@ enum Direction
 	UP_RIGHT,
 	DOWN_LEFT,
 	DOWN_RIGHT
+};
+
+enum MenuSelector {
+	NEW_GAME = 1,
+	CONTINUE,
+	RECORDS,
+	OPTIONS,
+	EXIT,
+	BACK,
+	NO_SELECT
 };
 
 //------------------- Текст и пути файлов ----------------------

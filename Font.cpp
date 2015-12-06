@@ -19,6 +19,7 @@ void InitializeText(TextWithInfo & textInfo) {
 	InitString(textInfo.textExit, String(TEXT_EXIT), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textAboutRecord, String(TEXT_ABOUT_RECORD), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textScore, String(""), textInfo.font, textInfo.sizeText);
+
 }
 
 void ReferenceLinePosition(Vector2u sizeWindow, Text & text, Vector2f & posPrevText, int sizeText) {
@@ -42,37 +43,40 @@ void UpdateText(TextWithInfo & textInfo, Player & player) {
 	textInfo.textPoint.setPosition(250, 10); // сделать зависимость от размеров окна и длины предыдущей строки
 }
 
-void SelectTextWithMouse(RenderWindow & window, Text & text) {
+void SelectTextWithMouse(RenderWindow & window, Text & text, MenuSelector & selector, MenuSelector selectMenu) {
 	if (IntRect(text.getGlobalBounds()).contains(Mouse::getPosition(window))) {
 		text.setColor(Color::Yellow);
-		
+		selector = selectMenu;
 	}
 	else {
 		text.setColor(Color::White);
 	}
 }
 
+void SelectButtons(RenderWindow & window, TextWithInfo & textInfo, MenuSelector & selector) {
+	selector = NO_SELECT;
+	SelectTextWithMouse(window, textInfo.textNewGame, selector, NEW_GAME);
+	SelectTextWithMouse(window, textInfo.textContinue, selector, CONTINUE);
+	SelectTextWithMouse(window, textInfo.textRecords, selector, RECORDS);
+	SelectTextWithMouse(window, textInfo.textOption, selector, OPTIONS);
+	SelectTextWithMouse(window, textInfo.textExit, selector, EXIT);
+}
+
 void UpdateTextMenu(RenderWindow & window, TextWithInfo & textInfo) {
 	Vector2f pos = { 0, 0 };
 	ReferenceLinePosition(window.getSize(), textInfo.textNewGame, pos, textInfo.sizeText);
-	SelectTextWithMouse(window, textInfo.textNewGame);
 
 	pos = textInfo.textNewGame.getPosition();
 	ReferenceLinePosition(window.getSize(), textInfo.textContinue, pos, textInfo.sizeText);
-	SelectTextWithMouse(window, textInfo.textContinue);
 
 	pos = textInfo.textContinue.getPosition();
 	ReferenceLinePosition(window.getSize(), textInfo.textRecords, pos, textInfo.sizeText);
-	SelectTextWithMouse(window, textInfo.textRecords);
 
 	pos = textInfo.textRecords.getPosition();
 	ReferenceLinePosition(window.getSize(), textInfo.textOption, pos, textInfo.sizeText);
-	SelectTextWithMouse(window, textInfo.textOption);
 
 	pos = textInfo.textOption.getPosition();
 	ReferenceLinePosition(window.getSize(), textInfo.textExit, pos, textInfo.sizeText);
-	SelectTextWithMouse(window, textInfo.textExit);
-
 }
 
 void DrawTextToWindow(TextWithInfo & textInfo, RenderWindow & window) {
@@ -87,3 +91,5 @@ void DrawTextToMenu(TextWithInfo & textInfo, RenderWindow & window) {
 	window.draw(textInfo.textOption);
 	window.draw(textInfo.textExit);
 }
+
+

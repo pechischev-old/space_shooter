@@ -44,3 +44,4 @@ struct Player
 void InitializePlayer(Player & player, TextureGame & textureGame);
 void Control(Player & player);
 void MovePlayer(Player & player, const Time & deltaTime);
+void ResetPlayer(Player & player, TextureGame & textureGame);

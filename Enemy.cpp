@@ -257,3 +257,16 @@ int GetTypeEnemy() {
 	return 1 + rand() % 2;
 }
 
+void ResetEnemy(Enemy & enemy) {
+	enemy.isBoss = false;
+	enemy.isOneBoss = false;
+	enemy.isEvasion = false;
+	enemy.isShock = false;
+	enemy.isRage = false;
+	enemy.damage = FIRST_EVER_DAMAGE_ENEMY;
+	enemy.health = FIRST_EVER_HEALTH_ENEMY;
+	enemy.rage = 0;
+	enemy.selector = TRIPLE_SHOT;
+	enemy.selectorShooting = 0;
+}
+
