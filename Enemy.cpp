@@ -209,6 +209,7 @@ void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame
 		case POWERFUL_SHOOTING: {
 			Shoot addBullet(posEnemy.x, posEnemy.y, boss.width, boss.height, LEFT, textureGame.blueLaserTexture, NAME_BULLET);
 			addBullet.sprite->setScale(4, 4);
+			addBullet.damage = boss.damage * 2;
 			enemy.bulletEnemy.push_back(addBullet);
 			break; }
 		case CROSS_FIRE: {

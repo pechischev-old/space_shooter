@@ -1,13 +1,11 @@
 #include "Game.h"
 
-
 using namespace sf;
 using namespace std;
 
 void InitializeGame(Game & game) {
 	game.player = new Player;
 	game.enemy = new Enemy;
-	game.window = new RenderWindow(VideoMode(SCRN_WIDTH, SCRN_HEIGTH), TITLE_GAME);
 	game.textInfo = new TextWithInfo;
 	game.asteroid = new Asteroid;
 	game.bonus = new Bonus;
@@ -38,7 +36,7 @@ void Game::IncreaseCharacteristicsObjects() {
 	}
 }
 
-void Game::CheckForCollision() {
+void Game::CheckForCollision(RenderWindow & window) {
 	//----------------- Окрашивает в белый цвет ----------------
 	if (player->ship->sprite->getColor() == Color::Red)
 		player->ship->sprite->setColor(Color::White);
@@ -71,7 +69,7 @@ void Game::CheckForCollision() {
 				enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame);
 			}
 		}
-		if (IsSeePlayer(posPlayer, *it2, window->getSize()) && it2->name != NAME_EASY_ENEMY) { // враг стреляет
+		if (IsSeePlayer(posPlayer, *it2, window.getSize()) && it2->name != NAME_EASY_ENEMY) { // враг стреляет
 			if (it2->health > 0) { 
 				if (!enemy->isRage)
 					enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame);
@@ -251,26 +249,99 @@ void Game::UseBonus(const Time & deltaTime){
 	}
 }
 
-void Game::DrawObjects() { // Отрисовка объектов
+void Game::DrawObjects(RenderWindow & window) { // Отрисовка объектов
 	for (Entity it : star->stars)
-		window->draw(*it.sprite);
+		window.draw(*it.sprite);
 	for (Shoot it : player->bullet) // пули игрока
-		window->draw(*it.sprite);
+		window.draw(*it.sprite);
 	for (Shoot it : enemy->bulletEnemy) // отрисовка вражеских пуль
-		window->draw(*it.sprite);
+		window.draw(*it.sprite);
 	for (Entity it3 : enemy->enemyShip) // противники
-		window->draw(*it3.sprite);
+		window.draw(*it3.sprite);
 	for (Entity it2 : asteroid->asteroids) // астероиды
-		window->draw(*it2.sprite);
+		window.draw(*it2.sprite);
 	for (Entity it4 : bonus->bonuses)
-		window->draw(*it4.sprite);
+		window.draw(*it4.sprite);
 	if (player->ship->isLife) {
-		window->draw(*player->ship->sprite); // отрисовывается игрок пока он жив
+		window.draw(*player->ship->sprite); // отрисовывается игрок пока он жив
 	}
 	else {  // это на время, пока не сделаю меню
 		cout << "Player dead" << endl;
-		window->close();
+		window.close();
 	}
+}
+
+void processEventsGame(Game & game, GlobalBool & globalBool, Event & event)
+{
+	Player & player = *game.player;
+	Control(player);
+	//--------------------------- Выстрел --------------------------
+	if (player.ship->health > 0) {
+		if (Mouse::isButtonPressed(Mouse::Left)) {
+			player.playerState.isShoot = true;
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Space)) {
+			player.playerState.isShoot = true;
+		}
+	}
+	//--------------------------------------------------------------
+	if (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape)
+		globalBool.g_isMenu = true;
+}
+
+void updateGame(Game & game, const Time & deltaTime, RenderWindow & window)
+{
+	Player & player = *game.player;
+	Enemy & enemy = *game.enemy;
+	Asteroid & asteroid = *game.asteroid;
+	Bonus & bonus = *game.bonus;
+	Star & star = *game.star;
+	PlayerState & playerState = player.playerState;
+
+	//--------------- Функции игры ---------------------
+
+	game.IncreaseCharacteristicsObjects();
+	game.CheckForCollision(window);
+	game.UseBonus(deltaTime);
+	//---------------- Интерфейс -----------------------
+	UpdateText(*game.textInfo, player);
+	//---------------- Функции звезд -------------------
+	//LoadStarInList(star, deltaTime, window, *game.textureGame); // добавить загрузочный экран
+	star.AddStar(game.textureGame);
+	star.UpdateStateStar(deltaTime, window);
+	//---------------- Функции игрока ------------------
+	if (player.ship->health <= 0) {
+		player.ship->direction = NONE;
+		player.ship->Explosion(deltaTime, game.textureGame.explosionTexture);
+	}
+	else {
+		MovePlayer(player, deltaTime); // задает координаты движения
+		player.ship->sprite->move(Border(*player.ship, window));
+		player.AddBullet(game.textureGame);
+		player.RecoveryMove();
+		UpdateStateBullet(deltaTime, window, player.bullet);
+	}
+	//---------------- Функции противников -------------
+	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus, game.textureGame);
+	enemy.AddEnemy(game.textureGame);
+	enemy.CalmBoss();
+	UpdateStateBullet(deltaTime, window, enemy.bulletEnemy);
+	//--------------- Функции астероидов ---------------
+	if (!enemy.isBoss)
+		asteroid.AddAsteroid(game.textureGame);
+	asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus, game.textureGame);
+	//---------------- Функции бонусов -----------------
+	bonus.GetMoveEveryBonus(deltaTime, window);
+}
+
+void renderGame(RenderWindow & window, Game & game)
+{
+	window.clear();
+	//if (!game.gameState.isLoading) {
+	game.DrawObjects(window);
+	DrawTextToWindow(*game.textInfo, window);
+	//}
+	window.display();
 }
 
 void Delete(Game & game) {
@@ -286,7 +357,5 @@ void Delete(Game & game) {
 	delete game.enemy;
 	delete game.player;
 	delete game.textInfo;
-	delete game.window;	
+	
 }
-
-

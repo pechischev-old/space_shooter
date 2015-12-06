@@ -21,4 +21,12 @@ void TextureGame::LoadingFromFileTexture() {
 	enemyEasyTexture.loadFromFile(PATH_EASY_ENEMY);
 	enemyMiddleTexture.loadFromFile(PATH_MIDDLE_ENEMY);
 	explosionTexture.loadFromFile(PATH_TO_EXPLOSION);
+
+	healthBarTexture.loadFromFile(PATH_HEALTH_BAR);
+	emptyBarTexture.loadFromFile(PATH_EMPTY_BAR);
+	rageBarTexture.loadFromFile(PATH_RAGE_BAR);
+}
+
+void TextureMenu::LoadingFromFileTextureForMenu() {
+	fieldTexture.loadFromFile(PATH_FIELD);
 }

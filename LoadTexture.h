@@ -30,5 +30,16 @@ struct TextureGame {
 	Texture redLaserTexture;
 	Texture blueLaserTexture;
 	Texture electricBullet;
+
+	Texture healthBarTexture;
+	Texture emptyBarTexture;
+	Texture rageBarTexture;
+
+	Texture fieldTexture;
 	void LoadingFromFileTexture();
+};
+
+struct TextureMenu {
+	Texture fieldTexture;
+	void LoadingFromFileTextureForMenu();
 };

@@ -5,137 +5,98 @@
 #include <math.h>
 
 #include "Game.h"
+#include "Menu.h"
 
 using namespace sf;
 using namespace std;
 
-bool g_isRestart = true;
-
 const Time TIME_PER_FRAME = seconds(1.f / 60.f);
 
-void processEvents(RenderWindow & window, Game & game)
-{
-	Player & player = *game.player;
+void processEvents(RenderWindow & window, Menu & menu, Game & game, GlobalBool & globalBool) {
 	Event event;
 	while (window.pollEvent(event))
 	{
-		Control(player);
-		//----------------- Restart -----------------------------------
-		if (event.type == Event::KeyPressed && event.key.code == Keyboard::N) {
-			g_isRestart = true;
-			game.window->close();
-		}
-		else
-			g_isRestart = false;
-		//--------------------------- Выстрел --------------------------
-		if (player.ship->health > 0) {
-			if (Mouse::isButtonPressed(Mouse::Left)) {
-				player.playerState.isShoot = true;
-			}
-			if (Keyboard::isKeyPressed(Keyboard::Space)) {
-				player.playerState.isShoot = true;
-			}
-		}
-		//--------------------------------------------------------------
-		// Окно закрыли
-		if ((event.type == Event::Closed) || (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape))
+		//-------------------- Restart ---------------------------
+		if (event.type == Event::KeyPressed && event.key.code == Keyboard::R) {		
+			globalBool.g_isRestart = true; 
 			window.close();
+		}
+		else {
+			globalBool.g_isRestart = false;
+		}
+		//--------------------------------------------------------
+		if (globalBool.g_isMenu) {
+			ProcessEventsMenu(menu, globalBool, event); // вызов меню	
+		}
+		else {
+			processEventsGame(game, globalBool, event);
+		}
+		if (event.type == Event::KeyPressed && event.key.code == Keyboard::P) {  //  Поставить на паузу или снять с паузы игру
+			if (!globalBool.g_isPause) {
+				globalBool.g_isPause = true;
+			}
+			else {
+				globalBool.g_isPause = false;
+			}
+		}
+
+
+		// Окно закрыли
+		if ((event.type == Event::Closed) || (event.type == Event::KeyPressed && event.key.code == Keyboard::T)) {
+			window.close();
+		}
 	}
+
 }
 
-
-void update(Game & game, const Time & deltaTime)
+int CallGame(GlobalBool & globalBool, Menu & menu)
 {
-	Player & player = *game.player;
-	Enemy & enemy = *game.enemy;
-	Asteroid & asteroid = *game.asteroid;
-	Bonus & bonus = *game.bonus;
-	RenderWindow & window = *game.window;
-	Star & star = *game.star;
-	PlayerState & playerState = player.playerState;
-
-	//--------------- Функции игры ---------------------
 	
-	game.IncreaseCharacteristicsObjects();
-	game.CheckForCollision();
-	game.UseBonus(deltaTime);
-	//---------------- Интерфейс -----------------------
-	UpdateText(*game.textInfo, player);
-	//---------------- Функции звезд -------------------
-	//LoadStarInList(star, deltaTime, window, *game.textureGame); // добавить загрузочный экран
-	star.AddStar(game.textureGame);
-	star.UpdateStateStar(deltaTime, window);
-	//---------------- Функции игрока ------------------
-	if (player.ship->health <= 0) {
-		player.ship->direction = NONE;
-		player.ship->Explosion(deltaTime, game.textureGame.explosionTexture);
-	}
-	else {
-		MovePlayer(player, deltaTime); // задает координаты движения
-		player.ship->sprite->move(Border(*player.ship, window));
-		player.AddBullet(game.textureGame);
-		player.RecoveryMove();
-		UpdateStateBullet(deltaTime, window, player.bullet);
-	}
-	//---------------- Функции противников -------------
-	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus, game.textureGame);
-	enemy.AddEnemy(game.textureGame);
-	enemy.CalmBoss();
-	UpdateStateBullet(deltaTime, window, enemy.bulletEnemy);
-	//--------------- Функции астероидов ---------------
-	if (!enemy.isBoss)
-		asteroid.AddAsteroid(game.textureGame);
-	asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus, game.textureGame);
-	//---------------- Функции бонусов -----------------
-	bonus.GetMoveEveryBonus(deltaTime, window);
-}
-
-void render(RenderWindow & window, Game & game)
-{
-	window.clear(); 
-	//if (!game.gameState.isLoading) {
-		game.DrawObjects();
-		DrawTextToWindow(*game.textInfo, *game.window);
-	//}
-	window.display();
-}
-
-int CallGame()
-{
+	RenderWindow window(VideoMode(SCRN_WIDTH, SCRN_HEIGTH), TITLE_GAME);
+	InitMenu(menu, window, menu.textureMenu);
 	Game *game = new Game();
 	InitializeGame(*game);
 
 	Clock clock;
 	Time timeSinceLastUpdate = Time::Zero;
 	Player & player = *game->player;
-	RenderWindow & window = *game->window;
-	game->window->setVerticalSyncEnabled(true);
+	
+	window.setVerticalSyncEnabled(true);
 	
 	while (window.isOpen())
 	{
-		processEvents(window, *game);
 		timeSinceLastUpdate += clock.restart();
 		while (timeSinceLastUpdate > TIME_PER_FRAME)
 		{
 			timeSinceLastUpdate -= TIME_PER_FRAME;
-			processEvents(window, *game);
-			update(*game, TIME_PER_FRAME);
+			processEvents(window, menu, *game, globalBool);
+			if ((!globalBool.g_isMenu) && !globalBool.g_isPause) {
+				updateGame(*game, TIME_PER_FRAME, window);
+			}
+			else {
+				UpdateMenu(menu, window, *game->textInfo);
+			}
+			
 		}
-		render(window, *game);
+		if ((!globalBool.g_isMenu) ) {
+			renderGame(window, *game);
+		}
+		else {
+			RenderMenu(menu, window, *game->textInfo);
+		}
 	}
 	Delete(*game);
 	delete game;
 	return 0;
 }
 
-
-
 int main()
 {
-	while (g_isRestart) {
-		CallGame();
+	Menu menu;
+	GlobalBool globalBool; // обявление глобальных булевских переменных
+	while (globalBool.g_isRestart) {
+		CallGame(globalBool, menu);
 	}
-
 	return 0;
 }
 

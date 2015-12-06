@@ -11,17 +11,8 @@
 
 using namespace sf;
 
-struct  GameState {
-	bool isNewGame = false;
-	bool isContinue;
-	bool isLoading;
-	bool isExit;
-	bool isMenu;
-};
-
 struct Game
 {
-	RenderWindow *window;
 	TextureGame textureGame;
 	Player *player;
 	Enemy *enemy;
@@ -32,11 +23,14 @@ struct Game
 	Clock clock;
 	float timeGame = 0;
 	int oldOrder = 0; // старший порядок числа (для усложнения игры)
-	void CheckForCollision(); // отвечает за проверку на столкновения
-	void DrawObjects();
+	void CheckForCollision(RenderWindow & window); // отвечает за проверку на столкновения
+	void DrawObjects(RenderWindow & window);
 	void IncreaseCharacteristicsObjects();
 	void UseBonus(const Time & deltaTime);
 };
 
 void InitializeGame(Game & game);
+void processEventsGame(Game & game, GlobalBool & globalBool, Event & event);
+void updateGame(Game & game, const Time & deltaTime, RenderWindow & window);
+void renderGame(RenderWindow & window, Game & game);
 void Delete(Game & game);

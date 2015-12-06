@@ -2,6 +2,14 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 
+struct GlobalBool {
+	bool g_isRestart = true;
+	bool g_isMenu = true;
+	bool g_isNewGame = true;
+	bool g_isExit = false;
+	bool g_isPause = false;
+};
+
 const static int SCRN_HEIGTH = 600, SCRN_WIDTH = 800;
 
 const static double BORDER = 0.3f;
@@ -117,9 +125,22 @@ enum Direction
 
 //------------------- Текст и пути файлов ----------------------
 
+const static int COUNT_STRING_IN_MENU = 5;
+
+const static float RATE_LINE_SPACING = 1;
+
 const static sf::String TEXT_HEALTH = L"Жизнь: ";
 
 const static sf::String TEXT_POINT = L"Очки: ";
+
+const static sf::String TEXT_NEW_GAME = L"Новая игра";
+const static sf::String TEXT_CONTINUE = L"Продолжить";
+const static sf::String TEXT_RECORDS = L"Рекорды";
+const static sf::String TEXT_OPTIONS = L"Настройки";
+const static sf::String TEXT_EXIT = L"Выход";
+const static sf::String TEXT_ABOUT_RECORD = L"Вы поставили новый рекорд. Введите свое имя для записи";
+const static sf::String TEXT_SCORE = L"Ваш счет: ";
+
 
 const static sf::String PATH_TO_FONT = "resourse/fonts/Ubuntu-R.ttf";
 
@@ -154,6 +175,14 @@ const static sf::String PATH_PLAYER_SHIP = "resourse/images/sokol.png";
 const static sf::String PATH_STAR = "resourse/images/star.png";
 
 const static sf::String PATH_ELECTRIC_BULLET = "resourse/images/electricBullet.png";
+
+const static sf::String PATH_HEALTH_BAR = "resourse/GUI/RedBar.png";
+
+const static sf::String PATH_EMPTY_BAR = "resourse/GUI/EmptyBar.png";
+
+const static sf::String PATH_RAGE_BAR = "resourse/GUI/YellowBar.png";
+
+const static sf::String PATH_FIELD = "resourse/images/map.png";
 
 //--------------------------------------------------------------
 
