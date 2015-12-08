@@ -1,5 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+
+
 #include <string>
 
 struct GlobalBool {
@@ -13,8 +15,6 @@ struct GlobalBool {
 const static int SCRN_HEIGTH = 600, SCRN_WIDTH = 800;
 
 const static double BORDER = 0.3f;
-
-const static int NUMBER_OF_FRAMES = 10;
 
 const static sf::String TITLE_GAME = "Main Game";
 
@@ -32,13 +32,13 @@ const static int PLAYER_DAMAGE = 25;
 
 const static double TIME_CREATE_BULLET = 0.1;
 
-const static int MAX_HEALTH = 50;
+const static int MAX_HEALTH = 500000;
 
 const static int MAX_DAMAGE = 50;
 
 const static sf::String NAME_PLAYER_SHIP = "sokol";
 
-const static float MAX_TIME_RECOVERY_MOVE = 4;
+const static float MAX_TIME_RECOVERY_MOVE = 3;
 
 //---------------------- Для врагов -----------------------------------
 
@@ -66,6 +66,14 @@ const static sf::String NAME_EASY_ENEMY = "enemy1";
 const static sf::String NAME_MIDDLE_ENEMY = "middleEnemy";
 
 const static sf::String NAME_BOSS = "boss";
+
+const static sf::String NAME_TOWER_ENEMY = "tower";
+
+const static int SPEED_TOWER = 70;
+
+const static sf::String NAME_KAMIKAZE_ENEMY = "kamikaze";
+
+const static int RATE_HEALTH_BOSS = 50;
 //-----------------------------Для астероидов  ---------------------------------
 
 const static double TIME_CREATE_ASTEROID = 1.1;
@@ -91,6 +99,12 @@ const static int DAMAGE_SMALL_ASTEROID = 10;
 //--------------------- Для взрыва -----------------------------
 
 const static int HEIGTH_EXPLOSION = 60, WIDTH_EXPLOSION = 64;
+
+const static int NUMBER_OF_FRAMES = 16;
+const static int SPEED_FRAMES = 12;
+
+const static int NUMBER_OF_FRAMES_BULLET = 10;
+const static int SPEED_FRAMES_BULLET = 10;
 
 //--------------------- Для бонусов ----------------------------
 
@@ -158,11 +172,15 @@ const static sf::String PATH_TO_RED_BULLET = "resourse/images/laser-red.png";
 
 const static sf::String PATH_TO_BLUE_BULLET = "resourse/images/laser-blue.png";
 
-const static sf::String PATH_TO_EXPLOSION = "resourse/images/explosion.png";
+const static sf::String PATH_TO_EXPLOSION = "resourse/images/explosion_2.png";
+
+const static sf::String PATH_TO_EXPLOSION_BULLET = "resourse/images/explosion.png";
 
 const static sf::String NAME_STAR = "star";
 
 const static sf::String NAME_BULLET = "laser";
+
+const static sf::String NAME_ROCKET= "rocket";
 
 const static sf::String NAME_ELECTRIC_BULLET = "electric_bulet";
 
@@ -176,6 +194,8 @@ const static sf::String PATH_SMALL_ASTEROID = "resourse/images/asteroid-small.pn
 const static sf::String PATH_MEIUM_ASTEROID = "resourse/images/asteroid-medium.png";
 const static sf::String PATH_ASTEROID = "resourse/images/asteroid.png";
 
+const static sf::String PATH_KAMIKAZE_ENEMY = "resourse/images/kamikaze.png";
+const static sf::String PATH_TOWER_ENEMY = "resourse/images/tower.png";
 const static sf::String PATH_MIDDLE_ENEMY = "resourse/images/middleEnemy.png";
 const static sf::String PATH_EASY_ENEMY = "resourse/images/enemy1.png";
 const static sf::String PATH_BOSS = "resourse/images/boss2.png";
@@ -185,6 +205,8 @@ const static sf::String PATH_PLAYER_SHIP = "resourse/images/sokol.png";
 const static sf::String PATH_STAR = "resourse/images/star.png";
 
 const static sf::String PATH_ELECTRIC_BULLET = "resourse/images/electricBullet.png";
+
+const static sf::String PATH_ROCKET = "resourse/images/rocket.png";
 
 const static sf::String PATH_HEALTH_BAR = "resourse/GUI/RedBar.png";
 

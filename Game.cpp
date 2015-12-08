@@ -20,6 +20,10 @@ void Game::IncreaseCharacteristicsObjects() {
 		enemy->damage += 15;
 		enemy->health += 30;
 		oldOrder += 1;
+		if (asteroid->timeToCreateAsteroid > 0.1)
+			asteroid->timeToCreateAsteroid -= 0.07;
+		if (enemy->timeToCreateEnemy > 0.1)
+			enemy->timeToCreateEnemy -= 0.1;
 		switch (enemy->selector) {
 		case TRIPLE_SHOT: enemy->selector = ELECTRICAL;
 			break;
@@ -36,7 +40,7 @@ void Game::IncreaseCharacteristicsObjects() {
 	}
 }
 
-void Game::CheckForCollision(RenderWindow & window) {
+void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, TextureGame & textureGame) {
 	//----------------- Окрашивает в белый цвет ----------------
 	if (player->ship->sprite->getColor() == Color::Red)
 		player->ship->sprite->setColor(Color::White);
@@ -66,23 +70,29 @@ void Game::CheckForCollision(RenderWindow & window) {
 			posPlayer = player->ship->sprite->getPosition();
 		if (IsEnterField(posPlayer, *it2) && it2->name == NAME_EASY_ENEMY) { // враг стреляет
 			if (it2->health > 0) {
-				enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame);
+				enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame.redLaserTexture);
 			}
 		}
-		if (IsSeePlayer(posPlayer, *it2, window.getSize()) && it2->name != NAME_EASY_ENEMY) { // враг стреляет
+		if (IsSeePlayer(posPlayer, *it2, window.getSize()) && it2->name != NAME_EASY_ENEMY && it2->name != NAME_TOWER_ENEMY) { // враг стреляет
 			if (it2->health > 0) { 
 				if (!enemy->isRage)
-					enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame);
+					enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame.redLaserTexture);
 				else if (enemy->isRage && it2->name == NAME_BOSS)
 					SpecialShootingBoss(*enemy, *it2, textureGame);
+			}
+		}
+		if (it2->name == NAME_TOWER_ENEMY) {
+			if (it2->health > 0) {
+				enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame.rocketTexture);
 			}
 		}
 		//------------------------------- Обработка попадания пули по врагу ----------------------------------------
 		for (list<Shoot>::iterator it = player->bullet.begin(); it != player->bullet.end(); it++) {
 			if (it->sprite->getGlobalBounds().intersects(it2->sprite->getGlobalBounds())) {
-				it2->health -= player->ship->damage;
+				if (!it->isExplosion)
+					it2->health -= player->ship->damage;
 				if (it2->health > 0)
-					it->life = false;
+					it->isExplosion = true;
 				it2->sprite->setColor(Color::Red);
 				if (it2->name == NAME_BOSS) {
 					if (enemy->rage <= POINT_FOR_RAGE && !enemy->isRage) {
@@ -117,7 +127,8 @@ void Game::CheckForCollision(RenderWindow & window) {
 	for (list<Shoot>::iterator it = enemy->bulletEnemy.begin(); it != enemy->bulletEnemy.end(); ++it) {
 		if (player->ship->sprite->getGlobalBounds().intersects(it->sprite->getGlobalBounds())) {
 			if (!player->playerState.isInvulnerability) {
-				player->ship->health -= enemy->damage;
+				if (!it->isExplosion)
+					player->ship->health -= enemy->damage;
 				player->ship->sprite->setColor(Color::Red);
 			}
 			if (it->name == NAME_ELECTRIC_BULLET) {
@@ -127,7 +138,16 @@ void Game::CheckForCollision(RenderWindow & window) {
 				enemy->isRage = false;
 				enemy->rage = 0;
 			}
-			it->life = false;
+			it->isExplosion = true;
+		}
+		// Обработка попадания по ракете
+		for (list<Shoot>::iterator playerBullet = player->bullet.begin(); playerBullet != player->bullet.end(); ++playerBullet) {
+			if (it->sprite->getGlobalBounds().intersects(playerBullet->sprite->getGlobalBounds())) {
+				if (it->name == NAME_ROCKET) {
+					it->isExplosion = true;
+					playerBullet->isExplosion = true;
+				}
+			}
 		}
 	}
 
@@ -149,17 +169,19 @@ void Game::CheckForCollision(RenderWindow & window) {
 		//------------------------------ Обработка попадания пули игрока по астероиду -------------------------------
 		for (list<Shoot>::iterator it = player->bullet.begin(); it != player->bullet.end(); ++it) {
 			if (it->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) {
-				it3->health -= 3 * player->ship->damage;
+				if (!it->isExplosion)
+					it3->health -= 3 * player->ship->damage;
 				if (it3->health > 0)
-					it->life = false;
+					it->isExplosion = true;
 				it3->sprite->setColor(Color::Red);
 			}
 		}
 		//------------------------------------ Обработка попадания пули врага по астероиду --------------------------
 		for (list<Shoot>::iterator it = enemy->bulletEnemy.begin(); it != enemy->bulletEnemy.end(); ++it) {
 			if (it->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) {
-				it3->health -= 3 * enemy->damage;
-				it->life = false;
+				if (!it->isExplosion)
+					it3->health -= 3 * enemy->damage;
+				it->isExplosion = true;
 				it3->sprite->setColor(Color::Red);
 			}
 		}
@@ -252,10 +274,6 @@ void Game::UseBonus(const Time & deltaTime){
 void Game::DrawObjects(RenderWindow & window) { // Отрисовка объектов
 	for (Entity it : star->stars)
 		window.draw(*it.sprite);
-	for (Shoot it : player->bullet) // пули игрока
-		window.draw(*it.sprite);
-	for (Shoot it : enemy->bulletEnemy) // отрисовка вражеских пуль
-		window.draw(*it.sprite);
 	for (Entity it3 : enemy->enemyShip) // противники
 		window.draw(*it3.sprite);
 	for (Entity it2 : asteroid->asteroids) // астероиды
@@ -265,6 +283,10 @@ void Game::DrawObjects(RenderWindow & window) { // Отрисовка объектов
 	if (player->ship->isLife) {
 		window.draw(*player->ship->sprite); // отрисовывается игрок пока он жив
 	}
+	for (Shoot it : player->bullet) // пули игрока
+		window.draw(*it.sprite);
+	for (Shoot it : enemy->bulletEnemy) // отрисовка вражеских пуль
+		window.draw(*it.sprite);
 }
 
 void processEventsGame(Game & game, GlobalBool & globalBool, Event & event)
@@ -297,7 +319,7 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 	//--------------- Функции игры ---------------------
 
 	game.IncreaseCharacteristicsObjects();
-	game.CheckForCollision(window);
+	game.CheckForCollision(window, deltaTime, game.textureGame);
 	game.UseBonus(deltaTime);
 	//---------------- Интерфейс -----------------------
 	UpdateText(*game.textInfo, player);
@@ -306,6 +328,7 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 	star.AddStar(game.textureGame);
 	star.UpdateStateStar(deltaTime, window);
 	//---------------- Функции игрока ------------------
+	Vector2f posPlayer = player.ship->sprite->getPosition();
 	if (player.ship->health <= 0) {
 		player.ship->direction = NONE;
 		player.ship->Explosion(deltaTime, game.textureGame.explosionTexture);
@@ -315,7 +338,7 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 		player.ship->sprite->move(Border(*player.ship, window));
 		player.AddBullet(game.textureGame);
 		player.RecoveryMove();
-		UpdateStateBullet(deltaTime, window, player.bullet);
+		UpdateStateBullet(deltaTime, window, player.bullet, game.textureGame, posPlayer);
 	}
 	if (!player.ship->isLife && !globalBool.g_isRestart) {
 		globalBool.g_isPause = true;
@@ -323,11 +346,12 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 	else {
 		globalBool.g_isPause = false;
 	}
+	
 	//---------------- Функции противников -------------
-	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus, game.textureGame);
+	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus, game.textureGame, posPlayer);
 	enemy.AddEnemy(game.textureGame);
 	enemy.CalmBoss();
-	UpdateStateBullet(deltaTime, window, enemy.bulletEnemy);
+	UpdateStateBullet(deltaTime, window, enemy.bulletEnemy, game.textureGame, posPlayer);
 	//--------------- Функции астероидов ---------------
 	if (!enemy.isBoss)
 		asteroid.AddAsteroid(game.textureGame);

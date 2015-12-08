@@ -24,7 +24,7 @@ void Entity::Explosion(const Time & deltaTime, Texture & texture) { // изменить 
 	y = sprite->getPosition().y;
 	delete(sprite);
 	sprite = new Sprite;
-	CurrentFrame += NUMBER_OF_FRAMES * deltaTime.asSeconds();
+	CurrentFrame += SPEED_FRAMES * deltaTime.asSeconds();
 	if (CurrentFrame <= NUMBER_OF_FRAMES) {
 		sprite->setTexture(texture);
 		sprite->setOrigin(WIDTH_EXPLOSION / 2, HEIGTH_EXPLOSION / 2);

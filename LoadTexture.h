@@ -12,6 +12,8 @@ struct TextureGame {
 	Texture enemyEasyTexture;
 	Texture enemyMiddleTexture;
 	Texture enemyBossTexture;
+	Texture enemyTowerTexture;
+	Texture enemyKamikazeTexture;
 
 	Texture asteroidSmallTexture;
 	Texture asteroidMediumTexture;
@@ -24,12 +26,14 @@ struct TextureGame {
 	Texture repairTexture;
 
 	Texture explosionTexture;
+	Texture explosionBulletTexture;
 
 	Texture starTexture;
 
 	Texture redLaserTexture;
 	Texture blueLaserTexture;
 	Texture electricBullet;
+	Texture rocketTexture;
 
 	Texture healthBarTexture;
 	Texture emptyBarTexture;

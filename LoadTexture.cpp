@@ -9,6 +9,7 @@ void TextureGame::LoadingFromFileTexture() {
 	blueLaserTexture.loadFromFile(PATH_TO_BLUE_BULLET);
 	redLaserTexture.loadFromFile(PATH_TO_RED_BULLET);
 	electricBullet.loadFromFile(PATH_ELECTRIC_BULLET);
+	rocketTexture.loadFromFile(PATH_ROCKET);
 
 	bombTexture.loadFromFile(PATH_BOMB);
 	decreaseTexture.loadFromFile(PATH_DECREASE);
@@ -17,10 +18,15 @@ void TextureGame::LoadingFromFileTexture() {
 
 	repairTexture.loadFromFile(PATH_REPAIR);
 	starTexture.loadFromFile(PATH_STAR);
+
 	enemyBossTexture.loadFromFile(PATH_BOSS);
 	enemyEasyTexture.loadFromFile(PATH_EASY_ENEMY);
 	enemyMiddleTexture.loadFromFile(PATH_MIDDLE_ENEMY);
+	enemyTowerTexture.loadFromFile(PATH_TOWER_ENEMY);
+	enemyKamikazeTexture.loadFromFile(PATH_KAMIKAZE_ENEMY);
+
 	explosionTexture.loadFromFile(PATH_TO_EXPLOSION);
+	explosionBulletTexture.loadFromFile(PATH_TO_EXPLOSION_BULLET);
 
 	healthBarTexture.loadFromFile(PATH_HEALTH_BAR);
 	emptyBarTexture.loadFromFile(PATH_EMPTY_BAR);

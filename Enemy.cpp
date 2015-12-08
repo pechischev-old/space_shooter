@@ -3,7 +3,7 @@
 using namespace std;
 using namespace sf;
 
-void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus, TextureGame & textureGame) {
+void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer) {
 	for (list<Entity>::iterator it = enemyShip.begin(); it != enemyShip.end();) {
 		it->MoveObject(deltaTime);
 		
@@ -11,8 +11,15 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWin
 			isBoss = false;
 			isRage = false;
 		}
-		if (it->name != NAME_BOSS)
-			SetRotationEnemy(*it);
+		if (it->name != NAME_BOSS) {
+			
+			if (it->name != NAME_TOWER_ENEMY) {
+				SetRotationEnemy(*it);
+			}
+			else {
+				ReferenceRotationTowardPlayer(*it, posPlayer);
+			}
+		}
 		else { // для босса
 			
 			BorderChecks(*it, window.getSize()); //Функция движения - появления
@@ -21,7 +28,7 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWin
 		it->CheckForCollisions(window);
 		if (it->health <= 0) {
 			it->Explosion(deltaTime, textureGame.explosionTexture);
-			if (it->CurrentFrame >= 9.5) {
+			if (it->CurrentFrame >= NUMBER_OF_FRAMES - 1.5) {
 				point += GetRandomPoint();
 			}
 		}
@@ -40,13 +47,13 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWin
 void Enemy::AddEnemy(TextureGame & textureGame) {
 	timeCreateEnemy += clock.restart();
 	if (!isBoss) {
-		if (timeCreateEnemy.asSeconds() > TIME_CREATE_ENEMY) {
+		if (timeCreateEnemy.asSeconds() > timeToCreateEnemy) {
 			int chooseEnemy = GetTypeEnemy();
 			Direction dir;
 			Vector2f getPositionEnemy;
 			String typeEnemy;
 			Texture *texture = NULL;
-			if (chooseEnemy == 1) {
+			if (chooseEnemy == 1) { // сделать через switch
 				dir = LEFT;
 				getPositionEnemy = GetRandomPosition(dir);
 				typeEnemy = NAME_EASY_ENEMY;
@@ -58,9 +65,19 @@ void Enemy::AddEnemy(TextureGame & textureGame) {
 				typeEnemy = NAME_MIDDLE_ENEMY;
 				texture = &textureGame.enemyMiddleTexture;
 			}
+			if (chooseEnemy == 3) {
+				dir = LEFT;
+				getPositionEnemy = GetRandomPosition(dir);
+				typeEnemy = NAME_TOWER_ENEMY;
+				texture = &textureGame.enemyTowerTexture;
+			}
 			Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy, *texture);
 			addEnemy.health = float(health);
 			addEnemy.speed = float(SPEED_ENEMY);
+			if (typeEnemy == NAME_TOWER_ENEMY) {
+				addEnemy.speed = float(SPEED_TOWER);
+				addEnemy.sprite->setScale(-1, 1);
+			}
 			addEnemy.direction = dir;
 			addEnemy.damage = float(damage);
 			if (typeEnemy == NAME_MIDDLE_ENEMY)
@@ -76,21 +93,26 @@ void Enemy::AddEnemy(TextureGame & textureGame) {
 		Vector2f getPositionEnemy = { 650, 350 };
 		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, NAME_BOSS, textureGame.enemyBossTexture);
 		addEnemy.direction = UP;
-		addEnemy.damage = float(damage) * 3;
-		addEnemy.health = float(health) * 10;
+		addEnemy.damage = float(damage);
+		addEnemy.health = float(health) * RATE_HEALTH_BOSS;
 		addEnemy.speed = SPEED_BOSS;
 		enemyShip.push_back(addEnemy);
 		isOneBoss = true;
 	}
 }
 
-void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer, TextureGame & textureGame) {
+void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer, Texture & texture) {
 	timeCreateBulletEnemy += clock.restart();
 	if (timeCreateBulletEnemy.asSeconds() > TIME_CREATE_BULLET_ENEMY) {
-		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
+		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, LEFT, texture, NAME_BULLET);
 		if ((enemy.name == NAME_MIDDLE_ENEMY || enemy.name == NAME_BOSS) && !isRage) {
 			addBullet.isOtherBullet = true;
 			addBullet.rememPos = posPlayer;
+		}
+		else if (enemy.name == NAME_TOWER_ENEMY) {
+			addBullet.isRocket = true;
+			addBullet.rememPos = posPlayer;
+			addBullet.name = NAME_ROCKET;
 		}
 		bulletEnemy.push_back(addBullet); // создание пули и занесение ее в список
 		timeCreateBulletEnemy = Time::Zero;
@@ -179,13 +201,17 @@ void Enemy::SetRotationEnemy(Entity & enemy) {
 void Enemy::CalmBoss() {
 	if (isRage) {
 		timeForCalm += clock.restart();
-		//cout << timeForCalm.asMicroseconds() << endl;
 		if (timeForCalm.asMicroseconds() > 100) {
 			rage -= 5;
 			isRage = rage > 0;
 			timeForCalm = Time::Zero;
 		}
 	}
+}
+
+void Enemy::ReferenceRotationTowardPlayer(Entity & enemy, Vector2f posPlayer) {
+	Vector2f posEnemy = enemy.sprite->getPosition();
+	enemy.sprite->setRotation(atan2((posPlayer.y - posEnemy.y), (posPlayer.x - posEnemy.x)) * 180 / M_PI);
 }
 
 void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame) {
@@ -254,7 +280,7 @@ bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow) {
 
 int GetTypeEnemy() {
 	srand(time(NULL));
-	return 1 + rand() % 2;
+	return 1 + rand() % 3;
 }
 
 void ResetEnemy(Enemy & enemy) {

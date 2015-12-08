@@ -1,8 +1,6 @@
 #include "Shoot.h"
 #include "math.h"
 
-#define PI 3.14159265    
-
 using namespace sf;
 using namespace std;
 
@@ -36,6 +34,24 @@ void Shoot::CheckForCollisions(RenderWindow & window) {
 	if (sprite->getPosition().y >= window.getSize().y + HEIGTH_BULLET) {
 		life = false;
 	}
+}
+
+void Shoot::Explosion(const Time & deltaTime, Texture & texture) { // изменить название функции
+	x = sprite->getPosition().x;
+	y = sprite->getPosition().y;
+	delete(sprite);
+	sprite = new Sprite;
+	currentFrame += SPEED_FRAMES_BULLET * deltaTime.asSeconds();
+	if (currentFrame <= NUMBER_OF_FRAMES_BULLET) {
+		sprite->setTexture(texture);
+		sprite->setOrigin(WIDTH_EXPLOSION / 2, HEIGTH_EXPLOSION / 2);
+		sprite->setTextureRect(IntRect(WIDTH_EXPLOSION * int(currentFrame), 0, WIDTH_EXPLOSION, HEIGTH_EXPLOSION));
+		sprite->setPosition(x, y);
+	}
+	else {
+		life = false;
+	}
+
 }
 
 void Shoot::MoveBullet(const Time & deltaTime) {
@@ -73,7 +89,8 @@ void Shoot::MoveBullet(const Time & deltaTime) {
 		sprite->setRotation(135);
 		break;
 	default:
-		life = false; 
+		movement.x = 0;
+		movement.y = 0;
 		break;
 	}
 
@@ -84,27 +101,57 @@ void Shoot::MoveBullet(const Time & deltaTime) {
 }
 
 void Shoot::MoveBulletHardEnemy(const Time & deltaTime) {
-	x += float(SPEED_HARD_ENEMY * deltaTime.asSeconds() * (rememPos.x - dx)) ;
-	y += float(SPEED_HARD_ENEMY * deltaTime.asSeconds() * (rememPos.y - dy)) ;
-	sprite->setPosition(x, y);
-	sprite->setRotation(atan2((rememPos.y - dy), (rememPos.x - dx)) * 180 / PI);
+	if (!isExplosion) {
+		x += float(SPEED_HARD_ENEMY * deltaTime.asSeconds() * (rememPos.x - dx));
+		y += float(SPEED_HARD_ENEMY * deltaTime.asSeconds() * (rememPos.y - dy));
+		sprite->setPosition(x, y);
+		sprite->setRotation(float(atan2((rememPos.y - dy), (rememPos.x - dx)) * 180 / M_PI));
+	}
 }
 
-void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot> & bullets) {
+void Shoot::MoveRocket(const Time & deltaTime, Vector2f posPlayer) {
+	if (!isExplosion) {
+		//float distance = sqrt((posPlayer.x - x)*(posPlayer.x - x) + (posPlayer.x - y)*(posPlayer.x - y));
+		//x += 5 * (posPlayer.x - x) / distance;  // совершает рывки почему-то
+		//y += 5 * (posPlayer.y - y) / distance;
+		x += float(SPEED_HARD_ENEMY * deltaTime.asSeconds() * (posPlayer.x - x));
+		y += float(SPEED_HARD_ENEMY * deltaTime.asSeconds() * (posPlayer.y - y));
+		sprite->setPosition(x, y);
+		sprite->setRotation(float(atan2((posPlayer.y - y), (posPlayer.x - x)) * 180 / M_PI));
+	}
+}
+
+
+void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot> & bullets, TextureGame & textureGame, Vector2f posPlayer) {
 	for (list<Shoot>::iterator it = bullets.begin(); it != bullets.end();) {
 		it->CheckForCollisions(window);
 		if (it->isOtherBullet) {
 			it->MoveBulletHardEnemy(deltaTime);
 		}
-		else
+		else if ( it->isRocket) {
+			it->MoveRocket(deltaTime, posPlayer);
+		}
+		else {
 			it->MoveBullet(deltaTime);
+		}
+		if (it->isExplosion) {
+			it->dir = NONE;
+			if (it->name != NAME_ELECTRIC_BULLET) {
+				it->Explosion(deltaTime, textureGame.explosionBulletTexture);
+			}
+			else {
+				it->life = false; // отдельная анимация 
+			}
+		}
 		if (!it->life) {
+			it->isExplosion = false;
 			delete it->sprite;
 			it = bullets.erase(it);
 		}
 		else  ++it;
 	}
 }
+
 
 void ClearList(list<Shoot> & bullets) {
 	for (list<Shoot>::iterator i = bullets.begin(); i != bullets.end(); ++i) {

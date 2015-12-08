@@ -18,6 +18,7 @@ struct Asteroid {
 	Clock clock;
 	Time timeCreateAsteroid = Time::Zero;
 	float CurrentFrame = 0;
+	float timeToCreateAsteroid = TIME_CREATE_ASTEROID;
 	void AddAsteroid(TextureGame & textureGame);
 	void GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame);
 	void SetRotateAsteroid(Entity & asteroid);

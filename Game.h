@@ -23,7 +23,7 @@ struct Game
 	Clock clock;
 	float timeGame = 0;
 	int oldOrder = 0; // старший порядок числа (для усложнения игры)
-	void CheckForCollision(RenderWindow & window); // отвечает за проверку на столкновения
+	void CheckForCollision(RenderWindow & window, const Time & deltaTime, TextureGame & textureGame); // отвечает за проверку на столкновения
 	void DrawObjects(RenderWindow & window);
 	void IncreaseCharacteristicsObjects();
 	void UseBonus(const Time & deltaTime);

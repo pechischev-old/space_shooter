@@ -9,7 +9,7 @@ void InitializeAsteroid(Asteroid & asteroid) {
 
 void Asteroid::AddAsteroid(TextureGame & textureGame) {
 	timeCreateAsteroid += clock.restart();
-	if (timeCreateAsteroid.asSeconds() > TIME_CREATE_ASTEROID) {
+	if (timeCreateAsteroid.asSeconds() > timeToCreateAsteroid) {
 		Direction dir = LEFT; //GetDirection();
 		Vector2f getPosition = GetRandomPosition(dir);
 		int objectSize = SpecifySize();
