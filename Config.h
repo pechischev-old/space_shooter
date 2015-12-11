@@ -24,9 +24,7 @@ const static int POINT_FOR_ADVANCE = 300;
 
 const static int SPEED_HERO = 280;
 
-const static int SPEED_BULLET = 350; // скорость пули
-
-const static int WIDTH_BULLET = 12, HEIGTH_BULLET = 4;  // размеры пули
+const static int SPEED_BULLET = 400; // скорость пули
 
 const static int PLAYER_DAMAGE = 25;
 
@@ -57,7 +55,7 @@ const static double SPEED_HARD_ENEMY = 1.5;
 
 const static float SPEED_BOSS = 150;
 
-const static int TIME_CREATE_ENEMY = 2;
+const static int TIME_CREATE_ENEMY = 1;
 
 const static double TIME_CREATE_BULLET_ENEMY = 0.2;
 

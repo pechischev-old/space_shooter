@@ -75,7 +75,7 @@ void Asteroid::SetRotateAsteroid(Entity & asteroid) {
 }
 
 int SpecifySize() {
-	srand(time(NULL));
+	srand(unsigned int(time(NULL)));
 	int point = 1 + rand() % 2;
 	return point;
 }

@@ -42,7 +42,7 @@ void Star::UpdateStateStar(const Time & deltaTime, RenderWindow & window) {
 }
 
 int SetRandomSpeed() {
-	srand(time(NULL));
+	srand(unsigned int(time(NULL)));
 	int speed = 270 + rand() % 400;
 	return speed;
 }

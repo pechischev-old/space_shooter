@@ -21,19 +21,22 @@ Shoot::Shoot(float X, float Y, float width, float heigth, Direction direction, T
 
 void Shoot::CheckForCollisions(RenderWindow & window) {
 	//----------------- Коллизии --------------------------
+	float height = sprite->getLocalBounds().height;
+	float width = sprite->getLocalBounds().width;
 	// если уходит за экран, то прекращает свое существование
-	if (sprite->getPosition().x < 0 - WIDTH_BULLET){
+	if (sprite->getPosition().x < 0 - width){
 		life = false;
 	}
-	if (sprite->getPosition().y < 0 - HEIGTH_BULLET) {
+	if (sprite->getPosition().y < 0 - height) {
 		life = false;
 	}
-	if (sprite->getPosition().x >= window.getSize().x + WIDTH_BULLET) {
+	if (sprite->getPosition().x >= window.getSize().x + width) {
 		life = false;
 	}
-	if (sprite->getPosition().y >= window.getSize().y + HEIGTH_BULLET) {
+	if (sprite->getPosition().y >= window.getSize().y + height) {
 		life = false;
 	}
+	
 }
 
 void Shoot::Explosion(const Time & deltaTime, Texture & texture) { // изменить название функции

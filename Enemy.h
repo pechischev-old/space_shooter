@@ -39,28 +39,27 @@ struct Enemy {
 	bool isShock = false;
 	bool isRage = false;
 	//--------------
-	float timeToCreateEnemy = TIME_CREATE_ENEMY;
+	float timeToCreateEnemy = float(TIME_CREATE_ENEMY);
 	int damage = FIRST_EVER_DAMAGE_ENEMY;
 	int health = FIRST_EVER_HEALTH_ENEMY;
-	bool selectorTower = true;
 	int rage = 0;
 	Selector selector = TRIPLE_SHOT;
 	int selectorShooting = 0;
 	void AddEnemy(TextureGame & textureGame);
 	void AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer, Texture & texture);
 	void UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer);
-	void SetRotationEnemy(Entity & enemy); 
 	void ReferenceRotationTowardPlayer(Entity & enemy, Vector2f posPlayer);
 
-	void MoveOnSinusoid(const Time & deltaTime, Entity & entity);
 	void Evasion(Vector2f posBullet, Entity & entity, Vector2u sizeWindow);
 	void BorderChecks(Entity & entity, Vector2u sizeWindow);
 	void CalmBoss();
+	void SetMove(RenderWindow & window, Entity & enemy);
+	void UpdateDirection(RenderWindow & window, Entity & enemy);
 };
 
 Direction GetDirection();
 Vector2f GetRandomPosition(Direction & selectHand);
-int GetRandomPoint();
+int GetRandomPoint(); // переделать или убрать
 int GetTypeEnemy();
 bool IsEnterField(Vector2f & playerPos, Entity & enemy);
 bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow);

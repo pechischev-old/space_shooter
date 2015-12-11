@@ -30,7 +30,7 @@ void ReferenceLinePosition(Vector2u sizeWindow, Text & text, Vector2f & posPrevT
 	//posPrevText = { x, y };
 }
 
-void UpdateText(TextWithInfo & textInfo, Player & player) {
+void UpdateTextWithHealth(TextWithInfo & textInfo, Player & player) {
 	ostringstream countHealthStr, countPoint;
 	if (player.ship->health >= 0)
 		countHealthStr << player.ship->health;

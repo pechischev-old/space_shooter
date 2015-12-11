@@ -20,21 +20,11 @@ void Game::IncreaseCharacteristicsObjects() {
 		enemy->damage += 15;
 		enemy->health += 30;
 		oldOrder += 1;
+		levelGame += 1;
 		if (asteroid->timeToCreateAsteroid > 0.1)
 			asteroid->timeToCreateAsteroid -= 0.07;
 		if (enemy->timeToCreateEnemy > 0.1)
 			enemy->timeToCreateEnemy -= 0.1;
-		switch (enemy->selector) {
-		case TRIPLE_SHOT: enemy->selector = ELECTRICAL;
-			break;
-		case ELECTRICAL: enemy->selector = POWERFUL_SHOOTING;
-			break;
-		case POWERFUL_SHOOTING: enemy->selector = CROSS_FIRE;
-			break;
-		case CROSS_FIRE: enemy->selector = TRIPLE_SHOT;
-			break;
-		}
-		
 		enemy->isBoss = true;
 		cout << "Enemy stand hard " << endl;
 	}
@@ -322,7 +312,7 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 	game.CheckForCollision(window, deltaTime, game.textureGame);
 	game.UseBonus(deltaTime);
 	//---------------- Интерфейс -----------------------
-	UpdateText(*game.textInfo, player);
+	UpdateTextWithHealth(*game.textInfo, player);
 	//---------------- Функции звезд -------------------
 	//LoadStarInList(star, deltaTime, window, *game.textureGame); // добавить загрузочный экран
 	star.AddStar(game.textureGame);

@@ -50,13 +50,13 @@ void Bonus::GetMoveEveryBonus(const Time & deltaTime, RenderWindow & window) {
 }
 
 int SpecifySizeBonus() {
-	srand(time(NULL));
+	srand(unsigned int(time(NULL)));
 	int point = 1 + rand() % 5;
 	return point;
 }
 
 int IssuanceProbability() {
-	srand(time(NULL));
+	srand(unsigned int(time(NULL)));
 	int point = 1 + rand() % 4;
 	return point;
 }
