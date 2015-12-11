@@ -29,24 +29,34 @@ struct Enemy {
 	std::list<Entity> enemyShip;
 	std::list<Shoot> bulletEnemy;
 	Clock clock;
-	Time timeCreateEnemy = Time::Zero,
-		timeCreateBulletEnemy = Time::Zero,
-		timeForCalm = Time::Zero; 
-	//--- Занести в отдельную структуру
-	bool isBoss = false; 
-	bool isOneBoss = false; 
-	bool isEvasion = false; // Флаг уклонения
-	bool isShock = false;
-	bool isRage = false;
-	//--------------
-	float timeToCreateEnemy = float(TIME_CREATE_ENEMY);
-	int damage = FIRST_EVER_DAMAGE_ENEMY;
-	int health = FIRST_EVER_HEALTH_ENEMY;
-	int rage = 0;
+		Time timeCreateEnemy = Time::Zero;
+		Time timeCreateBulletEnemy = Time::Zero;
+		Time timeForCalm = Time::Zero;
+	struct BossState {
+	
+		bool isBoss = false;
+		bool isOneBoss = false;
+		bool isEvasion = false; // Флаг уклонения
+		bool isShock = false;
+		bool isRage = false;
+	};
+	BossState bossState;
+		float timeToCreateEnemy = float(TIME_CREATE_ENEMY);
+		int damage = FIRST_EVER_DAMAGE_ENEMY;
+		int health = FIRST_EVER_HEALTH_ENEMY;
+		int rage = 0;
+	struct NumberEnemy {
+		int numberEasyEnemy = COUNT_EASY_ENEMY;
+		int numberMiddleEnemy = COUNT_MIDDLE_ENEMY;
+		int numberTowerEnemy = COUNT_TOWER_ENEMY;
+		int numberKamikaze = COUNT_KAMIKAZE_ENEMY;
+	};
+	NumberEnemy numberEnemy;
 	Selector selector = TRIPLE_SHOT;
-	int selectorShooting = 0;
+		int selectorShooting = 0;
 	void AddEnemy(TextureGame & textureGame);
-	void AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer, Texture & texture);
+	void AddBulletEnemy(Entity & enemy, Vector2f posPlayer, Texture & texture, Time & timeCreateBullet);
+
 	void UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer);
 	void ReferenceRotationTowardPlayer(Entity & enemy, Vector2f posPlayer);
 
@@ -54,14 +64,15 @@ struct Enemy {
 	void BorderChecks(Entity & entity, Vector2u sizeWindow);
 	void CalmBoss();
 	void SetMove(RenderWindow & window, Entity & enemy);
+	
 	void UpdateDirection(RenderWindow & window, Entity & enemy);
+	void MoveKamikaze(const Time & deltaTime, Vector2f posPlayer, Entity & enemy);
 };
 
-Direction GetDirection();
-Vector2f GetRandomPosition(Direction & selectHand);
-int GetRandomPoint(); // переделать или убрать
-int GetTypeEnemy();
-bool IsEnterField(Vector2f & playerPos, Entity & enemy);
-bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow);
 void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame);
 void ResetEnemy(Enemy & enemy);
+	Direction GetDirection(Direction dir);
+	Vector2f GetRandomPosition(Direction & selectHand);
+	int GetRandomPoint(); // переделать или убрать
+	bool IsEnterField(Vector2f & playerPos, Entity & enemy);
+	bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow);

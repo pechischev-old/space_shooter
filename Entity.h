@@ -28,6 +28,7 @@ struct Entity {
 	void CheckForCollisions(RenderWindow & window);
 	void MoveObject(const Time & deltaTime);
 	Time timeChangeDirection = Time::Zero; // для врагов
+	Time timeCreateBullet = Time::Zero; // для врагов
 };
 
 Vector2f Border(Entity & object, RenderWindow & window);

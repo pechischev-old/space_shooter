@@ -19,7 +19,7 @@ void Star::AddStar(TextureGame & textureGame) {
 			Vector2f setPosition = GetRandomPosition(dir);
 			Entity addStar(setPosition.x, setPosition.y, NAME_STAR, textureGame.starTexture);
 			addStar.direction = LEFT;
-			addStar.speed = SetRandomSpeed();
+			addStar.speed = float(SetRandomSpeed());
 			stars.push_back(addStar);
 			timeCreateStar = Time::Zero;
 		}

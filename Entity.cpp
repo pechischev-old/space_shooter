@@ -10,9 +10,9 @@ Entity::Entity(float x, float y, String Name, Texture & texture) {
 	name = Name;
 	sprite = new Sprite;
 	sprite->setTexture(texture);
-	width = texture.getSize().x;
-	height = texture.getSize().y;
-	sprite->setTextureRect(IntRect(0, 0, width, height));
+	width = float(texture.getSize().x);
+	height = float(texture.getSize().y);
+	sprite->setTextureRect(IntRect(0, 0, int(width), int(height)));
 	sprite->setOrigin(width / 2, height / 2);
 	sprite->setPosition(x, y);
 	isLife = true;

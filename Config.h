@@ -51,15 +51,20 @@ const static int POINT_FOR_RAGE = 30;
 
 const static int SPEED_ENEMY = 150;
 
-const static double SPEED_HARD_ENEMY = 1.5;
+const static double SPEED_HARD_ENEMY = 4.0;
 
 const static float SPEED_BOSS = 150;
 
-const static int TIME_CREATE_ENEMY = 1;
+const static int TIME_CREATE_ENEMY = 2;
 
 const static double TIME_CREATE_BULLET_ENEMY = 0.2;
 
-const static sf::String NAME_EASY_ENEMY = "enemy1";
+static const int COUNT_EASY_ENEMY = 2;
+static const int COUNT_MIDDLE_ENEMY = 0;
+static const int COUNT_TOWER_ENEMY = 0;
+static const int COUNT_KAMIKAZE_ENEMY = 1;
+
+const static sf::String NAME_EASY_ENEMY = "easyEnemy";
 
 const static sf::String NAME_MIDDLE_ENEMY = "middleEnemy";
 

@@ -5,12 +5,17 @@ using namespace sf;
 
 void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer) {
 	for (list<Entity>::iterator it = enemyShip.begin(); it != enemyShip.end();) {
-		SetMove(window, *it);
+		if (it->name != NAME_BOSS) {
+			SetMove(window, *it);
+		}
 		it->MoveObject(deltaTime);
 		UpdateDirection(window, *it);
+		if (it->name == NAME_KAMIKAZE_ENEMY) {
+			MoveKamikaze(deltaTime, posPlayer, *it);
+		}
 		if (it->health <= 0 && it->name == NAME_BOSS) {
-			isBoss = false;
-			isRage = false;
+			bossState.isBoss = false;
+			bossState.isRage = false;
 		}
 		if (it->name != NAME_BOSS) {
 			if (it->name == NAME_TOWER_ENEMY) {
@@ -41,51 +46,67 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWin
 }
 
 void Enemy::AddEnemy(TextureGame & textureGame) {
+	auto GetTypeEnemy = [&]() {
+		srand(unsigned int(time(NULL)));
+		return 1 + rand() % 4;
+	};
+
 	timeCreateEnemy += clock.restart();
-	if (!isBoss) {
+	if (!bossState.isBoss) {
 		if (timeCreateEnemy.asSeconds() > timeToCreateEnemy) {
 			int chooseEnemy = GetTypeEnemy();
 			Direction dir;
 			Vector2f getPositionEnemy;
 			String typeEnemy;
 			Texture *texture = NULL;
+			int countEnemy = 0;
 			if (chooseEnemy == 1) { // сделать через switch
 				dir = LEFT;
-				getPositionEnemy = GetRandomPosition(dir);
 				typeEnemy = NAME_EASY_ENEMY;
 				texture = &textureGame.enemyEasyTexture;
+				countEnemy = numberEnemy.numberEasyEnemy;
 			}
 			if (chooseEnemy == 2) {
 				dir = LEFT;
-				getPositionEnemy = GetRandomPosition(dir);
 				typeEnemy = NAME_MIDDLE_ENEMY;
 				texture = &textureGame.enemyMiddleTexture;
+				countEnemy = numberEnemy.numberMiddleEnemy;
 			}
 			if (chooseEnemy == 3) {
 				dir = LEFT;
-				getPositionEnemy = GetRandomPosition(dir);
 				typeEnemy = NAME_TOWER_ENEMY;
 				texture = &textureGame.enemyTowerTexture;
+				countEnemy = numberEnemy.numberTowerEnemy;
 			}
-			Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy, *texture);
-			addEnemy.health = float(health);
-			addEnemy.speed = float(SPEED_ENEMY);
-			if (typeEnemy == NAME_TOWER_ENEMY) {
-				addEnemy.speed = float(SPEED_TOWER);
-				addEnemy.sprite->setScale(-1, 1);
+			if (chooseEnemy == 4) {
+				dir = LEFT;
+				typeEnemy = NAME_KAMIKAZE_ENEMY;
+				texture = &textureGame.enemyKamikazeTexture;
+				countEnemy = numberEnemy.numberKamikaze;
 			}
-			addEnemy.direction = dir;
-			addEnemy.damage = float(damage);
-			if (typeEnemy == NAME_MIDDLE_ENEMY)
-				addEnemy.health = 2 * float(health);
-			else
+			for (int i = 1; i <= countEnemy; ++i) {
+				getPositionEnemy = GetRandomPosition(dir);
+				Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy, *texture);
 				addEnemy.health = float(health);
-			enemyShip.push_back(addEnemy);
+				addEnemy.speed = float(SPEED_ENEMY);
+				if (typeEnemy == NAME_TOWER_ENEMY) {
+
+					addEnemy.speed = float(SPEED_TOWER);
+					addEnemy.sprite->setScale(-1, 1);
+				}
+				addEnemy.direction = dir;
+				addEnemy.damage = float(damage);
+				if (typeEnemy == NAME_MIDDLE_ENEMY)
+					addEnemy.health = 2 * float(health);
+				else
+					addEnemy.health = float(health);
+				enemyShip.push_back(addEnemy);
+			}
 			timeCreateEnemy = Time::Zero;
-			isOneBoss = false;
+			bossState.isOneBoss = false;
 		}
 	}
-	if (isBoss && !isOneBoss) {
+	if (bossState.isBoss && !bossState.isOneBoss) {
 		Vector2f getPositionEnemy = { 650, 350 };
 		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, NAME_BOSS, textureGame.enemyBossTexture);
 		addEnemy.direction = UP;
@@ -93,15 +114,16 @@ void Enemy::AddEnemy(TextureGame & textureGame) {
 		addEnemy.health = float(health) * RATE_HEALTH_BOSS;
 		addEnemy.speed = SPEED_BOSS;
 		enemyShip.push_back(addEnemy);
-		isOneBoss = true;
+		bossState.isOneBoss = true;
 	}
 }
 
-void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, Vector2f posPlayer, Texture & texture) {
-	timeCreateBulletEnemy += clock.restart();
-	if (timeCreateBulletEnemy.asSeconds() > TIME_CREATE_BULLET_ENEMY) {
+void Enemy::AddBulletEnemy(Entity & enemy, Vector2f posPlayer, Texture & texture, Time & timeCreateBullet) {
+	timeCreateBullet += clock.getElapsedTime();
+	Vector2f posEnemy = enemy.sprite->getPosition();
+	if (timeCreateBullet.asSeconds() > TIME_CREATE_BULLET_ENEMY) {
 		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, LEFT, texture, NAME_BULLET);
-		if ((enemy.name == NAME_MIDDLE_ENEMY || enemy.name == NAME_BOSS) && !isRage) {
+		if ((enemy.name == NAME_MIDDLE_ENEMY || enemy.name == NAME_BOSS) && !bossState.isRage) {
 			addBullet.isOtherBullet = true;
 			addBullet.rememPos = posPlayer;
 		}
@@ -111,7 +133,7 @@ void Enemy::AddBulletEnemy(Vector2f posEnemy, Direction & dir, Entity & enemy, V
 			addBullet.name = NAME_ROCKET;
 		}
 		bulletEnemy.push_back(addBullet); // создание пули и занесение ее в список
-		timeCreateBulletEnemy = Time::Zero;
+		timeCreateBullet = Time::Zero;
 	}
 }
 
@@ -137,11 +159,11 @@ void Enemy::Evasion(Vector2f posBullet, Entity & entity, Vector2u sizeWindow) {
 }
 
 void Enemy::CalmBoss() {
-	if (isRage) {
+	if (bossState.isRage) {
 		timeForCalm += clock.restart();
 		if (timeForCalm.asMicroseconds() > 100) {
 			rage -= 5;
-			isRage = rage > 0;
+			bossState.isRage = rage > 0;
 			timeForCalm = Time::Zero;
 		}
 		if (rage <= 0) {
@@ -162,6 +184,16 @@ void Enemy::CalmBoss() {
 void Enemy::ReferenceRotationTowardPlayer(Entity & enemy, Vector2f posPlayer) {
 	Vector2f posEnemy = enemy.sprite->getPosition();
 	enemy.sprite->setRotation(float(atan2((posPlayer.y - posEnemy.y), (posPlayer.x - posEnemy.x)) * 180 / M_PI));
+}
+
+void Enemy::MoveKamikaze(const Time & deltaTime, Vector2f posPlayer, Entity & enemy) {
+	if (enemy.health > 0) {
+		Vector2f posEnemy = enemy.sprite->getPosition();
+		float distance = sqrt((posPlayer.x - posEnemy.x)*(posPlayer.x - posEnemy.x) + (posPlayer.x - posEnemy.y)*(posPlayer.x - posEnemy.y));
+		posEnemy.x += 5 * (posPlayer.x - posEnemy.x) / distance;  // совершает рывки почему-то
+		posEnemy.y += 5 * (posPlayer.y - posEnemy.y) / distance;
+		enemy.sprite->setPosition(posEnemy.x, posEnemy.y);
+	}
 }
 
 void Enemy::UpdateDirection(RenderWindow & window, Entity & enemy) {
@@ -187,31 +219,43 @@ void Enemy::SetMove(RenderWindow & window, Entity & enemy) {
 	auto isNoBorder = [&](RenderWindow & window, Vector2f position) {
 		float distance = 100;
 		bool flagOne = distance <= position.x && position.x <= window.getSize().x - distance;
-		bool flagTwo = distance <= position.y && position.y <= window.getSize().y - distance;
+		bool flagTwo = 0 <= position.y && position.y <= window.getSize().y;
 		return flagOne && flagTwo; };
 
 	if (isNoBorder(window, position)) {
 		enemy.timeChangeDirection += clock.restart();
-		if (enemy.timeChangeDirection.asSeconds() > 0.5) {
-			enemy.direction = GetDirection();
+		if (enemy.timeChangeDirection.asSeconds() > 2) {
+			enemy.direction = GetDirection(enemy.direction);
 			enemy.timeChangeDirection = Time::Zero;
 		}
-
 	}
 }
 
-Direction GetDirection() {
+Direction GetDirection(Direction oldDir) {
 	Direction dir;
 	srand(unsigned int(time(NULL)));
-	int selectHand = 1 + rand() % 4;
-	if (selectHand == 1) dir = RIGHT;
-	if (selectHand == 2) dir = DOWN;
-	if (selectHand == 3) dir = LEFT;
-	if (selectHand == 4) dir = UP;
-	/*if (selectHand == 5) dir = UP_RIGHT;
-	if (selectHand == 6) dir = DOWN_LEFT;
-	if (selectHand == 7) dir = DOWN_RIGHT;
-	if (selectHand == 8) dir = UP_LEFT;*/
+	int selectHand = 1 + rand() % 3;
+	if (oldDir == UP) {
+		if (selectHand == 1) dir = RIGHT;
+		if (selectHand == 2) dir = DOWN;
+		if (selectHand == 3) dir = LEFT;
+	}
+	else if (oldDir == LEFT) {
+		if (selectHand == 1) dir = RIGHT;
+		if (selectHand == 2) dir = DOWN;
+		if (selectHand == 3) dir = UP;
+	}
+	else if (oldDir == RIGHT) {
+		if (selectHand == 1) dir = LEFT;
+		if (selectHand == 2) dir = DOWN;
+		if (selectHand == 3) dir = UP;
+	}
+	else if (oldDir == DOWN) {
+		if (selectHand == 1) dir = RIGHT;
+		if (selectHand == 2) dir = LEFT;
+		if (selectHand == 3) dir = UP;
+	}
+	
 	return dir;
 }
 
@@ -303,17 +347,12 @@ bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow) {
 	return false;
 }
 
-int GetTypeEnemy() {
-	srand(unsigned int(time(NULL)));
-	return 1 + rand() % 3;
-}
-
 void ResetEnemy(Enemy & enemy) {
-	enemy.isBoss = false;
-	enemy.isOneBoss = false;
-	enemy.isEvasion = false;
-	enemy.isShock = false;
-	enemy.isRage = false;
+	enemy.bossState.isBoss = false;
+	enemy.bossState.isOneBoss = false;
+	enemy.bossState.isEvasion = false;
+	enemy.bossState.isShock = false;
+	enemy.bossState.isRage = false;
 	enemy.damage = FIRST_EVER_DAMAGE_ENEMY;
 	enemy.health = FIRST_EVER_HEALTH_ENEMY;
 	enemy.rage = 0;

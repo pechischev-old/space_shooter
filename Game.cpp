@@ -21,12 +21,18 @@ void Game::IncreaseCharacteristicsObjects() {
 		enemy->health += 30;
 		oldOrder += 1;
 		levelGame += 1;
-		if (asteroid->timeToCreateAsteroid > 0.1)
-			asteroid->timeToCreateAsteroid -= 0.07;
-		if (enemy->timeToCreateEnemy > 0.1)
-			enemy->timeToCreateEnemy -= 0.1;
-		enemy->isBoss = true;
-		cout << "Enemy stand hard " << endl;
+		//-------- увеличение количества кораблей врагов
+		enemy->numberEnemy.numberEasyEnemy += 1;
+		enemy->numberEnemy.numberKamikaze += 1;
+		enemy->numberEnemy.numberMiddleEnemy += 1;
+		enemy->numberEnemy.numberTowerEnemy += 1;
+		//---------- уменьшение времени появления враждебных объектов
+		if (asteroid->timeToCreateAsteroid > 0.3)
+			asteroid->timeToCreateAsteroid -= 0.07f;
+		if (enemy->timeToCreateEnemy > 0.3)
+			enemy->timeToCreateEnemy -= 0.1f;
+		//enemy->isBoss = true;
+		cout << "Enemy stand hard " << levelGame << endl;
 	}
 }
 
@@ -35,13 +41,12 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 	if (player->ship->sprite->getColor() == Color::Red)
 		player->ship->sprite->setColor(Color::White);
 	//----------------------------------------------------------
-
 	for (list<Entity>::iterator it2 = enemy->enemyShip.begin(); it2 != enemy->enemyShip.end(); ++it2) {
 		//----------------- Окрашивает в белый цвет ----------------
 		if (it2->sprite->getColor() == Color::Red)
 			it2->sprite->setColor(Color::White);
 		//----------------------- Обработка взаимодействия игрока и противников ------------------------------------
-		if(player->ship->sprite->getGlobalBounds().intersects(it2->sprite->getGlobalBounds())) // столкновение игрока с врагом
+		if (player->ship->sprite->getGlobalBounds().intersects(it2->sprite->getGlobalBounds())) // столкновение игрока с врагом
 		{
 			if (it2->health > 0) {
 				if (!player->playerState.isInvulnerability) {
@@ -52,28 +57,27 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 			if (player->ship->health > 0) {
 				if (it2->name == NAME_BOSS)
 					player->ship->health = 0;
-				else 
+				else
 					it2->health = 0;
 			}
 		}
 		Vector2f posEnemy = it2->sprite->getPosition(),
 			posPlayer = player->ship->sprite->getPosition();
-		if (IsEnterField(posPlayer, *it2) && it2->name == NAME_EASY_ENEMY) { // враг стреляет
-			if (it2->health > 0) {
-				enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame.redLaserTexture);
+		//----------------------------- враг стреляет -----------------------------------------------------
+	  if (it2->health > 0 && it2->name != NAME_KAMIKAZE_ENEMY) {
+			if (IsEnterField(posPlayer, *it2) && it2->name == NAME_EASY_ENEMY) {
+
+				enemy->AddBulletEnemy(*it2, posPlayer, textureGame.redLaserTexture, it2->timeCreateBullet);
 			}
-		}
-		if (IsSeePlayer(posPlayer, *it2, window.getSize()) && it2->name != NAME_EASY_ENEMY && it2->name != NAME_TOWER_ENEMY) { // враг стреляет
-			if (it2->health > 0) { 
-				if (!enemy->isRage)
-					enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame.redLaserTexture);
-				else if (enemy->isRage && it2->name == NAME_BOSS)
-					SpecialShootingBoss(*enemy, *it2, textureGame);
+
+			else if (IsSeePlayer(posPlayer, *it2, window.getSize()) && it2->name != NAME_EASY_ENEMY && it2->name != NAME_TOWER_ENEMY) { // враг стреляет
+					if (!enemy->bossState.isRage) // переделать условие
+						enemy->AddBulletEnemy(*it2, posPlayer, textureGame.redLaserTexture, it2->timeCreateBullet);
+					else if (enemy->bossState.isRage && it2->name == NAME_BOSS)
+						SpecialShootingBoss(*enemy, *it2, textureGame);
 			}
-		}
-		if (it2->name == NAME_TOWER_ENEMY) {
-			if (it2->health > 0) {
-				enemy->AddBulletEnemy(posEnemy, it2->direction, *it2, posPlayer, textureGame.rocketTexture);
+			else if (it2->name == NAME_TOWER_ENEMY) {
+					enemy->AddBulletEnemy(*it2, posPlayer, textureGame.rocketTexture, it2->timeCreateBullet);
 			}
 		}
 		//------------------------------- Обработка попадания пули по врагу ----------------------------------------
@@ -85,11 +89,11 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 					it->isExplosion = true;
 				it2->sprite->setColor(Color::Red);
 				if (it2->name == NAME_BOSS) {
-					if (enemy->rage <= POINT_FOR_RAGE && !enemy->isRage) {
+					if (enemy->rage <= POINT_FOR_RAGE && !enemy->bossState.isRage) {
 						enemy->rage += 5;
 					}
 					else {
-						enemy->isRage = true;
+						enemy->bossState.isRage = true;
 					}
 				}
 			}
@@ -103,11 +107,6 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 		for (list<Entity>::iterator it3 = asteroid->asteroids.begin(); it3 != asteroid->asteroids.end(); ++it3) {
 			if (it2->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) // столкновение врага с астероидом
 			{
-				if (it3->health > 0) {
-
-					it2->health -= it2->damage;
-					it2->sprite->setColor(Color::Red);
-				}
 				it3->health = 0;
 			}
 		}
@@ -125,7 +124,7 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 				player->playerState.isMove = false;
 				player->direction = NONE;
 				player->timeRecoveryMove = Time::Zero;
-				enemy->isRage = false;
+				enemy->bossState.isRage = false;
 				enemy->rage = 0;
 			}
 			it->isExplosion = true;
@@ -343,7 +342,7 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 	enemy.CalmBoss();
 	UpdateStateBullet(deltaTime, window, enemy.bulletEnemy, game.textureGame, posPlayer);
 	//--------------- Функции астероидов ---------------
-	if (!enemy.isBoss)
+	if (!enemy.bossState.isBoss)
 		asteroid.AddAsteroid(game.textureGame);
 	asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus, game.textureGame);
 	//---------------- Функции бонусов -----------------
