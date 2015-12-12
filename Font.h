@@ -12,7 +12,7 @@ using namespace std;
 struct TextWithInfo {
 	Font font;
 	Text textPlayerHealth;
-	Text textPoint;
+	Text textNumber;
 	Text textNewGame;
 	Text textContinue;
 	Text textRecords;
@@ -20,16 +20,19 @@ struct TextWithInfo {
 	Text textExit;
 	Text textScore;
 	Text textAboutRecord;
+	Text textLevel;
 	int sizeText = 32;
+	
 };
 
 void InitializeText(TextWithInfo & textInfo);
 void InitString(Text & text, String & str, Font & font, int sizeText);
-void UpdateTextWithHealth(TextWithInfo & textInfo, Player & player);
+void UpdateTextWithHealth(TextWithInfo & textInfo, Player & player, RenderWindow & window);
+float GetWidth(Text & text);
 
 void ReferenceLinePosition(Vector2u sizeWindow, Text & text, Vector2f & posPrevText, int sizeText);
 void SelectTextWithMouse(RenderWindow & window, Text & text, MenuSelector & selector, MenuSelector selectMenu);
 void SelectButtons(RenderWindow & window, TextWithInfo & textInfo, MenuSelector & selector);
 void UpdateTextMenu(RenderWindow & window, TextWithInfo & textInfo);
-void DrawTextToWindow(TextWithInfo & textInfo, RenderWindow & window);
+void DrawTextToGame(TextWithInfo & textInfo, RenderWindow & window);
 void DrawTextToMenu(TextWithInfo & textInfo, RenderWindow & window);

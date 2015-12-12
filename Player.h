@@ -32,9 +32,10 @@ struct Player
 	Time timeRecoveryMove; 
 	int scaleBullet = 2;
 	std::list<Shoot> bullet;
-	int point = 0;
 	int maxHealth = MAX_HEALTH;
 	int maxDamage = MAX_DAMAGE;
+	int point = POINT_FOR_ADVANCE;
+	int levelGame = 1;
 	//Функции для игрока
 	void AddBullet(TextureGame & textureGame);
 	void CheckPlayerLife();

@@ -57,7 +57,7 @@ struct Enemy {
 	void AddEnemy(TextureGame & textureGame);
 	void AddBulletEnemy(Entity & enemy, Vector2f posPlayer, Texture & texture, Time & timeCreateBullet);
 
-	void UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer);
+	void UpdateStateEveryEnemy(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer, int & point);
 	void ReferenceRotationTowardPlayer(Entity & enemy, Vector2f posPlayer);
 
 	void Evasion(Vector2f posBullet, Entity & entity, Vector2u sizeWindow);
@@ -73,6 +73,5 @@ void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame
 void ResetEnemy(Enemy & enemy);
 	Direction GetDirection(Direction dir);
 	Vector2f GetRandomPosition(Direction & selectHand);
-	int GetRandomPoint(); // переделать или убрать
 	bool IsEnterField(Vector2f & playerPos, Entity & enemy);
 	bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow);

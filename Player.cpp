@@ -113,7 +113,6 @@ void MovePlayer(Player & player, const Time & deltaTime) {
 }
 
 void ResetPlayer(Player & player, TextureGame & textureGame) {
-	player.point = 0;
 	player.maxHealth = MAX_HEALTH;
 	player.maxDamage = MAX_DAMAGE;
 	player.ship->sprite->setPosition(250, 250);

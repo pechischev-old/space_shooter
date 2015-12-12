@@ -12,13 +12,15 @@ struct GlobalBool {
 	bool g_isPause = false;
 };
 
-const static int SCRN_HEIGTH = 600, SCRN_WIDTH = 800;
+const static int SCRN_HEIGTH = 768, SCRN_WIDTH = 1390;
 
 const static double BORDER = 0.3f;
 
 const static sf::String TITLE_GAME = "Main Game";
 
-const static int POINT_FOR_ADVANCE = 300;
+const static int POINT_FOR_ADVANCE = 15;
+
+const static int MAX_LEVEL_GAME = 15;
 
 //---------------------- Для игрока ------------------------------------
 
@@ -59,10 +61,10 @@ const static int TIME_CREATE_ENEMY = 2;
 
 const static double TIME_CREATE_BULLET_ENEMY = 0.2;
 
-static const int COUNT_EASY_ENEMY = 2;
+static const int COUNT_EASY_ENEMY = 3;
 static const int COUNT_MIDDLE_ENEMY = 0;
 static const int COUNT_TOWER_ENEMY = 0;
-static const int COUNT_KAMIKAZE_ENEMY = 1;
+static const int COUNT_KAMIKAZE_ENEMY = 0;
 
 const static sf::String NAME_EASY_ENEMY = "easyEnemy";
 
@@ -158,7 +160,9 @@ const static float RATE_LINE_SPACING = 1;
 
 const static sf::String TEXT_HEALTH = L"Жизнь: ";
 
-const static sf::String TEXT_POINT = L"Очки: ";
+const static sf::String TEXT_POINT = L"Врагов осталось: ";
+
+const static sf::String TEXT_LEVEL = L"Уровень ";
 
 const static sf::String TEXT_NEW_GAME = L"Новая игра";
 const static sf::String TEXT_CONTINUE = L"Продолжить";

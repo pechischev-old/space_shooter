@@ -11,7 +11,7 @@ void InitString(Text & text, String & str, Font & font, int sizeText) {
 void InitializeText(TextWithInfo & textInfo) {
 	textInfo.font.loadFromFile(PATH_TO_FONT);
 	InitString(textInfo.textPlayerHealth, String(""), textInfo.font, textInfo.sizeText);
-	InitString(textInfo.textPoint, String(""), textInfo.font, textInfo.sizeText);
+	InitString(textInfo.textNumber, String(""), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textNewGame, String(TEXT_NEW_GAME), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textContinue, String(TEXT_CONTINUE), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textRecords, String(TEXT_RECORDS), textInfo.font, textInfo.sizeText);
@@ -19,7 +19,7 @@ void InitializeText(TextWithInfo & textInfo) {
 	InitString(textInfo.textExit, String(TEXT_EXIT), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textAboutRecord, String(TEXT_ABOUT_RECORD), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textScore, String(""), textInfo.font, textInfo.sizeText);
-
+	InitString(textInfo.textLevel, String(""), textInfo.font, textInfo.sizeText);
 }
 
 void ReferenceLinePosition(Vector2u sizeWindow, Text & text, Vector2f & posPrevText, int sizeText) {
@@ -27,10 +27,13 @@ void ReferenceLinePosition(Vector2u sizeWindow, Text & text, Vector2f & posPrevT
 	float x = sizeWindow.x / 2;
 	float y = distance + posPrevText.y;
 	text.setPosition(x, y);
-	//posPrevText = { x, y };
 }
 
-void UpdateTextWithHealth(TextWithInfo & textInfo, Player & player) {
+float GetWidth(Text & text) {
+	return text.getLocalBounds().width;
+}
+
+void UpdateTextWithHealth(TextWithInfo & textInfo, Player & player, RenderWindow & window) {
 	ostringstream countHealthStr, countPoint;
 	if (player.ship->health >= 0)
 		countHealthStr << player.ship->health;
@@ -39,8 +42,12 @@ void UpdateTextWithHealth(TextWithInfo & textInfo, Player & player) {
 	countPoint << player.point;
 	textInfo.textPlayerHealth.setString(TEXT_HEALTH + countHealthStr.str());
 	textInfo.textPlayerHealth.setPosition(10, 10);
-	textInfo.textPoint.setString(TEXT_POINT + countPoint.str());
-	textInfo.textPoint.setPosition(250, 10); // сделать зависимость от размеров окна и длины предыдущей строки
+	textInfo.textNumber.setString(TEXT_POINT + countPoint.str());
+	textInfo.textNumber.setPosition(250, 10); // сделать зависимость от размеров окна и длины предыдущей строки
+	textInfo.textLevel.setString(TEXT_LEVEL + to_string(player.levelGame));
+	float width = GetWidth(textInfo.textLevel);
+	float widthWindow = window.getSize().x;
+	textInfo.textLevel.setPosition(widthWindow - width * 2, 10);
 }
 
 void SelectTextWithMouse(RenderWindow & window, Text & text, MenuSelector & selector, MenuSelector selectMenu) {
@@ -79,9 +86,10 @@ void UpdateTextMenu(RenderWindow & window, TextWithInfo & textInfo) {
 	ReferenceLinePosition(window.getSize(), textInfo.textExit, pos, textInfo.sizeText);
 }
 
-void DrawTextToWindow(TextWithInfo & textInfo, RenderWindow & window) {
+void DrawTextToGame(TextWithInfo & textInfo, RenderWindow & window) {
 	window.draw(textInfo.textPlayerHealth);
-	window.draw(textInfo.textPoint);
+	window.draw(textInfo.textNumber);
+	window.draw(textInfo.textLevel);
 }
 
 void DrawTextToMenu(TextWithInfo & textInfo, RenderWindow & window) {

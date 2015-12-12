@@ -3,7 +3,7 @@
 using namespace std;
 using namespace sf;
 
-void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer) {
+void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer, int & point) {
 	for (list<Entity>::iterator it = enemyShip.begin(); it != enemyShip.end();) {
 		if (it->name != NAME_BOSS) {
 			SetMove(window, *it);
@@ -29,14 +29,12 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, int & point, RenderWin
 		it->CheckForCollisions(window);
 		if (it->health <= 0) {
 			it->Explosion(deltaTime, textureGame.explosionTexture);
-			if (it->CurrentFrame >= NUMBER_OF_FRAMES - 1.5) {
-				point += GetRandomPoint();
-			}
 		}
 		if (!it->isLife) {
 			if (it->isKilled) {  // выпадение бонуса
 				if (CheckProbably())
 					bonus.AddBonus(Vector2f(it->x, it->y), textureGame);
+				--point;
 			}
 			delete it->sprite;
 			it = enemyShip.erase(it);
@@ -319,11 +317,6 @@ void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame
 		enemy.timeCreateBulletEnemy = Time::Zero;
 	}
 }
-
-int GetRandomPoint() { 
-	srand(unsigned int(time(NULL)));
-	return 1 + rand() % 3;
-} 
 
 bool IsEnterField(Vector2f & playerPos, Entity & enemy) {
 	Vector2f posEnemy = enemy.sprite->getPosition(),

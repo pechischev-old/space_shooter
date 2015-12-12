@@ -16,11 +16,12 @@ void InitializeGame(Game & game) {
 }
 
 void Game::IncreaseCharacteristicsObjects() {
-	if ( player->point / POINT_FOR_ADVANCE == oldOrder + 1) { // переделать диапозон очков
+	if (player->point == 0 ) { // переделать диапозон очков
 		enemy->damage += 15;
 		enemy->health += 30;
-		oldOrder += 1;
-		levelGame += 1;
+		countEnemy += 10;
+		player->point = countEnemy;
+		player->levelGame += 1;
 		//-------- увеличение количества кораблей врагов
 		enemy->numberEnemy.numberEasyEnemy += 1;
 		enemy->numberEnemy.numberKamikaze += 1;
@@ -31,8 +32,8 @@ void Game::IncreaseCharacteristicsObjects() {
 			asteroid->timeToCreateAsteroid -= 0.07f;
 		if (enemy->timeToCreateEnemy > 0.3)
 			enemy->timeToCreateEnemy -= 0.1f;
-		//enemy->isBoss = true;
-		cout << "Enemy stand hard " << levelGame << endl;
+		if (player->levelGame == MAX_LEVEL_GAME)
+			enemy->bossState.isBoss = true;
 	}
 }
 
@@ -311,7 +312,7 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 	game.CheckForCollision(window, deltaTime, game.textureGame);
 	game.UseBonus(deltaTime);
 	//---------------- Интерфейс -----------------------
-	UpdateTextWithHealth(*game.textInfo, player);
+	UpdateTextWithHealth(*game.textInfo, *game.player, window);
 	//---------------- Функции звезд -------------------
 	//LoadStarInList(star, deltaTime, window, *game.textureGame); // добавить загрузочный экран
 	star.AddStar(game.textureGame);
@@ -337,7 +338,7 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 	}
 	
 	//---------------- Функции противников -------------
-	enemy.UpdateStateEveryEnemy(deltaTime, player.point, window, bonus, game.textureGame, posPlayer);
+	enemy.UpdateStateEveryEnemy(deltaTime, window, bonus, game.textureGame, posPlayer, player.point);
 	enemy.AddEnemy(game.textureGame);
 	enemy.CalmBoss();
 	UpdateStateBullet(deltaTime, window, enemy.bulletEnemy, game.textureGame, posPlayer);
@@ -354,7 +355,7 @@ void renderGame(RenderWindow & window, Game & game)
 	window.clear();
 	//if (!game.gameState.isLoading) {
 	game.DrawObjects(window);
-	DrawTextToWindow(*game.textInfo, window);
+	DrawTextToGame(*game.textInfo, window);
 	//}
 	window.display();
 }
@@ -368,7 +369,7 @@ void ResetGame(Game & game) {
 	ResetPlayer(*game.player, game.textureGame);
 	ResetEnemy(*game.enemy);
 	game.timeGame = 0;
-	game.oldOrder = 0;
+	game.player->point = POINT_FOR_ADVANCE;
 }
 
 void Delete(Game & game) {

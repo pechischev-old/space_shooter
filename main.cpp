@@ -10,6 +10,7 @@
 using namespace sf;
 using namespace std;
 
+
 const Time TIME_PER_FRAME = seconds(1.f / 60.f);
 
 void processEvents(RenderWindow & window, Menu & menu, Game & game, GlobalBool & globalBool) {
