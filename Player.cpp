@@ -4,7 +4,7 @@ using namespace sf;
 using namespace std;
 
 void InitializePlayer(Player & player, TextureGame & textureGame) {
-	player.ship = new Entity(250, 250, NAME_PLAYER_SHIP, textureGame.playerTexture);
+	player.ship = new Entity(SCRN_WIDTH / 2, SCRN_HEIGTH / 2, NAME_PLAYER_SHIP, textureGame.playerTexture);
 	player.ship->health = float(player.maxHealth);
 	player.playerState.isAlive = true;
 	player.ship->damage = float(player.maxDamage);
@@ -16,7 +16,7 @@ void Player::CheckPlayerLife() {
 	playerState.isAlive = ship->health > 0;
 }
 
-void Player::AddBullet(TextureGame & textureGame) {
+void Player::AddBullet(TextureGame & textureGame, Vector2f posPoint) {
 	if (playerState.isShoot) {
 		timeCreateBullet += clock.restart(); 
 		if (timeCreateBullet.asSeconds() > TIME_CREATE_BULLET) { // Зависимость появления пули от времени
@@ -24,6 +24,8 @@ void Player::AddBullet(TextureGame & textureGame) {
 			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, textureGame.blueLaserTexture, NAME_BULLET);
 			addBullet.damage = int(ship->damage);
 			addBullet.sprite->setScale(float(scaleBullet), float(scaleBullet));
+			addBullet.isOtherBullet = true;
+			addBullet.rememPos = posPoint;
 			bullet.push_back(addBullet); // создание пули и занесение ее в список
 			timeCreateBullet = Time::Zero;
 		}
@@ -115,7 +117,7 @@ void MovePlayer(Player & player, const Time & deltaTime) {
 void ResetPlayer(Player & player, TextureGame & textureGame) {
 	player.maxHealth = MAX_HEALTH;
 	player.maxDamage = MAX_DAMAGE;
-	player.ship->sprite->setPosition(250, 250);
+	player.ship->sprite->setPosition(SCRN_WIDTH / 2, SCRN_HEIGTH / 2);
 	player.ship->sprite->setTexture(textureGame.playerTexture);
 	player.ship->health = float(player.maxHealth);
 	player.playerState.isAlive = true;

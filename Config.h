@@ -40,6 +40,12 @@ const static sf::String NAME_PLAYER_SHIP = "sokol";
 
 const static float MAX_TIME_RECOVERY_MOVE = 3;
 
+//--------------
+
+static const int SPEED_OTHER_BULLET = 20;
+
+static const int SPEED_ROCKET = 6;
+
 //---------------------- Для врагов -----------------------------------
 
 const static int HEIGTH_ENEMY = 50,
@@ -62,8 +68,8 @@ const static int TIME_CREATE_ENEMY = 2;
 const static double TIME_CREATE_BULLET_ENEMY = 0.2;
 
 static const int COUNT_EASY_ENEMY = 3;
-static const int COUNT_MIDDLE_ENEMY = 0;
-static const int COUNT_TOWER_ENEMY = 0;
+static const int COUNT_MIDDLE_ENEMY = 1;
+static const int COUNT_TOWER_ENEMY = 1;
 static const int COUNT_KAMIKAZE_ENEMY = 0;
 
 const static sf::String NAME_EASY_ENEMY = "easyEnemy";

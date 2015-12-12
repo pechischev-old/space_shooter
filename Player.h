@@ -37,7 +37,7 @@ struct Player
 	int point = POINT_FOR_ADVANCE;
 	int levelGame = 1;
 	//Функции для игрока
-	void AddBullet(TextureGame & textureGame);
+	void AddBullet(TextureGame & textureGame, Vector2f posPoint);
 	void CheckPlayerLife();
 	void RecoveryMove();
 };

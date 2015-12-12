@@ -103,36 +103,28 @@ void Shoot::MoveBullet(const Time & deltaTime) {
 	sprite->move(x, y);
 }
 
-void Shoot::MoveBulletHardEnemy(const Time & deltaTime) {
-	if (!isExplosion) {
-		x += float(SPEED_HARD_ENEMY * deltaTime.asSeconds() * (rememPos.x - dx));
-		y += float(SPEED_HARD_ENEMY * deltaTime.asSeconds() * (rememPos.y - dy));
-		sprite->setPosition(x, y);
-		sprite->setRotation(float(atan2((rememPos.y - dy), (rememPos.x - dx)) * 180 / M_PI));
+void Shoot::MoveBulletHardEnemy(const Time & deltaTime, Vector2f posObject, int speed) {
+	float dX = dx;
+	float dY = dy;
+	if (isRocket) {
+		dX = x;
+		dY = y;
 	}
+	float distance = sqrt((posObject.x - dX)*(posObject.x - dX) + (posObject.y - dY)*(posObject.y - dY));
+	x += speed * (posObject.x - dX) / distance;
+	y += speed * (posObject.y - dY) / distance;
+	sprite->setPosition(x, y);
+	sprite->setRotation(float(atan2((posObject.y - dY), (posObject.x - dX)) * 180 / M_PI));
 }
-
-void Shoot::MoveRocket(const Time & deltaTime, Vector2f posPlayer) {
-	if (!isExplosion) {
-		//float distance = sqrt((posPlayer.x - x)*(posPlayer.x - x) + (posPlayer.x - y)*(posPlayer.x - y));
-		//x += 5 * (posPlayer.x - x) / distance;  // совершает рывки почему-то
-		//y += 5 * (posPlayer.y - y) / distance;
-		x += float(SPEED_HARD_ENEMY * deltaTime.asSeconds() * (posPlayer.x - x));
-		y += float(SPEED_HARD_ENEMY * deltaTime.asSeconds() * (posPlayer.y - y));
-		sprite->setPosition(x, y);
-		sprite->setRotation(float(atan2((posPlayer.y - y), (posPlayer.x - x)) * 180 / M_PI));
-	}
-}
-
 
 void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot> & bullets, TextureGame & textureGame, Vector2f posPlayer) {
 	for (list<Shoot>::iterator it = bullets.begin(); it != bullets.end();) {
 		it->CheckForCollisions(window);
-		if (it->isOtherBullet) {
-			it->MoveBulletHardEnemy(deltaTime);
+		if (it->isOtherBullet && !it->isExplosion) {
+			it->MoveBulletHardEnemy(deltaTime, it->rememPos, SPEED_OTHER_BULLET);
 		}
-		else if ( it->isRocket) {
-			it->MoveRocket(deltaTime, posPlayer);
+		else if ( it->isRocket && !it->isExplosion) {
+			it->MoveBulletHardEnemy(deltaTime, posPlayer, SPEED_ROCKET);
 		}
 		else {
 			it->MoveBullet(deltaTime);
@@ -154,7 +146,6 @@ void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot
 		else  ++it;
 	}
 }
-
 
 void ClearList(list<Shoot> & bullets) {
 	for (list<Shoot>::iterator i = bullets.begin(); i != bullets.end(); ++i) {

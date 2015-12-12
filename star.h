@@ -18,7 +18,7 @@ struct Star {
 	Time timeCreateStar = Time::Zero;
 	Vector2u sizeStar;
 	void UpdateStateStar(const Time & deltaTime, RenderWindow & window);
-	void AddStar(TextureGame & textureGame);
+	void AddStar(TextureGame & textureGame, RenderWindow & window);
 };
 
 void LoadStarInList(Star & star, const Time & deltaTime, RenderWindow & window, TextureGame & textureGame);

@@ -11,12 +11,12 @@ void LoadStarInList(Star & star, const Time & deltaTime, RenderWindow & window, 
 	isEndLoading = true;
 }
 
-void Star::AddStar(TextureGame & textureGame) {
+void Star::AddStar(TextureGame & textureGame, RenderWindow & window) {
 	if (stars.size() < 60) {
 		timeCreateStar += clock.restart();
 		if (timeCreateStar.asSeconds() > 0.7) {
 			Direction dir = LEFT;
-			Vector2f setPosition = GetRandomPosition(dir);
+			Vector2f setPosition = GetRandomPosition(dir, window);
 			Entity addStar(setPosition.x, setPosition.y, NAME_STAR, textureGame.starTexture);
 			addStar.direction = LEFT;
 			addStar.speed = float(SetRandomSpeed());
@@ -33,7 +33,7 @@ void Star::UpdateStateStar(const Time & deltaTime, RenderWindow & window) {
 		it5->CheckForCollisions(window);
 		if (!it5->isLife) {
 			Direction dir = LEFT;
-			Vector2f posit = GetRandomPosition(dir);
+			Vector2f posit = GetRandomPosition(dir, window);
 			it5->isLife = true;
 			it5->sprite->setPosition(posit);
 		}

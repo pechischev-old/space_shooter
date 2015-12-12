@@ -5,7 +5,7 @@ using namespace sf;
 
 void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer, int & point) {
 	for (list<Entity>::iterator it = enemyShip.begin(); it != enemyShip.end();) {
-		if (it->name != NAME_BOSS) {
+		if (it->name != NAME_BOSS ) {
 			SetMove(window, *it);
 		}
 		it->MoveObject(deltaTime);
@@ -18,10 +18,8 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, RenderWindow & window,
 			bossState.isRage = false;
 		}
 		if (it->name != NAME_BOSS) {
-			if (it->name == NAME_TOWER_ENEMY) {
-				ReferenceRotationTowardPlayer(*it, posPlayer);
-			}
-			
+			if (it->name != NAME_KAMIKAZE_ENEMY)
+				it->SetRotationObject(posPlayer);
 		}
 		else { // дл€ босса
 			BorderChecks(*it, window.getSize()); //‘ункци€ движени€ - по€влени€
@@ -43,55 +41,66 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, RenderWindow & window,
 	}
 }
 
-void Enemy::AddEnemy(TextureGame & textureGame) {
+void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window) {
 	auto GetTypeEnemy = [&]() {
 		srand(unsigned int(time(NULL)));
 		return 1 + rand() % 4;
+	};
+
+	auto GetFirstDirection = [&]() {
+		Direction dir = NONE;
+		srand(unsigned int(time(NULL)));
+		int choose = 1 + rand() % 4;
+		if (choose == 1) dir = UP;
+		if (choose == 2) dir = LEFT;
+		if (choose == 3) dir = DOWN;
+		if (choose == 4) dir = RIGHT;
+		return dir;
 	};
 
 	timeCreateEnemy += clock.restart();
 	if (!bossState.isBoss) {
 		if (timeCreateEnemy.asSeconds() > timeToCreateEnemy) {
 			int chooseEnemy = GetTypeEnemy();
-			Direction dir;
+			Direction dir = NONE;
 			Vector2f getPositionEnemy;
 			String typeEnemy;
 			Texture *texture = NULL;
 			int countEnemy = 0;
 			if (chooseEnemy == 1) { // сделать через switch
-				dir = LEFT;
 				typeEnemy = NAME_EASY_ENEMY;
 				texture = &textureGame.enemyEasyTexture;
 				countEnemy = numberEnemy.numberEasyEnemy;
 			}
 			if (chooseEnemy == 2) {
-				dir = LEFT;
 				typeEnemy = NAME_MIDDLE_ENEMY;
 				texture = &textureGame.enemyMiddleTexture;
 				countEnemy = numberEnemy.numberMiddleEnemy;
 			}
 			if (chooseEnemy == 3) {
-				dir = LEFT;
 				typeEnemy = NAME_TOWER_ENEMY;
 				texture = &textureGame.enemyTowerTexture;
 				countEnemy = numberEnemy.numberTowerEnemy;
 			}
 			if (chooseEnemy == 4) {
-				dir = LEFT;
 				typeEnemy = NAME_KAMIKAZE_ENEMY;
 				texture = &textureGame.enemyKamikazeTexture;
 				countEnemy = numberEnemy.numberKamikaze;
 			}
 			for (int i = 1; i <= countEnemy; ++i) {
-				getPositionEnemy = GetRandomPosition(dir);
+				if (dir == NONE)
+					dir = GetFirstDirection();
+				else
+					GetDirection(dir);
+					
+				getPositionEnemy = GetRandomPosition(dir, window);
 				Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy, *texture);
 				addEnemy.health = float(health);
 				addEnemy.speed = float(SPEED_ENEMY);
 				if (typeEnemy == NAME_TOWER_ENEMY) {
-
 					addEnemy.speed = float(SPEED_TOWER);
-					addEnemy.sprite->setScale(-1, 1);
 				}
+				addEnemy.sprite->setScale(-1, 1);
 				addEnemy.direction = dir;
 				addEnemy.damage = float(damage);
 				if (typeEnemy == NAME_MIDDLE_ENEMY)
@@ -121,7 +130,7 @@ void Enemy::AddBulletEnemy(Entity & enemy, Vector2f posPlayer, Texture & texture
 	Vector2f posEnemy = enemy.sprite->getPosition();
 	if (timeCreateBullet.asSeconds() > TIME_CREATE_BULLET_ENEMY) {
 		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, LEFT, texture, NAME_BULLET);
-		if ((enemy.name == NAME_MIDDLE_ENEMY || enemy.name == NAME_BOSS) && !bossState.isRage) {
+		if (enemy.name != NAME_TOWER_ENEMY && !bossState.isRage) {
 			addBullet.isOtherBullet = true;
 			addBullet.rememPos = posPlayer;
 		}
@@ -177,11 +186,6 @@ void Enemy::CalmBoss() {
 			}
 		}
 	}
-}
-
-void Enemy::ReferenceRotationTowardPlayer(Entity & enemy, Vector2f posPlayer) {
-	Vector2f posEnemy = enemy.sprite->getPosition();
-	enemy.sprite->setRotation(float(atan2((posPlayer.y - posEnemy.y), (posPlayer.x - posEnemy.x)) * 180 / M_PI));
 }
 
 void Enemy::MoveKamikaze(const Time & deltaTime, Vector2f posPlayer, Entity & enemy) {
@@ -253,31 +257,32 @@ Direction GetDirection(Direction oldDir) {
 		if (selectHand == 2) dir = LEFT;
 		if (selectHand == 3) dir = UP;
 	}
+
 	
 	return dir;
 }
 
-Vector2f GetRandomPosition(Direction & selectHand) {
+Vector2f GetRandomPosition(Direction & selectHand, RenderWindow & window) {
 	Vector2f getPosit;
-
-	getPosit.x = float(SCRN_WIDTH); //WIDTH_ENEMY + rand() % (SCRN_HEIGTH - WIDTH_ENEMY);
-	getPosit.y = float(HEIGTH_ENEMY + rand() % (SCRN_HEIGTH - 2 * HEIGTH_ENEMY));
-	/*if (selectHand == RIGHT) { // слева
+	Vector2u sizeWindow = window.getSize();
+	//getPosit.x = float(sizeWindow.x); //WIDTH_ENEMY + rand() % (SCRN_HEIGTH - WIDTH_ENEMY);
+	//getPosit.y = float(HEIGTH_ENEMY + rand() % (sizeWindow.y - 2 * HEIGTH_ENEMY));
+	if (selectHand == RIGHT) { // слева
 	getPosit.x = 0;
-	getPosit.y = HEIGTH_ENEMY + rand() % (SCRN_HEIGTH - 2 * HEIGTH_ENEMY);
+	getPosit.y = HEIGTH_ENEMY + rand() % (sizeWindow.y - 2 * HEIGTH_ENEMY);
 	}
 	else if (selectHand == DOWN ) { // сверху
-	getPosit.x = WIDTH_ENEMY + rand() % (SCRN_WIDTH - WIDTH_ENEMY);
+	getPosit.x = WIDTH_ENEMY + rand() % (sizeWindow.x - WIDTH_ENEMY);
 	getPosit.y = 0;
 	}
 	else if (selectHand == LEFT) { // справа
-	getPosit.x = SCRN_WIDTH;
-	getPosit.y = HEIGTH_ENEMY + rand() % (SCRN_HEIGTH - HEIGTH_ENEMY);
+	getPosit.x = sizeWindow.x;
+	getPosit.y = HEIGTH_ENEMY + rand() % (sizeWindow.y - HEIGTH_ENEMY);
 	}
 	else if (selectHand == UP || selectHand == UP_LEFT || selectHand == UP_RIGHT) { // снизу
-	getPosit.x = WIDTH_ENEMY + rand() % (SCRN_WIDTH - WIDTH_ENEMY);
-	getPosit.y = SCRN_HEIGTH;
-	}*/
+	getPosit.x = WIDTH_ENEMY + rand() % (sizeWindow.x - WIDTH_ENEMY);
+	getPosit.y = sizeWindow.y;
+	}
 	return getPosit;
 }
 
@@ -318,7 +323,7 @@ void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame
 	}
 }
 
-bool IsEnterField(Vector2f & playerPos, Entity & enemy) {
+bool IsEnterField(Vector2f & playerPos, Entity & enemy) { // помен€ть с учетом вращени€
 	Vector2f posEnemy = enemy.sprite->getPosition(),
 		posPlayer = playerPos;
 	float widthEnemy = enemy.width;
@@ -329,7 +334,7 @@ bool IsEnterField(Vector2f & playerPos, Entity & enemy) {
 	return false;
 }
 
-bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow) {
+bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow) { // помен€ть с учетом вращени€
 	Vector2f posEnemy = enemy.sprite->getPosition(),
 		posPlayer = playerPos;
 	float widthEnemy = enemy.width;

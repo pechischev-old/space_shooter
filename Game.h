@@ -31,7 +31,7 @@ struct Game
 
 void InitializeGame(Game & game);
 void ResetGame(Game & game);
-void processEventsGame(Game & game, GlobalBool & globalBool, Event & event);
+void processEventsGame(Game & game, GlobalBool & globalBool, Event & event, RenderWindow & window);
 void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, GlobalBool & globalBool);
 void renderGame(RenderWindow & window, Game & game);
 void Delete(Game & game);

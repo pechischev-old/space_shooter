@@ -279,10 +279,11 @@ void Game::DrawObjects(RenderWindow & window) { // Отрисовка объектов
 		window.draw(*it.sprite);
 }
 
-void processEventsGame(Game & game, GlobalBool & globalBool, Event & event)
+void processEventsGame(Game & game, GlobalBool & globalBool, Event & event, RenderWindow & window)
 {
 	Player & player = *game.player;
 	Control(player);
+	
 	//--------------------------- Выстрел --------------------------
 	if (player.ship->health > 0) {
 		if (Mouse::isButtonPressed(Mouse::Left)) {
@@ -306,6 +307,9 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 	Star & star = *game.star;
 	PlayerState & playerState = player.playerState;
 
+	Vector2i pixelPos = Mouse::getPosition(window);//забираем коорд курсора
+	Vector2f pos = window.mapPixelToCoords(pixelPos);//переводим их в игровые (уходим от коорд окна)
+
 	//--------------- Функции игры ---------------------
 
 	game.IncreaseCharacteristicsObjects();
@@ -315,18 +319,20 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 	UpdateTextWithHealth(*game.textInfo, *game.player, window);
 	//---------------- Функции звезд -------------------
 	//LoadStarInList(star, deltaTime, window, *game.textureGame); // добавить загрузочный экран
-	star.AddStar(game.textureGame);
+	star.AddStar(game.textureGame, window);
 	star.UpdateStateStar(deltaTime, window);
 	//---------------- Функции игрока ------------------
 	Vector2f posPlayer = player.ship->sprite->getPosition();
 	if (player.ship->health <= 0) {
 		player.ship->direction = NONE;
 		player.ship->Explosion(deltaTime, game.textureGame.explosionTexture);
+		
 	}
 	else {
 		MovePlayer(player, deltaTime); // задает координаты движения
 		player.ship->sprite->move(Border(*player.ship, window));
-		player.AddBullet(game.textureGame);
+		player.AddBullet(game.textureGame, pos);
+		player.ship->SetRotationObject(pos);
 		player.RecoveryMove();
 		UpdateStateBullet(deltaTime, window, player.bullet, game.textureGame, posPlayer);
 	}
@@ -339,12 +345,12 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 	
 	//---------------- Функции противников -------------
 	enemy.UpdateStateEveryEnemy(deltaTime, window, bonus, game.textureGame, posPlayer, player.point);
-	enemy.AddEnemy(game.textureGame);
+	enemy.AddEnemy(game.textureGame, window);
 	enemy.CalmBoss();
 	UpdateStateBullet(deltaTime, window, enemy.bulletEnemy, game.textureGame, posPlayer);
 	//--------------- Функции астероидов ---------------
 	if (!enemy.bossState.isBoss)
-		asteroid.AddAsteroid(game.textureGame);
+		asteroid.AddAsteroid(game.textureGame, window);
 	asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus, game.textureGame);
 	//---------------- Функции бонусов -----------------
 	bonus.GetMoveEveryBonus(deltaTime, window);

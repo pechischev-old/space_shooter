@@ -54,11 +54,10 @@ struct Enemy {
 	NumberEnemy numberEnemy;
 	Selector selector = TRIPLE_SHOT;
 		int selectorShooting = 0;
-	void AddEnemy(TextureGame & textureGame);
+	void AddEnemy(TextureGame & textureGame, RenderWindow & window);
 	void AddBulletEnemy(Entity & enemy, Vector2f posPlayer, Texture & texture, Time & timeCreateBullet);
 
 	void UpdateStateEveryEnemy(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer, int & point);
-	void ReferenceRotationTowardPlayer(Entity & enemy, Vector2f posPlayer);
 
 	void Evasion(Vector2f posBullet, Entity & entity, Vector2u sizeWindow);
 	void BorderChecks(Entity & entity, Vector2u sizeWindow);
@@ -72,6 +71,6 @@ struct Enemy {
 void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame);
 void ResetEnemy(Enemy & enemy);
 	Direction GetDirection(Direction dir);
-	Vector2f GetRandomPosition(Direction & selectHand);
+	Vector2f GetRandomPosition(Direction & selectHand, RenderWindow & window);
 	bool IsEnterField(Vector2f & playerPos, Entity & enemy);
 	bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow);

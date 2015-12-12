@@ -1,5 +1,9 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+
+#define _USE_MATH_DEFINES
+
+#include <math.h>
 #include <iostream>
 #include <list>
 
@@ -27,9 +31,12 @@ struct Entity {
 	void Explosion(const Time & deltaTime, Texture & texture);
 	void CheckForCollisions(RenderWindow & window);
 	void MoveObject(const Time & deltaTime);
+
+	void SetRotationObject(Vector2f posPoint);
 	Time timeChangeDirection = Time::Zero; // для врагов
 	Time timeCreateBullet = Time::Zero; // для врагов
 };
+
 
 Vector2f Border(Entity & object, RenderWindow & window);
 void ClearListObject(list<Entity> & objects);

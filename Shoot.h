@@ -31,8 +31,7 @@ struct Shoot {
 	void Explosion(const Time & deltaTime, Texture & texture);
 	void MoveBullet(const Time & deltaTime);
 	void CheckForCollisions(RenderWindow & window);
-	void MoveBulletHardEnemy(const Time & deltaTime);
-	void MoveRocket(const Time & deltaTime, Vector2f posPlayer);
+	void MoveBulletHardEnemy(const Time & deltaTime, Vector2f posObject, int speed);
 };
 
 void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot> & bullets, TextureGame & textureGame, Vector2f posPlayer);

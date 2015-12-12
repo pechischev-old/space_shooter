@@ -97,6 +97,11 @@ void Entity::MoveObject(const Time & deltaTime) {
 	}
 }
 
+void Entity::SetRotationObject(Vector2f posPoint) {
+	Vector2f posEnemy = sprite->getPosition();
+	sprite->setRotation(float(atan2((posPoint.y - posEnemy.y), (posPoint.x - posEnemy.x)) * 180 / M_PI));
+}
+
 Vector2f Border(Entity & object, RenderWindow & window) {
 	Vector2f limit(0.f, 0.f);
 	float heigth = object.height,

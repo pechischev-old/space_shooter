@@ -21,7 +21,7 @@ void processEvents(RenderWindow & window, Menu & menu, Game & game, GlobalBool &
 			ProcessEventsMenu(window, menu, globalBool, event); // вызов меню	
 		}
 		else {
-			processEventsGame(game, globalBool, event);
+			processEventsGame(game, globalBool, event, window);
 		}
 		if (event.type == Event::KeyPressed && event.key.code == Keyboard::P) {  //  Поставить на паузу или снять с паузы игру
 			if (!globalBool.g_isPause) {
