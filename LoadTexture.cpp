@@ -31,6 +31,7 @@ void TextureGame::LoadingFromFileTexture() {
 	healthBarTexture.loadFromFile(PATH_HEALTH_BAR);
 	emptyBarTexture.loadFromFile(PATH_EMPTY_BAR);
 	rageBarTexture.loadFromFile(PATH_RAGE_BAR);
+
 }
 
 void TextureMenu::LoadingFromFileTextureForMenu() {

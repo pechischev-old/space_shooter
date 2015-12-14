@@ -5,7 +5,7 @@ void InitString(Text & text, String & str, Font & font, int sizeText) {
 	text.setFont(font);
 	text.setCharacterSize(sizeText);
 	float width = text.getGlobalBounds().width;
-	text.setOrigin( width / 2, sizeText / 2);
+	text.setOrigin( width / 2, float(sizeText) / 2);
 }
 
 void InitializeText(TextWithInfo & textInfo) {
@@ -24,7 +24,7 @@ void InitializeText(TextWithInfo & textInfo) {
 
 void ReferenceLinePosition(Vector2u sizeWindow, Text & text, Vector2f & posPrevText, int sizeText) {
 	float distance = (sizeWindow.y - COUNT_STRING_IN_MENU * sizeText) / (RATE_LINE_SPACING * COUNT_STRING_IN_MENU);
-	float x = sizeWindow.x / 2;
+	float x = float(sizeWindow.x) / 2;
 	float y = distance + posPrevText.y;
 	text.setPosition(x, y);
 }
@@ -46,7 +46,7 @@ void UpdateTextWithHealth(TextWithInfo & textInfo, Player & player, RenderWindow
 	textInfo.textNumber.setPosition(250, 10); // сделать зависимость от размеров окна и длины предыдущей строки
 	textInfo.textLevel.setString(TEXT_LEVEL + to_string(player.levelGame));
 	float width = GetWidth(textInfo.textLevel);
-	float widthWindow = window.getSize().x;
+	float widthWindow = float(window.getSize().x);
 	textInfo.textLevel.setPosition(widthWindow - width * 2, 10);
 }
 

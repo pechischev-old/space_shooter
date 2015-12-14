@@ -8,6 +8,7 @@
 #include <sstream>
 #include <list>
 #include <cstdlib>
+#include <random> 
 #include <ctime> // содержит time()
 
 #include "Entity.h"

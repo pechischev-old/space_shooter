@@ -30,19 +30,23 @@ struct Player
 	Clock clock;                        
 	Time timeCreateBullet = Time::Zero;
 	Time timeRecoveryMove; 
+	
 	int scaleBullet = 2;
+	int gun = 0;
 	std::list<Shoot> bullet;
 	int maxHealth = MAX_HEALTH;
 	int maxDamage = MAX_DAMAGE;
 	int point = POINT_FOR_ADVANCE;
 	int levelGame = 1;
+
 	//Функции для игрока
-	void AddBullet(TextureGame & textureGame, Vector2f posPoint);
+	void AddBullet(Texture & texture, Vector2f posPoint, float time, String name);
 	void CheckPlayerLife();
 	void RecoveryMove();
+		void ChangeWeapons(TextureGame & textureGame, Vector2f posPoint);
 };
 
 void InitializePlayer(Player & player, TextureGame & textureGame);
-void Control(Player & player);
+void Control(Player & player, Event & event);
 void MovePlayer(Player & player, const Time & deltaTime);
 void ResetPlayer(Player & player, TextureGame & textureGame);

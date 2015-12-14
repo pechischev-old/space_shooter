@@ -16,12 +16,13 @@ void InitializeGame(Game & game) {
 }
 
 void Game::IncreaseCharacteristicsObjects() {
-	if (player->point == 0 ) { // переделать диапозон очков
+	if (player->point <= 0 ) { // переделать диапозон очков
 		enemy->damage += 15;
 		enemy->health += 30;
 		countEnemy += 10;
 		player->point = countEnemy;
 		player->levelGame += 1;
+		player->ship->health = float(player->maxHealth); // восстановление здоровья
 		//-------- увеличение количества кораблей врагов
 		enemy->numberEnemy.numberEasyEnemy += 1;
 		enemy->numberEnemy.numberKamikaze += 1;
@@ -67,26 +68,29 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 		//----------------------------- враг стреляет -----------------------------------------------------
 	  if (it2->health > 0 && it2->name != NAME_KAMIKAZE_ENEMY) {
 			if (IsEnterField(posPlayer, *it2) && it2->name == NAME_EASY_ENEMY) {
-
 				enemy->AddBulletEnemy(*it2, posPlayer, textureGame.redLaserTexture, it2->timeCreateBullet);
 			}
-
-			else if (IsSeePlayer(posPlayer, *it2, window.getSize()) && it2->name != NAME_EASY_ENEMY && it2->name != NAME_TOWER_ENEMY) { // враг стреляет
-					if (!enemy->bossState.isRage) // переделать условие
-						enemy->AddBulletEnemy(*it2, posPlayer, textureGame.redLaserTexture, it2->timeCreateBullet);
-					else if (enemy->bossState.isRage && it2->name == NAME_BOSS)
-						SpecialShootingBoss(*enemy, *it2, textureGame);
-			}
-			else if (it2->name == NAME_TOWER_ENEMY) {
+			else if (it2->name == NAME_TOWER_ENEMY || it2->name == NAME_BOSS) {
+				if (enemy->bossState.isRage && it2->name == NAME_BOSS)
+					SpecialShootingBoss(*enemy, *it2, textureGame);
+				else if (it2->name == NAME_TOWER_ENEMY)
 					enemy->AddBulletEnemy(*it2, posPlayer, textureGame.rocketTexture, it2->timeCreateBullet);
+				else if (it2->name == NAME_BOSS)
+					enemy->AddBulletEnemy(*it2, posPlayer, textureGame.redLaserTexture, it2->timeCreateBullet);
 			}
+			else if (IsSeePlayer(posPlayer, *it2, window.getSize()) && it2->name == NAME_MIDDLE_ENEMY) { // враг стреляет
+					
+					enemy->AddBulletEnemy(*it2, posPlayer, textureGame.redLaserTexture, it2->timeCreateBullet);
+					
+			}
+			
 		}
 		//------------------------------- Обработка попадания пули по врагу ----------------------------------------
 		for (list<Shoot>::iterator it = player->bullet.begin(); it != player->bullet.end(); it++) {
 			if (it->sprite->getGlobalBounds().intersects(it2->sprite->getGlobalBounds())) {
 				if (!it->isExplosion)
 					it2->health -= player->ship->damage;
-				if (it2->health > 0)
+				if (it2->health > 0 && it2->name != NAME_ELECTRIC_BULLET)
 					it->isExplosion = true;
 				it2->sprite->setColor(Color::Red);
 				if (it2->name == NAME_BOSS) {
@@ -135,12 +139,13 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 			if (it->sprite->getGlobalBounds().intersects(playerBullet->sprite->getGlobalBounds())) {
 				if (it->name == NAME_ROCKET) {
 					it->isExplosion = true;
-					playerBullet->isExplosion = true;
+					if (playerBullet->name != NAME_ELECTRIC_BULLET)
+						playerBullet->isExplosion = true;
 				}
 			}
 		}
 	}
-
+	// Обработка астеройдов
 	for (list<Entity>::iterator it3 = asteroid->asteroids.begin(); it3 != asteroid->asteroids.end(); ++it3) {
 		//----------------- Окрашивает в белый цвет ----------------
 		if (it3->sprite->getColor() == Color::Red)
@@ -200,34 +205,36 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 			if (it4->name == BOMB_IMAGE) {
 				player->playerState.isBomb = true;
 			}
+			
 			it4->isLife = false;
+			
 		}
 	}
 }
 
-void Game::UseBonus(const Time & deltaTime){
+void Game::UseBonus(const Time & deltaTime, TextureGame & textureGame){
 	PlayerState & playerState = player->playerState;
 	if (playerState.isRepair) {
 		player->ship->health = float(player->maxHealth);
 		playerState.isRepair = false;
 	}
 	if (playerState.isInvulnerability) {
-		timeGame += 1 * deltaTime.asSeconds();
+		timeUseBonus += 1 * deltaTime.asSeconds();
 		player->ship->sprite->setColor(Color::Blue);
-		if (timeGame > 30) {
+		if (timeUseBonus > 30) {
 			player->ship->sprite->setColor(Color::White);
 			playerState.isInvulnerability = false;
-			timeGame = 0;
+			timeUseBonus = 0;
 		}
 	}
 	if (playerState.isDecrease) { // уменьшение размеров
-		timeGame += 1 * deltaTime.asSeconds();
+		timeUseBonus += 1 * deltaTime.asSeconds();
 		player->ship->sprite->setColor(Color::Yellow);
 		player->ship->sprite->setScale(0.5, 0.5);
-		if (timeGame > 15) {
+		if (timeUseBonus > 15) {
 			player->ship->sprite->setColor(Color::White);
 			playerState.isDecrease = false;
-			timeGame = 0;
+			timeUseBonus = 0;
 		}
 	}
 	else {
@@ -235,14 +242,14 @@ void Game::UseBonus(const Time & deltaTime){
 	}
 	
 	if (playerState.isIncreaseDamage) { // увеличение урона
-		timeGame += 1 * deltaTime.asSeconds();
+		timeUseBonus += 1 * deltaTime.asSeconds();
 		player->ship->sprite->setColor(Color::Magenta);
 		player->scaleBullet = 3;
 		player->ship->damage = float(player->maxDamage) * 3;
-		if (timeGame > 20) {
+		if (timeUseBonus > 20) {
 			player->ship->sprite->setColor(Color::White);
 			playerState.isIncreaseDamage = false;
-			timeGame = 0;
+			timeUseBonus = 0;
 		}
 	}
 	else {
@@ -282,7 +289,7 @@ void Game::DrawObjects(RenderWindow & window) { // Отрисовка объектов
 void processEventsGame(Game & game, GlobalBool & globalBool, Event & event, RenderWindow & window)
 {
 	Player & player = *game.player;
-	Control(player);
+	Control(player, event);
 	
 	//--------------------------- Выстрел --------------------------
 	if (player.ship->health > 0) {
@@ -314,7 +321,7 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 
 	game.IncreaseCharacteristicsObjects();
 	game.CheckForCollision(window, deltaTime, game.textureGame);
-	game.UseBonus(deltaTime);
+	game.UseBonus(deltaTime, game.textureGame);
 	//---------------- Интерфейс -----------------------
 	UpdateTextWithHealth(*game.textInfo, *game.player, window);
 	//---------------- Функции звезд -------------------
@@ -331,7 +338,7 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 	else {
 		MovePlayer(player, deltaTime); // задает координаты движения
 		player.ship->sprite->move(Border(*player.ship, window));
-		player.AddBullet(game.textureGame, pos);
+		player.ChangeWeapons(game.textureGame, pos);
 		player.ship->SetRotationObject(pos);
 		player.RecoveryMove();
 		UpdateStateBullet(deltaTime, window, player.bullet, game.textureGame, posPlayer);
@@ -374,7 +381,7 @@ void ResetGame(Game & game) {
 	ClearListObject(game.bonus->bonuses);
 	ResetPlayer(*game.player, game.textureGame);
 	ResetEnemy(*game.enemy);
-	game.timeGame = 0;
+	game.timeUseBonus = 0;
 	game.player->point = POINT_FOR_ADVANCE;
 }
 

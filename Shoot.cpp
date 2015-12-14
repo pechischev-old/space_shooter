@@ -7,7 +7,7 @@ using namespace std;
 Shoot::Shoot(float X, float Y, float width, float heigth, Direction direction, Texture & texture, String Name) {
 	sprite = new Sprite;
 	sprite->setTexture(texture);
-	sprite->setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
+	sprite->setOrigin(float(texture.getSize().x) / 2, float(texture.getSize().y) / 2);
 	sprite->setScale(2, 2);
 	sprite->setPosition(X + heigth / 11, Y + width / 11);
 	dir = direction;

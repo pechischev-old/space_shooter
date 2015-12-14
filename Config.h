@@ -24,7 +24,7 @@ const static int MAX_LEVEL_GAME = 15;
 
 //---------------------- Для игрока ------------------------------------
 
-const static int SPEED_HERO = 280;
+const static int SPEED_HERO = 500;
 
 const static int SPEED_BULLET = 400; // скорость пули
 
@@ -32,7 +32,7 @@ const static int PLAYER_DAMAGE = 25;
 
 const static double TIME_CREATE_BULLET = 0.1;
 
-const static int MAX_HEALTH = 500000;
+const static int MAX_HEALTH = 1000;
 
 const static int MAX_DAMAGE = 50;
 
@@ -45,6 +45,8 @@ const static float MAX_TIME_RECOVERY_MOVE = 3;
 static const int SPEED_OTHER_BULLET = 20;
 
 static const int SPEED_ROCKET = 6;
+
+static const int BORDER_CREATE = 80;
 
 //---------------------- Для врагов -----------------------------------
 
@@ -67,9 +69,11 @@ const static int TIME_CREATE_ENEMY = 2;
 
 const static double TIME_CREATE_BULLET_ENEMY = 0.2;
 
+const static float DISTANCE_FOR_ATACK = 500.f;
+
 static const int COUNT_EASY_ENEMY = 3;
-static const int COUNT_MIDDLE_ENEMY = 1;
-static const int COUNT_TOWER_ENEMY = 1;
+static const int COUNT_MIDDLE_ENEMY = 0;
+static const int COUNT_TOWER_ENEMY = 0;
 static const int COUNT_KAMIKAZE_ENEMY = 0;
 
 const static sf::String NAME_EASY_ENEMY = "easyEnemy";
@@ -132,6 +136,8 @@ const static sf::String REPAIR_IMAGE = "repair";
 const static int SPEED_BONUS = 50;
 
 const static int TIME_CREATE_BONUS = 2;
+
+const static int SPEED_FRAME_ANIMATION = 7;
 
 //--------------------------------------------------------------
 

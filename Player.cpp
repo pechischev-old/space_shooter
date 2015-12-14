@@ -16,12 +16,12 @@ void Player::CheckPlayerLife() {
 	playerState.isAlive = ship->health > 0;
 }
 
-void Player::AddBullet(TextureGame & textureGame, Vector2f posPoint) {
+void Player::AddBullet(Texture & texture, Vector2f posPoint, float time, String name) {
 	if (playerState.isShoot) {
 		timeCreateBullet += clock.restart(); 
-		if (timeCreateBullet.asSeconds() > TIME_CREATE_BULLET) { // «ависимость по€влени€ пули от времени
+		if (timeCreateBullet.asSeconds() > time) { // «ависимость по€влени€ пули от времени
 			directionShoot = RIGHT;
-			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, textureGame.blueLaserTexture, NAME_BULLET);
+			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, texture, name);
 			addBullet.damage = int(ship->damage);
 			addBullet.sprite->setScale(float(scaleBullet), float(scaleBullet));
 			addBullet.isOtherBullet = true;
@@ -44,7 +44,7 @@ void Player::RecoveryMove() {
 	}
 }
 
-void Control(Player & player) {
+void Control(Player & player, Event & event) {
 	if (player.ship->health > 0 && player.playerState.isMove) {
 		if (Keyboard::isKeyPressed(Keyboard::W) && Keyboard::isKeyPressed(Keyboard::A)) {
 			player.direction = UP_LEFT;
@@ -74,10 +74,44 @@ void Control(Player & player) {
 		else {
 			player.direction = NONE;
 		}
+		if (event.type == Event::MouseWheelMoved) {
+			if (event.mouseWheel.delta == 1) {
+				if (player.gun < 2) {
+					player.gun += 1;
+				}
+				else {
+					player.gun = 0;
+				}
+			}
+			if (event.mouseWheel.delta == -1) {
+				if (player.gun > 0) {
+					player.gun -= 1;
+				}
+				else {
+					player.gun = 2;
+				}
+			}
+		}
 	}
 	else {
 		player.direction = NONE;
 	}
+}
+
+void Player::ChangeWeapons(TextureGame & textureGame, Vector2f posPoint) {
+	if (playerState.isShoot) {
+		if (gun == 0) { // обычные снар€ды
+			AddBullet(textureGame.blueLaserTexture, posPoint, float(TIME_CREATE_BULLET), NAME_BULLET);
+		}
+		else if (gun == 1) { // двойные снар€ды
+			AddBullet(textureGame.redLaserTexture, posPoint, float(TIME_CREATE_BULLET), NAME_BULLET);
+			AddBullet(textureGame.redLaserTexture, posPoint, float(TIME_CREATE_BULLET), NAME_BULLET);
+		}
+		else if (gun == 2) { // электрический луч
+			AddBullet(textureGame.electricBullet, posPoint, float(TIME_CREATE_BULLET - 1), NAME_ELECTRIC_BULLET);
+		}
+	}
+
 }
 
 void MovePlayer(Player & player, const Time & deltaTime) {

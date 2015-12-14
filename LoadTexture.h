@@ -40,6 +40,7 @@ struct TextureGame {
 	Texture rageBarTexture;
 
 	Texture fieldTexture;
+
 	void LoadingFromFileTexture();
 };
 

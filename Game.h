@@ -21,12 +21,12 @@ struct Game
 	TextWithInfo *textInfo;
 	Star *star;
 	Clock clock;
-	float timeGame = 0;
+	float timeUseBonus = 0;
 	int countEnemy = POINT_FOR_ADVANCE;
 	void CheckForCollision(RenderWindow & window, const Time & deltaTime, TextureGame & textureGame); // отвечает за проверку на столкновения
 	void DrawObjects(RenderWindow & window);
 	void IncreaseCharacteristicsObjects();
-	void UseBonus(const Time & deltaTime);
+	void UseBonus(const Time & deltaTime, TextureGame & textureGame);
 };
 
 void InitializeGame(Game & game);
