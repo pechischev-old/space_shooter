@@ -23,6 +23,7 @@ struct Game
 	Clock clock;
 	float timeUseBonus = 0;
 	int countEnemy = POINT_FOR_ADVANCE;
+	bool isPause = false;
 	void CheckForCollision(RenderWindow & window, const Time & deltaTime, TextureGame & textureGame); // отвечает за проверку на столкновения
 	void DrawObjects(RenderWindow & window);
 	void IncreaseCharacteristicsObjects();
@@ -32,7 +33,7 @@ struct Game
 void InitializeGame(Game & game);
 void ResetGame(Game & game);
 bool hasIntersection(Sprite & object1, Sprite & object2);
-void processEventsGame(Game & game, GlobalBool & globalBool, Event & event, RenderWindow & window);
+void processEventsGame(Game & game, Event & event, RenderWindow & window);
 void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, GlobalBool & globalBool);
 void renderGame(RenderWindow & window, Game & game);
 void Delete(Game & game);

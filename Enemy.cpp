@@ -92,7 +92,7 @@ void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window) {
 				if (i == 1)
 					dir = static_cast<Direction>(GetFirstDirection());
 				else
-					dir = static_cast<Direction>(GetFirstDirection());
+					dir = static_cast<Direction>(GetDirection(dir));
 				getPositionEnemy = GetRandomPosition(dir, window);
 				Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy, *texture);
 				addEnemy.health = float(health);

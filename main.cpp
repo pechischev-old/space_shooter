@@ -17,22 +17,15 @@ void processEvents(RenderWindow & window, Menu & menu, Game & game, GlobalBool &
 	Event event;
 	while (window.pollEvent(event))
 	{
+	
 		if (globalBool.g_isMenu) {
 			ProcessEventsMenu(window, menu, globalBool, event); // вызов меню	
 		}
 		else {
-			processEventsGame(game, globalBool, event, window);
+			processEventsGame(game, event, window);
+			globalBool.g_isMenu = event.type == Event::KeyPressed && event.key.code == Keyboard::Escape;
 		}
-		if (event.type == Event::KeyPressed && event.key.code == Keyboard::P) {  //  Поставить на паузу или снять с паузы игру
-			if (!globalBool.g_isPause) {
-				globalBool.g_isPause = true;
-			}
-			else {
-				globalBool.g_isPause = false;
-			}
-		}
-
-
+		
 		// Окно закрыли
 		if ((event.type == Event::Closed) || (event.type == Event::KeyPressed && event.key.code == Keyboard::T)) {
 			window.close();
@@ -53,7 +46,10 @@ int CallGame(GlobalBool & globalBool, Menu & menu)
 	Clock clock;
 	Time timeSinceLastUpdate = Time::Zero;
 	Player & player = *game->player;
-	
+	menu.restart = [&]() {
+		ResetGame(*game);
+	};
+
 	window.setVerticalSyncEnabled(true);
 	
 	while (window.isOpen())
@@ -63,23 +59,18 @@ int CallGame(GlobalBool & globalBool, Menu & menu)
 		{
 			timeSinceLastUpdate -= TIME_PER_FRAME;
 			processEvents(window, menu, *game, globalBool);
-			if ((!globalBool.g_isMenu && !globalBool.g_isPause) && globalBool.g_isNewGame) {
-				updateGame(*game, TIME_PER_FRAME, window, globalBool);
-			}
-			else {
+			if (globalBool.g_isMenu) {
 				UpdateMenu(menu, window, *game->textInfo);
 			}
-			
+			else {
+				updateGame(*game, TIME_PER_FRAME, window, globalBool);
+			}
 		}
-		if (globalBool.g_isRestart) {
-			ResetGame(*game);
-			globalBool.g_isRestart = false;
-		}
-		if ((!globalBool.g_isMenu) && globalBool.g_isNewGame) {
-			renderGame(window, *game);
+		if (globalBool.g_isMenu) {
+			RenderMenu(menu, window, *game->textInfo);
 		}
 		else {
-			RenderMenu(menu, window, *game->textInfo);
+			renderGame(window, *game);
 		}
 	}
 	Delete(*game);

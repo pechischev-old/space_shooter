@@ -12,7 +12,11 @@ void LoadStarInList(Star & star, const Time & deltaTime, RenderWindow & window, 
 }
 
 void Star::AddStar(TextureGame & textureGame, RenderWindow & window) {
-	if (stars.size() < 60) {
+	auto SetRandomSpeed = [&]() {
+		int speed = 270 + rand() % 400;
+		return speed;
+	};
+	if (stars.size() < 40) {
 		timeCreateStar += clock.restart();
 		if (timeCreateStar.asSeconds() > 0.7) {
 			Direction dir = LEFT;
@@ -39,9 +43,4 @@ void Star::UpdateStateStar(const Time & deltaTime, RenderWindow & window) {
 		}
 		 ++it5;
 	}
-}
-
-int SetRandomSpeed() {
-	int speed = 270 + rand() % 400;
-	return speed;
 }

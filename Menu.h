@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <functional>
 
 #include "Config.h"
 #include "LoadTexture.h"
@@ -15,6 +16,7 @@ struct StateMenu {
 	bool isRecords = false;
 	bool isOptions = false;
 	bool isMainMenu = true;
+	bool isNewGame = false;
 };
 
 struct Records {
@@ -33,6 +35,7 @@ struct Menu {
 	Sprite boxMenu;
 	Records records;
 	Options options;
+	function<void()> restart;
 };
 
 void InitMenu(Menu & menu, RenderWindow & window, TextureMenu & textureMenu, TextWithInfo & text);

@@ -21,4 +21,3 @@ struct Star {
 };
 
 void LoadStarInList(Star & star, const Time & deltaTime, RenderWindow & window, TextureGame & textureGame);
-int SetRandomSpeed();

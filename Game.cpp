@@ -22,10 +22,9 @@ void Game::IncreaseCharacteristicsObjects() {
 			enemy->bossState.isBoss = true;
 		}
 		else {
-			// вынести в константы все числа
-			enemy->damage += 15;
-			enemy->health += 30;
-			countEnemy += 10;
+			enemy->damage += INCREASED_DAMAGE_ENEMY;
+			enemy->health += INCREASED_HEALTH_ENEMY;
+			countEnemy += INCREASED_COUNT_ENEMY;
 			player->point = countEnemy;
 			player->levelGame += 1;
 			player->ship->health = float(player->maxHealth); // восстановление здоровья
@@ -38,10 +37,10 @@ void Game::IncreaseCharacteristicsObjects() {
 			if (player->levelGame >= 4)
 				enemy->numberEnemy.numberTowerEnemy += 1;
 			//---------- уменьшение времени появления враждебных объектов
-			if (asteroid->timeToCreateAsteroid > 0.3)
-				asteroid->timeToCreateAsteroid -= 0.07f;
-			if (enemy->timeToCreateEnemy > 0.3)
-				enemy->timeToCreateEnemy -= 0.1f;
+			if (asteroid->timeToCreateAsteroid > 0.3f)
+				asteroid->timeToCreateAsteroid -= DIFFERENT_TIME_CREATE_ASTEROID;
+			if (enemy->timeToCreateEnemy > 0.3f)
+				enemy->timeToCreateEnemy -= DIFFERENT_TIME_CREATE_ENEMY;
 		}
 	}
 }
@@ -225,16 +224,16 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 	}
 }
 
-void Game::UseBonus(const Time & deltaTime, TextureGame & textureGame){
+void Game::UseBonus(const Time & deltaTime, TextureGame & textureGame){ 
 	PlayerState & playerState = player->playerState;
-	if (playerState.isRepair) {
+	if (playerState.isRepair) { // восстановление здоровья
 		player->ship->health = float(player->maxHealth);
 		playerState.isRepair = false;
 	}
-	if (playerState.isInvulnerability) {
+	if (playerState.isInvulnerability) { // неуязвимость
 		timeUseBonus += 1 * deltaTime.asSeconds();
 		player->ship->sprite->setColor(Color::Blue);
-		if (timeUseBonus > 30) {
+		if (timeUseBonus > TIME_USE_INVULNERABILITY_IN_SECONDS) {
 			player->ship->sprite->setColor(Color::White);
 			playerState.isInvulnerability = false;
 			timeUseBonus = 0;
@@ -244,7 +243,7 @@ void Game::UseBonus(const Time & deltaTime, TextureGame & textureGame){
 		timeUseBonus += 1 * deltaTime.asSeconds();
 		player->ship->sprite->setColor(Color::Yellow);
 		player->ship->sprite->setScale(0.5, 0.5);
-		if (timeUseBonus > 15) {
+		if (timeUseBonus > TIME_USE_DECREASE_IN_SECONDS) {
 			player->ship->sprite->setColor(Color::White);
 			playerState.isDecrease = false;
 			timeUseBonus = 0;
@@ -259,7 +258,7 @@ void Game::UseBonus(const Time & deltaTime, TextureGame & textureGame){
 		player->ship->sprite->setColor(Color::Magenta);
 		player->scaleBullet = 3;
 		player->ship->damage = float(player->maxDamage) * 3;
-		if (timeUseBonus > 20) {
+		if (timeUseBonus > TIME_USE_INCREASE_IN_SECONDS) {
 			player->ship->sprite->setColor(Color::White);
 			playerState.isIncreaseDamage = false;
 			timeUseBonus = 0;
@@ -299,7 +298,7 @@ void Game::DrawObjects(RenderWindow & window) { // Отрисовка объектов
 		window.draw(*it.sprite);
 }
 
-void processEventsGame(Game & game, GlobalBool & globalBool, Event & event, RenderWindow & window)
+void processEventsGame(Game & game, Event & event, RenderWindow & window)
 {
 	Player & player = *game.player;
 	Control(player, event);
@@ -313,71 +312,73 @@ void processEventsGame(Game & game, GlobalBool & globalBool, Event & event, Rend
 			player.playerState.isShoot = true;
 		}
 	}
+	//------------------------- Пауза -------------------------------
+	if (event.type == Event::KeyPressed && event.key.code == Keyboard::P) {  //  Поставить на паузу или снять с паузы игру
+		if (!game.isPause) {
+			game.isPause = true;
+		}
+		else {
+			game.isPause = false;
+		}
+	}
 	//--------------------------------------------------------------
-	if (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape)
-		globalBool.g_isMenu = true;
+	
 }
 
 void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, GlobalBool & globalBool)
 {
-	Player & player = *game.player;
-	Enemy & enemy = *game.enemy;
-	Asteroid & asteroid = *game.asteroid;
-	Bonus & bonus = *game.bonus;
-	Star & star = *game.star;
-	PlayerState & playerState = player.playerState;
+	if (!game.isPause && game.player->ship->isLife) {
+		Player & player = *game.player;
+		Enemy & enemy = *game.enemy;
+		Asteroid & asteroid = *game.asteroid;
+		Bonus & bonus = *game.bonus;
+		Star & star = *game.star;
+		PlayerState & playerState = player.playerState;
 
-	Vector2i pixelPos = Mouse::getPosition(window);//забираем коорд курсора
-	Vector2f pos = window.mapPixelToCoords(pixelPos);//переводим их в игровые (уходим от коорд окна)
+		Vector2i pixelPos = Mouse::getPosition(window);//забираем коорд курсора
+		Vector2f pos = window.mapPixelToCoords(pixelPos);//переводим их в игровые (уходим от коорд окна)
 
-	//--------------- Функции игры ---------------------
+		//--------------- Функции игры ---------------------
 
-	game.IncreaseCharacteristicsObjects();
-	game.CheckForCollision(window, deltaTime, game.textureGame);
-	game.UseBonus(deltaTime, game.textureGame);
-	//---------------- Интерфейс -----------------------
-	UpdateTextWithHealth(*game.textInfo, *game.player, window);
-	//---------------- Функции звезд -------------------
-	//LoadStarInList(star, deltaTime, window, *game.textureGame); // добавить загрузочный экран
-	star.AddStar(game.textureGame, window);
-	star.UpdateStateStar(deltaTime, window);
-	//---------------- Функции игрока ------------------
-	Vector2f posPlayer = player.ship->sprite->getPosition();
-	if (player.ship->health <= 0) {
-		player.ship->direction = NONE;
-		player.ship->Explosion(deltaTime, game.textureGame.explosionTexture);
-		
-	}
-	else {
-		MovePlayer(player, deltaTime); // задает координаты движения
-		player.ship->sprite->move(Border(*player.ship, window));
-		player.ChangeWeapons(game.textureGame, pos);
-		player.ship->SetRotationObject(pos);
-		player.RecoveryMove();
+		game.IncreaseCharacteristicsObjects();
+		game.CheckForCollision(window, deltaTime, game.textureGame);
+		game.UseBonus(deltaTime, game.textureGame);
+		//---------------- Интерфейс -----------------------
+		UpdateTextWithHealth(*game.textInfo, *game.player, window);
+		//---------------- Функции звезд -------------------
+		//LoadStarInList(star, deltaTime, window, *game.textureGame); // добавить загрузочный экран
+		star.AddStar(game.textureGame, window);
+		star.UpdateStateStar(deltaTime, window);
+		//---------------- Функции игрока ------------------
+		Vector2f posPlayer = player.ship->sprite->getPosition();
+		if (player.ship->health <= 0) {
+			player.ship->direction = NONE;
+			player.ship->Explosion(deltaTime, game.textureGame.explosionTexture);
+
+		}
+		else {
+			MovePlayer(player, deltaTime); // задает координаты движения
+			player.ship->sprite->move(Border(*player.ship, window));
+			player.ChangeWeapons(game.textureGame, pos);
+			player.ship->SetRotationObject(pos);
+			player.RecoveryMove();
+		}
 		UpdateStateBullet(deltaTime, window, player.bullet, game.textureGame, posPlayer);
+		//---------------- Функции противников -------------
+		enemy.UpdateStateEveryEnemy(deltaTime, window, bonus, game.textureGame, posPlayer, player.point);
+		enemy.AddEnemy(game.textureGame, window);
+		enemy.CalmBoss();
+		UpdateStateBullet(deltaTime, window, enemy.bulletEnemy, game.textureGame, posPlayer);
+		//--------------- Функции астероидов ---------------
+		if (!enemy.bossState.isBoss)
+			asteroid.AddAsteroid(game.textureGame, window);
+		asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus, game.textureGame);
+		//---------------- Функции бонусов -----------------
+		bonus.GetMoveEveryBonus(deltaTime, window);
 	}
-	if (!player.ship->isLife && !globalBool.g_isRestart) {
-		globalBool.g_isPause = true;
-	}
-	else {
-		globalBool.g_isPause = false;
-	}
-	
-	//---------------- Функции противников -------------
-	enemy.UpdateStateEveryEnemy(deltaTime, window, bonus, game.textureGame, posPlayer, player.point);
-	enemy.AddEnemy(game.textureGame, window);
-	enemy.CalmBoss();
-	UpdateStateBullet(deltaTime, window, enemy.bulletEnemy, game.textureGame, posPlayer);
-	//--------------- Функции астероидов ---------------
-	if (!enemy.bossState.isBoss)
-		asteroid.AddAsteroid(game.textureGame, window);
-	asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus, game.textureGame);
-	//---------------- Функции бонусов -----------------
-	bonus.GetMoveEveryBonus(deltaTime, window);
 }
 
-void renderGame(RenderWindow & window, Game & game)
-{
+void renderGame(RenderWindow & window, Game & game) {
 	window.clear();
 	//if (!game.gameState.isLoading) {
 	game.DrawObjects(window);
@@ -415,5 +416,4 @@ void Delete(Game & game) {
 	delete game.enemy;
 	delete game.player;
 	delete game.textInfo;
-	
 }

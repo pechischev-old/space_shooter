@@ -5,11 +5,7 @@
 #include <string>
 
 struct GlobalBool {
-	bool g_isRestart = true;
 	bool g_isMenu = true;
-	bool g_isNewGame = false;
-	bool g_isExit = false;
-	bool g_isPause = false;
 };
 
 const static int SCRN_HEIGTH = 768, SCRN_WIDTH = 1390;
@@ -89,6 +85,13 @@ const static int SPEED_TOWER = 70;
 const static sf::String NAME_KAMIKAZE_ENEMY = "kamikaze";
 
 const static int RATE_HEALTH_BOSS = 50;
+
+		// увеличение характеристик
+		const static int INCREASED_DAMAGE_ENEMY = 5;
+		const static int INCREASED_HEALTH_ENEMY = 30;
+		const static int INCREASED_COUNT_ENEMY = 10;
+
+const static float DIFFERENT_TIME_CREATE_ENEMY = 0.1f;
 //-----------------------------Для астероидов  ---------------------------------
 
 const static float TIME_CREATE_ASTEROID = 1.1f;
@@ -110,6 +113,8 @@ const static sf::String NAME_SMALL_ASTEROID = "asteroid-small";
 const static int SPEED_SMALL_ASTEROID = 250;
 const static int HEALTH_SMALL_ASTEROID = 50;
 const static int DAMAGE_SMALL_ASTEROID = 10;
+
+static const float DIFFERENT_TIME_CREATE_ASTEROID = 0.07f;
 
 //--------------------- Для взрыва -----------------------------
 
@@ -139,6 +144,10 @@ const static int TIME_CREATE_BONUS = 2;
 
 const static int SPEED_FRAME_ANIMATION = 7;
 
+	// время использования
+	const static int TIME_USE_INVULNERABILITY_IN_SECONDS = 25;
+	const static int TIME_USE_INCREASE_IN_SECONDS = 20;
+	const static int TIME_USE_DECREASE_IN_SECONDS = 20;
 //--------------------------------------------------------------
 
 enum Direction
@@ -210,7 +219,7 @@ const static sf::String PATH_INVULNERABILITY = "resourse/images/invulnerability.
 const static sf::String PATH_REPAIR = "resourse/images/repair.png";
 
 const static sf::String PATH_SMALL_ASTEROID = "resourse/images/asteroid-small.png";
-const static sf::String PATH_MEIUM_ASTEROID = "resourse/images/asteroid-medium.png";
+const static sf::String PATH_MEDIUM_ASTEROID = "resourse/images/asteroid-medium.png";
 const static sf::String PATH_ASTEROID = "resourse/images/asteroid.png";
 
 const static sf::String PATH_KAMIKAZE_ENEMY = "resourse/images/kamikaze.png";

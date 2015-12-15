@@ -27,6 +27,5 @@ struct Bonus {
 };
 
 void InitializeBonus(Bonus & bonus);
-int IssuanceProbability();
-int SpecifySizeBonus();
-bool CheckProbably();
+int IssuanceProbability(); // задание вероятности выпадения
+bool CheckProbably();  

@@ -26,5 +26,3 @@ struct Asteroid {
 	void GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame);
 	void InitRotateAsteroid(Entity & asteroid);
 };
-
-int SpecifySize();

@@ -2,7 +2,7 @@
 
 void TextureGame::LoadingFromFileTexture() {
 	playerTexture.loadFromFile(PATH_PLAYER_SHIP);
-	asteroidMediumTexture.loadFromFile(PATH_MEIUM_ASTEROID);
+	asteroidMediumTexture.loadFromFile(PATH_MEDIUM_ASTEROID);
 	asteroidSmallTexture.loadFromFile(PATH_SMALL_ASTEROID);
 	asteroidTexture.loadFromFile(PATH_ASTEROID);
 

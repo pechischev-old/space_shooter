@@ -3,6 +3,10 @@
 using namespace std;
 
 void Bonus::AddBonus(Vector2f getPosition, TextureGame & textureGame) {
+	auto SpecifySizeBonus  = [&]() {
+		int point = 1 + rand() % 5;
+		return point;
+	};
 	timeCreateBonus += clock.restart();
 	if (timeCreateBonus.asSeconds() > TIME_CREATE_BONUS) {
 		Direction dir = DOWN; 
@@ -50,11 +54,6 @@ void Bonus::GetMoveEveryBonus(const Time & deltaTime, RenderWindow & window) {
 		}
 		else  ++it;
 	}
-}
-
-int SpecifySizeBonus() {
-	int point = 1 + rand() % 5;
-	return point;
 }
 
 int IssuanceProbability() {

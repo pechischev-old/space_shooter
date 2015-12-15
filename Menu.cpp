@@ -4,14 +4,12 @@ void ProcessEventsMenu(RenderWindow & window, Menu & menu, GlobalBool & globalBo
 	if (Mouse::isButtonPressed(Mouse::Left)) {
 		if (menu.menuSelector == NEW_GAME) {
 			globalBool.g_isMenu = false;
-			globalBool.g_isRestart = true;
-			globalBool.g_isNewGame = true;
-			globalBool.g_isPause = false;
+			menu.stateMenu.isNewGame = true;
+			menu.restart();
 		}
 		if (menu.menuSelector == CONTINUE) {
-			if (globalBool.g_isNewGame) {
+			if (menu.stateMenu.isNewGame) {
 				globalBool.g_isMenu = false;
-				globalBool.g_isPause = false;
 			}
 		}
 		if (menu.menuSelector == RECORDS) {
@@ -28,7 +26,9 @@ void ProcessEventsMenu(RenderWindow & window, Menu & menu, GlobalBool & globalBo
 	}
 
 	if (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape && menu.stateMenu.isMainMenu) {
+		if (menu.stateMenu.isNewGame) {
 			globalBool.g_isMenu = false;
+		}
 	}
 	else if (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape && !menu.stateMenu.isMainMenu) {
 		menu.stateMenu.isOptions = false;
