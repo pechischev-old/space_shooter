@@ -159,4 +159,6 @@ void ResetPlayer(Player & player, TextureGame & textureGame) {
 	player.ship->isLife = true;
 	player.playerState.isMove = true;
 	player.ship->isKilled = false;
+	player.gun = 0;
+	player.levelGame = 1;
 }

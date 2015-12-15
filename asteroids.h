@@ -3,8 +3,6 @@
 #include <iostream>
 #include <list>
 #include <cstdlib>
-#include <ctime> // содержит time()
-
 
 #include "Entity.h"
 #include "Enemy.h"
@@ -17,12 +15,16 @@ struct Asteroid {
 	std::list<Entity> asteroids;
 	Clock clock;
 	Time timeCreateAsteroid = Time::Zero;
-	float CurrentFrame = 0;
+	enum TypeAsteroid {
+		SMALL = 1,
+		MIDDLE,
+		BIG
+	};
+	TypeAsteroid typeAsteroid;
 	float timeToCreateAsteroid = float(TIME_CREATE_ASTEROID);
 	void AddAsteroid(TextureGame & textureGame, RenderWindow & window);
 	void GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame);
-	void SetRotateAsteroid(Entity & asteroid);
+	void InitRotateAsteroid(Entity & asteroid);
 };
 
-void InitializeAsteroid(Asteroid & asteroid);
 int SpecifySize();

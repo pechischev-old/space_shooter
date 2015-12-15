@@ -53,6 +53,13 @@ struct Enemy {
 		int numberKamikaze = COUNT_KAMIKAZE_ENEMY;
 	};
 	NumberEnemy numberEnemy;
+	enum  TypeEnemy {
+		EASY = 1,
+		MIDDLE,
+		KAMIKAZE,
+		TOWER
+	};
+	TypeEnemy idEnemy;
 	Selector selector = TRIPLE_SHOT;
 		int selectorShooting = 0;
 	void AddEnemy(TextureGame & textureGame, RenderWindow & window);

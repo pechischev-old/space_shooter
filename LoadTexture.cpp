@@ -8,6 +8,7 @@ void TextureGame::LoadingFromFileTexture() {
 
 	blueLaserTexture.loadFromFile(PATH_TO_BLUE_BULLET);
 	redLaserTexture.loadFromFile(PATH_TO_RED_BULLET);
+	greenLaserTexture.loadFromFile(PATH_TO_GREEN_BULLET);
 	electricBullet.loadFromFile(PATH_ELECTRIC_BULLET);
 	rocketTexture.loadFromFile(PATH_ROCKET);
 

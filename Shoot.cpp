@@ -12,11 +12,10 @@ Shoot::Shoot(float X, float Y, float width, float heigth, Direction direction, T
 	sprite->setPosition(X + heigth / 11, Y + width / 11);
 	dir = direction;
 	name = Name;
-	x = X;
-	y = Y;
-	dx = x;
-	dy = y;
+	position = {X, Y};
+	oldPosition = position;
 	life = true;
+	health = 100;
 }
 
 void Shoot::CheckForCollisions(RenderWindow & window) {
@@ -40,8 +39,7 @@ void Shoot::CheckForCollisions(RenderWindow & window) {
 }
 
 void Shoot::Explosion(const Time & deltaTime, Texture & texture) { // изменить название функции
-	x = sprite->getPosition().x;
-	y = sprite->getPosition().y;
+	position = sprite->getPosition();
 	delete(sprite);
 	sprite = new Sprite;
 	currentFrame += SPEED_FRAMES_BULLET * deltaTime.asSeconds();
@@ -49,7 +47,8 @@ void Shoot::Explosion(const Time & deltaTime, Texture & texture) { // изменить н
 		sprite->setTexture(texture);
 		sprite->setOrigin(WIDTH_EXPLOSION / 2, HEIGTH_EXPLOSION / 2);
 		sprite->setTextureRect(IntRect(WIDTH_EXPLOSION * int(currentFrame), 0, WIDTH_EXPLOSION, HEIGTH_EXPLOSION));
-		sprite->setPosition(x, y);
+		sprite->setScale(1.5f, 1.5f);
+		sprite->setPosition(position);
 	}
 	else {
 		life = false;
@@ -97,23 +96,23 @@ void Shoot::MoveBullet(const Time & deltaTime) {
 		break;
 	}
 
-	x = movement.x * deltaTime.asSeconds();
-	y = movement.y * deltaTime.asSeconds();
+	position.x = movement.x * deltaTime.asSeconds();
+	position.y = movement.y * deltaTime.asSeconds();
 
-	sprite->move(x, y);
+	sprite->move(position);
 }
 
 void Shoot::MoveBulletHardEnemy(const Time & deltaTime, Vector2f posObject, int speed) {
-	float dX = dx;
-	float dY = dy;
+	float dX = oldPosition.x;
+	float dY = oldPosition.y;
 	if (isRocket) {
-		dX = x;
-		dY = y;
+		dX = position.x;
+		dY = position.y;
 	}
 	float distance = sqrt((posObject.x - dX)*(posObject.x - dX) + (posObject.y - dY)*(posObject.y - dY));
-	x += speed * (posObject.x - dX) / distance;
-	y += speed * (posObject.y - dY) / distance;
-	sprite->setPosition(x, y);
+	position.x += speed * (posObject.x - dX) / distance;
+	position.y += speed * (posObject.y - dY) / distance;
+	sprite->setPosition(position);
 	sprite->setRotation(float(atan2((posObject.y - dY), (posObject.x - dX)) * 180 / M_PI));
 }
 
@@ -137,6 +136,9 @@ void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot
 			else {
 				it->life = false; // отдельная анимация 
 			}
+		}
+		if (it->name == NAME_ROCKET) {
+			it->life = it->health > 0;
 		}
 		if (!it->life) {
 			it->isExplosion = false;

@@ -3,7 +3,6 @@
 #include <iostream>
 #include <list>
 #include <cstdlib>
-#include <ctime> // содержит time()
 
 #include "Entity.h"
 #include "Config.h"

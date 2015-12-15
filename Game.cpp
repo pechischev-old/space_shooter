@@ -10,32 +10,44 @@ void InitializeGame(Game & game) {
 	game.asteroid = new Asteroid;
 	game.bonus = new Bonus;
 	game.star = new Star;
+	srand(unsigned int(time(NULL)));
 	game.textureGame.LoadingFromFileTexture();
 	InitializePlayer(*game.player, game.textureGame);
 	InitializeText(*game.textInfo);
 }
 
 void Game::IncreaseCharacteristicsObjects() {
-	if (player->point <= 0 ) { // переделать диапозон очков
-		enemy->damage += 15;
-		enemy->health += 30;
-		countEnemy += 10;
-		player->point = countEnemy;
-		player->levelGame += 1;
-		player->ship->health = float(player->maxHealth); // восстановление здоровь€
-		//-------- увеличение количества кораблей врагов
-		enemy->numberEnemy.numberEasyEnemy += 1;
-		enemy->numberEnemy.numberKamikaze += 1;
-		enemy->numberEnemy.numberMiddleEnemy += 1;
-		enemy->numberEnemy.numberTowerEnemy += 1;
-		//---------- уменьшение времени по€влени€ враждебных объектов
-		if (asteroid->timeToCreateAsteroid > 0.3)
-			asteroid->timeToCreateAsteroid -= 0.07f;
-		if (enemy->timeToCreateEnemy > 0.3)
-			enemy->timeToCreateEnemy -= 0.1f;
-		if (player->levelGame == MAX_LEVEL_GAME)
+	if (player->point <= 0 ) { 
+		if (player->levelGame == MAX_LEVEL_GAME) {
 			enemy->bossState.isBoss = true;
+		}
+		else {
+			// вынести в константы все числа
+			enemy->damage += 15;
+			enemy->health += 30;
+			countEnemy += 10;
+			player->point = countEnemy;
+			player->levelGame += 1;
+			player->ship->health = float(player->maxHealth); // восстановление здоровь€
+			//-------- увеличение количества кораблей врагов
+			enemy->numberEnemy.numberEasyEnemy += 1;
+			if (player->levelGame >= 2)
+				enemy->numberEnemy.numberMiddleEnemy += 1;
+			if (player->levelGame >= 3 )
+				enemy->numberEnemy.numberKamikaze += 1;
+			if (player->levelGame >= 4)
+				enemy->numberEnemy.numberTowerEnemy += 1;
+			//---------- уменьшение времени по€влени€ враждебных объектов
+			if (asteroid->timeToCreateAsteroid > 0.3)
+				asteroid->timeToCreateAsteroid -= 0.07f;
+			if (enemy->timeToCreateEnemy > 0.3)
+				enemy->timeToCreateEnemy -= 0.1f;
+		}
 	}
+}
+
+bool hasIntersection(Sprite & object1, Sprite & object2) {
+	return object1.getGlobalBounds().intersects(object2.getGlobalBounds());
 }
 
 void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, TextureGame & textureGame) {
@@ -43,57 +55,57 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 	if (player->ship->sprite->getColor() == Color::Red)
 		player->ship->sprite->setColor(Color::White);
 	//----------------------------------------------------------
-	for (list<Entity>::iterator it2 = enemy->enemyShip.begin(); it2 != enemy->enemyShip.end(); ++it2) {
+	for (auto &enemyShip : enemy->enemyShip) {
 		//----------------- ќкрашивает в белый цвет ----------------
-		if (it2->sprite->getColor() == Color::Red)
-			it2->sprite->setColor(Color::White);
+		if (enemyShip.sprite->getColor() == Color::Red)
+			enemyShip.sprite->setColor(Color::White);
 		//----------------------- ќбработка взаимодействи€ игрока и противников ------------------------------------
-		if (player->ship->sprite->getGlobalBounds().intersects(it2->sprite->getGlobalBounds())) // столкновение игрока с врагом
+		if (hasIntersection(*player->ship->sprite, *enemyShip.sprite)) // столкновение игрока с врагом
 		{
-			if (it2->health > 0) {
+			if (enemyShip.health > 0) {
 				if (!player->playerState.isInvulnerability) {
-					player->ship->health -= it2->damage;
+					player->ship->health -= enemyShip.damage;
 					player->ship->sprite->setColor(Color::Red);
 				}
 			}
 			if (player->ship->health > 0) {
-				if (it2->name == NAME_BOSS)
+				if (enemyShip.name == NAME_BOSS)
 					player->ship->health = 0;
 				else
-					it2->health = 0;
+					enemyShip.health = 0;
 			}
 		}
-		Vector2f posEnemy = it2->sprite->getPosition(),
+		Vector2f posEnemy = enemyShip.sprite->getPosition(),
 			posPlayer = player->ship->sprite->getPosition();
 		//----------------------------- враг стрел€ет -----------------------------------------------------
-	  if (it2->health > 0 && it2->name != NAME_KAMIKAZE_ENEMY) {
-			if (IsEnterField(posPlayer, *it2) && it2->name == NAME_EASY_ENEMY) {
-				enemy->AddBulletEnemy(*it2, posPlayer, textureGame.redLaserTexture, it2->timeCreateBullet);
+	  if (enemyShip.health > 0 && enemyShip.name != NAME_KAMIKAZE_ENEMY) {
+			if (IsEnterField(posPlayer, enemyShip) && enemyShip.name == NAME_EASY_ENEMY) {
+				enemy->AddBulletEnemy(enemyShip, posPlayer, textureGame.redLaserTexture, enemyShip.timeCreateBullet);
 			}
-			else if (it2->name == NAME_TOWER_ENEMY || it2->name == NAME_BOSS) {
-				if (enemy->bossState.isRage && it2->name == NAME_BOSS)
-					SpecialShootingBoss(*enemy, *it2, textureGame);
-				else if (it2->name == NAME_TOWER_ENEMY)
-					enemy->AddBulletEnemy(*it2, posPlayer, textureGame.rocketTexture, it2->timeCreateBullet);
-				else if (it2->name == NAME_BOSS)
-					enemy->AddBulletEnemy(*it2, posPlayer, textureGame.redLaserTexture, it2->timeCreateBullet);
+			else if (enemyShip.name == NAME_TOWER_ENEMY || enemyShip.name == NAME_BOSS) {
+				if (enemy->bossState.isRage && enemyShip.name == NAME_BOSS)
+					SpecialShootingBoss(*enemy, enemyShip, textureGame);
+				else if (enemyShip.name == NAME_TOWER_ENEMY)
+					enemy->AddBulletEnemy(enemyShip, posPlayer, textureGame.rocketTexture, enemyShip.timeCreateBullet);
+				else if (enemyShip.name == NAME_BOSS)
+					enemy->AddBulletEnemy(enemyShip, posPlayer, textureGame.redLaserTexture, enemyShip.timeCreateBullet);
 			}
-			else if (IsSeePlayer(posPlayer, *it2, window.getSize()) && it2->name == NAME_MIDDLE_ENEMY) { // враг стрел€ет
+			else if (IsSeePlayer(posPlayer, enemyShip, window.getSize()) && enemyShip.name == NAME_MIDDLE_ENEMY) { // враг стрел€ет
 					
-					enemy->AddBulletEnemy(*it2, posPlayer, textureGame.redLaserTexture, it2->timeCreateBullet);
+					enemy->AddBulletEnemy(enemyShip, posPlayer, textureGame.greenLaserTexture, enemyShip.timeCreateBullet);
 					
 			}
 			
 		}
 		//------------------------------- ќбработка попадани€ пули по врагу ----------------------------------------
-		for (list<Shoot>::iterator it = player->bullet.begin(); it != player->bullet.end(); it++) {
-			if (it->sprite->getGlobalBounds().intersects(it2->sprite->getGlobalBounds())) {
-				if (!it->isExplosion)
-					it2->health -= player->ship->damage;
-				if (it2->health > 0 && it2->name != NAME_ELECTRIC_BULLET)
-					it->isExplosion = true;
-				it2->sprite->setColor(Color::Red);
-				if (it2->name == NAME_BOSS) {
+		for (auto &playerullet : player->bullet) {
+			if (hasIntersection(*playerullet.sprite, *enemyShip.sprite)) {
+				if (!playerullet.isExplosion)
+					enemyShip.health -= player->ship->damage;
+				if (enemyShip.health > 0 && enemyShip.name != NAME_ELECTRIC_BULLET)
+					playerullet.isExplosion = true;
+				enemyShip.sprite->setColor(Color::Red);
+				if (enemyShip.name == NAME_BOSS) {
 					if (enemy->rage <= POINT_FOR_RAGE && !enemy->bossState.isRage) {
 						enemy->rage += 5;
 					}
@@ -102,111 +114,112 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 					}
 				}
 			}
-			if (it2->name == NAME_BOSS) {
-				if (IsEnterField(Vector2f(it->sprite->getPosition()), *it2)) { // ѕроверка на вхождение пули в область видимости
+			/*if (it2.name == NAME_BOSS) {
+				if (IsEnterField(Vector2f(it.sprite->getPosition()), it2)) { // ѕроверка на вхождение пули в область видимости
 					//enemy->Evasion(Vector2f(it->sprite->getPosition()), *it2, window->getSize()); // ‘ункци€ уклонени€
 				}
-			}
+			}*/
 		}
 		//---------------------------- ќбработка столкновени€ противника с астероидом ------------------------------
-		for (list<Entity>::iterator it3 = asteroid->asteroids.begin(); it3 != asteroid->asteroids.end(); ++it3) {
-			if (it2->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) // столкновение врага с астероидом
+		for (auto &asteroid : asteroid->asteroids) {
+			if (hasIntersection(*enemyShip.sprite, *asteroid.sprite)) // столкновение врага с астероидом
 			{
-				it3->health = 0;
+				asteroid.health = 0;
 			}
 		}
 	}
 	
 	// ќбработка попадани€ пули по игроку
-	for (list<Shoot>::iterator it = enemy->bulletEnemy.begin(); it != enemy->bulletEnemy.end(); ++it) {
-		if (player->ship->sprite->getGlobalBounds().intersects(it->sprite->getGlobalBounds())) {
+	for (auto &enemyBullet : enemy->bulletEnemy) {
+		if (hasIntersection(*player->ship->sprite, *enemyBullet.sprite)) {
 			if (!player->playerState.isInvulnerability) {
-				if (!it->isExplosion)
+				if (!enemyBullet.isExplosion)
 					player->ship->health -= enemy->damage;
 				player->ship->sprite->setColor(Color::Red);
 			}
-			if (it->name == NAME_ELECTRIC_BULLET) {
+			if (enemyBullet.name == NAME_ELECTRIC_BULLET) {
 				player->playerState.isMove = false;
 				player->direction = NONE;
 				player->timeRecoveryMove = Time::Zero;
 				enemy->bossState.isRage = false;
 				enemy->rage = 0;
 			}
-			it->isExplosion = true;
+			enemyBullet.isExplosion = true;
 		}
 		// ќбработка попадани€ по ракете
-		for (list<Shoot>::iterator playerBullet = player->bullet.begin(); playerBullet != player->bullet.end(); ++playerBullet) {
-			if (it->sprite->getGlobalBounds().intersects(playerBullet->sprite->getGlobalBounds())) {
-				if (it->name == NAME_ROCKET) {
-					it->isExplosion = true;
-					if (playerBullet->name != NAME_ELECTRIC_BULLET)
-						playerBullet->isExplosion = true;
+		for (auto &playerBullet : player->bullet) {
+			if (hasIntersection(*enemyBullet.sprite, *playerBullet.sprite)) {
+				if (enemyBullet.name == NAME_ROCKET) {
+					if (!playerBullet.isExplosion)
+						enemyBullet.health -= playerBullet.damage;
+					if (playerBullet.name != NAME_ELECTRIC_BULLET)
+						playerBullet.isExplosion = true;
 				}
 			}
 		}
 	}
 	// ќбработка астеройдов
-	for (list<Entity>::iterator it3 = asteroid->asteroids.begin(); it3 != asteroid->asteroids.end(); ++it3) {
+	for (auto &asteroid : asteroid->asteroids) {
 		//----------------- ќкрашивает в белый цвет ----------------
-		if (it3->sprite->getColor() == Color::Red)
-			it3->sprite->setColor(Color::White);
+		if (asteroid.sprite->getColor() == Color::Red)
+			asteroid.sprite->setColor(Color::White);
 		//------------------------------ ќбработка столкновени€ астероида с игроком ---------------------------------
-		if (player->ship->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) // столкновение игрока с врагом
+		if (hasIntersection(*player->ship->sprite, *asteroid.sprite)) // столкновение игрока с врагом
 		{
-			if (it3->health > 0) {
+			if (asteroid.health > 0) {
 				if (!player->playerState.isInvulnerability) {
-					player->ship->health -= enemy->damage;
+					player->ship->health -= asteroid.damage;
 					player->ship->sprite->setColor(Color::Red);
 				}
 			}
-			it3->health = 0;
+			asteroid.health = 0;
 		}
 		//------------------------------ ќбработка попадани€ пули игрока по астероиду -------------------------------
-		for (list<Shoot>::iterator it = player->bullet.begin(); it != player->bullet.end(); ++it) {
-			if (it->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) {
-				if (!it->isExplosion)
-					it3->health -= 3 * player->ship->damage;
-				if (it3->health > 0)
-					it->isExplosion = true;
-				it3->sprite->setColor(Color::Red);
+		for (auto &playerBullet : player->bullet) {
+			if (hasIntersection(*playerBullet.sprite, *asteroid.sprite)) {
+				if (!playerBullet.isExplosion)
+					asteroid.health -= 3 * player->ship->damage;
+				if (asteroid.health > 0)
+					playerBullet.isExplosion = true;
+				asteroid.sprite->setColor(Color::Red);
 			}
 		}
 		//------------------------------------ ќбработка попадани€ пули врага по астероиду --------------------------
-		for (list<Shoot>::iterator it = enemy->bulletEnemy.begin(); it != enemy->bulletEnemy.end(); ++it) {
-			if (it->sprite->getGlobalBounds().intersects(it3->sprite->getGlobalBounds())) {
-				if (!it->isExplosion)
-					it3->health -= 3 * enemy->damage;
-				it->isExplosion = true;
-				it3->sprite->setColor(Color::Red);
+		for (auto &enemyBullet : enemy->bulletEnemy) {
+			if (hasIntersection(*enemyBullet.sprite, *asteroid.sprite)) {
+				if (!enemyBullet.isExplosion)
+					asteroid.health -= 3 * enemy->damage;
+				enemyBullet.isExplosion = true;
+				asteroid.sprite->setColor(Color::Red);
 			}
 		}
 	}
 	// ќбработка подбирани€ бонусов
-	for (list<Entity>::iterator it4 = bonus->bonuses.begin(); it4 != bonus->bonuses.end(); ++it4) {
-		if (player->ship->sprite->getGlobalBounds().intersects(it4->sprite->getGlobalBounds())) {
-			if (it4->name == REPAIR_IMAGE) {
+	for (auto &bonus : bonus->bonuses) {
+		if (hasIntersection(*player->ship->sprite, *bonus.sprite)) {
+			if (bonus.name == REPAIR_IMAGE) {
 				player->playerState.isRepair = true;
 			}
-			if (it4->name == INVULNERABILITY_IMAGE) {
+			if (bonus.name == INVULNERABILITY_IMAGE) {
 				player->playerState.isInvulnerability = true;
 				player->playerState.isDecrease = false;
 				player->playerState.isIncreaseDamage = false;
 			}
-			if (it4->name == INCREASE_DAMAGE_IMAGE) {
+			if (bonus.name == INCREASE_DAMAGE_IMAGE) {
 				player->playerState.isIncreaseDamage = true;
 				player->playerState.isInvulnerability = false;
 				player->playerState.isDecrease = false;
 			}
-			if (it4->name == DECREASE_IMAGE) {
+			if (bonus.name == DECREASE_IMAGE) {
 				player->playerState.isIncreaseDamage = false;
 				player->playerState.isInvulnerability = false;
 				player->playerState.isDecrease = true;
 			}
-			if (it4->name == BOMB_IMAGE) {
+			if (bonus.name == BOMB_IMAGE) {
 				player->playerState.isBomb = true;
 			}
 			
-			it4->isLife = false;
+			bonus.isLife = false;
 			
 		}
 	}
@@ -370,6 +383,9 @@ void renderGame(RenderWindow & window, Game & game)
 	game.DrawObjects(window);
 	DrawTextToGame(*game.textInfo, window);
 	//}
+	if (!game.player->ship->isLife) {
+		OutputMessageAboutLosing(window, *game.textInfo);
+	}
 	window.display();
 }
 
@@ -383,6 +399,7 @@ void ResetGame(Game & game) {
 	ResetEnemy(*game.enemy);
 	game.timeUseBonus = 0;
 	game.player->point = POINT_FOR_ADVANCE;
+	game.asteroid->timeToCreateAsteroid = TIME_CREATE_ASTEROID;
 }
 
 void Delete(Game & game) {

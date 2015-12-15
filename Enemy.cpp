@@ -50,52 +50,49 @@ void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window) {
 	};
 
 	auto GetFirstDirection = [&]() {
-		Direction dir = NONE;
 		random_device rd;
 		mt19937 gen(rd());
 		uniform_int_distribution<> dist(1, 4);
-		int choose = dist(gen);
-		if (choose == 1) dir = UP;
-		if (choose == 2) dir = LEFT;
-		if (choose == 3) dir = DOWN;
-		if (choose == 4) dir = RIGHT;
-		return dir;
+		return dist(gen);
 	};
 
 	timeCreateEnemy += clock.restart();
 	if (!bossState.isBoss) {
 		if (timeCreateEnemy.asSeconds() > timeToCreateEnemy) {
-			int chooseEnemy = GetTypeEnemy();
 			Direction dir = LEFT;
 			Vector2f getPositionEnemy;
 			String typeEnemy;
 			Texture *texture = NULL;
+			idEnemy = static_cast<TypeEnemy> (GetTypeEnemy());
 			int countEnemy = 0;
-			if (chooseEnemy == 1) { // сделать через switch
+			switch (idEnemy)
+			{
+			case TypeEnemy::EASY:
 				typeEnemy = NAME_EASY_ENEMY;
 				texture = &textureGame.enemyEasyTexture;
 				countEnemy = numberEnemy.numberEasyEnemy;
-			}
-			if (chooseEnemy == 2) {
+				break;
+			case TypeEnemy::MIDDLE:
 				typeEnemy = NAME_MIDDLE_ENEMY;
 				texture = &textureGame.enemyMiddleTexture;
 				countEnemy = numberEnemy.numberMiddleEnemy;
-			}
-			if (chooseEnemy == 3) {
+				break;
+			case TypeEnemy::KAMIKAZE:
 				typeEnemy = NAME_TOWER_ENEMY;
 				texture = &textureGame.enemyTowerTexture;
 				countEnemy = numberEnemy.numberTowerEnemy;
-			}
-			if (chooseEnemy == 4) {
+				break;
+			case TypeEnemy::TOWER:
 				typeEnemy = NAME_KAMIKAZE_ENEMY;
 				texture = &textureGame.enemyKamikazeTexture;
 				countEnemy = numberEnemy.numberKamikaze;
+				break;
 			}
 			for (int i = 1; i <= countEnemy; ++i) {
 				if (i == 1)
-					dir = GetFirstDirection();
+					dir = static_cast<Direction>(GetFirstDirection());
 				else
-					dir = GetDirection(dir);
+					dir = static_cast<Direction>(GetFirstDirection());
 				getPositionEnemy = GetRandomPosition(dir, window);
 				Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy, *texture);
 				addEnemy.health = float(health);
@@ -116,7 +113,7 @@ void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window) {
 			bossState.isOneBoss = false;
 		}
 	}
-	if (bossState.isBoss && !bossState.isOneBoss) {
+	if (bossState.isBoss && !bossState.isOneBoss) { // переделать
 		Vector2f getPositionEnemy = { 650, 350 };
 		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, NAME_BOSS, textureGame.enemyBossTexture);
 		addEnemy.direction = UP;
@@ -131,7 +128,10 @@ void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window) {
 void Enemy::AddBulletEnemy(Entity & enemy, Vector2f posPlayer, Texture & texture, Time & timeCreateBullet) {
 	timeCreateBullet += clock.getElapsedTime();
 	Vector2f posEnemy = enemy.sprite->getPosition();
-	if (timeCreateBullet.asSeconds() > TIME_CREATE_BULLET_ENEMY) {
+	float timeCreate = TIME_CREATE_BULLET_ENEMY;
+	if (enemy.name == NAME_TOWER_ENEMY)
+		timeCreate = 0.7f;
+	if (timeCreateBullet.asSeconds() > timeCreate) {
 		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, LEFT, texture, NAME_BULLET);
 		if (enemy.name != NAME_TOWER_ENEMY && !bossState.isRage) {
 			addBullet.isOtherBullet = true;
@@ -346,7 +346,7 @@ bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow) { 
 		posPlayer = playerPos;
 	float angle = enemy.sprite->getRotation();
 	Transform transform;
-	FloatRect rect = transform.rotate(angle, Vector2f(posEnemy)).transformRect(FloatRect(posEnemy, Vector2f(float(sizeWindow.x) / 1.5, float(sizeWindow.y) / 1.5))); 
+	FloatRect rect = transform.rotate(angle, Vector2f(posEnemy)).transformRect(FloatRect(posEnemy, Vector2f(float(sizeWindow.x) / 1.5f, float(sizeWindow.y) / 1.5f))); 
 	// задаю поворот и размеры области стрельбы 
 	return rect.contains(posPlayer);
 }
@@ -362,5 +362,10 @@ void ResetEnemy(Enemy & enemy) {
 	enemy.rage = 0;
 	enemy.selector = TRIPLE_SHOT;
 	enemy.selectorShooting = 0;
+	enemy.timeToCreateEnemy = TIME_CREATE_ENEMY;
+	enemy.numberEnemy.numberEasyEnemy = COUNT_EASY_ENEMY;
+	enemy.numberEnemy.numberKamikaze = COUNT_KAMIKAZE_ENEMY;
+	enemy.numberEnemy.numberMiddleEnemy = COUNT_MIDDLE_ENEMY;
+	enemy.numberEnemy.numberTowerEnemy = COUNT_TOWER_ENEMY;
 }
 

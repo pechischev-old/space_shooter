@@ -3,7 +3,6 @@
 #include <iostream>
 #include <list>
 #include <cstdlib>
-#include <ctime> // содержит time()
 
 #include "Config.h"
 #include "Entity.h"
@@ -12,6 +11,14 @@ using namespace sf;
 
 struct Bonus {
 	std::list<Entity> bonuses;
+	enum TypeBonuses {
+		REPAIR = 1,
+		DECREASE,
+		INCREASE_DAMAGE,
+		INVULNERABILITY,
+		BOMB
+	};
+	TypeBonuses typeBonus;
 	Clock clock;
 	Time timeCreateBonus = Time::Zero;
 	int probabilityOccurrence;

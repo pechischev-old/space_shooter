@@ -28,7 +28,7 @@ void Entity::Explosion(const Time & deltaTime, Texture & texture) { // изменить 
 	if (CurrentFrame <= NUMBER_OF_FRAMES) {
 		sprite->setTexture(texture);
 		sprite->setOrigin(WIDTH_EXPLOSION / 2, HEIGTH_EXPLOSION / 2);
-		sprite->setScale(1.5, 1.5);
+		sprite->setScale(2.5, 2.5);
 		sprite->setTextureRect(IntRect(WIDTH_EXPLOSION * int(CurrentFrame), 0, WIDTH_EXPLOSION, HEIGTH_EXPLOSION));
 		sprite->setPosition(x, y);
 	}

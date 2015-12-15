@@ -15,7 +15,9 @@ using namespace std;
 
 struct Shoot {
 	Shoot(float X, float Y, float WIDTH, float  HEIGTH, Direction dir, Texture & texture, String Name);
-	float x, y, dx, dy;
+	Vector2f position;
+	Vector2f oldPosition;
+	//float x, y, dx, dy;
 	Direction dir;
 	Sprite *sprite;
 	String name;
@@ -23,7 +25,8 @@ struct Shoot {
 	int damage;
 	Vector2f movement = { 0.f, 0.f };
 	Vector2f rememPos;
-	float currentFrame = 0;
+	float currentFrame = 0; // нужно для анимации
+	float health;
 	bool isExplosion = false;
 	bool isOtherBullet = false;
 	bool isRocket = false;

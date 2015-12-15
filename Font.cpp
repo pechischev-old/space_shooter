@@ -17,7 +17,7 @@ void InitializeText(TextWithInfo & textInfo) {
 	InitString(textInfo.textRecords, String(TEXT_RECORDS), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textOption, String(TEXT_OPTIONS), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textExit, String(TEXT_EXIT), textInfo.font, textInfo.sizeText);
-	InitString(textInfo.textAboutRecord, String(TEXT_ABOUT_RECORD), textInfo.font, textInfo.sizeText);
+	InitString(textInfo.textLosing, String(TEXT_ABOUT_LOSING), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textScore, String(""), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textLevel, String(""), textInfo.font, textInfo.sizeText);
 }
@@ -101,3 +101,8 @@ void DrawTextToMenu(TextWithInfo & textInfo, RenderWindow & window) {
 }
 
 
+void OutputMessageAboutLosing(RenderWindow & window, TextWithInfo & textInfo) {
+	Vector2u sizeWindow = window.getSize();
+	textInfo.textLosing.setPosition(float(sizeWindow.x) / 2, float(sizeWindow.y) / 2);
+	window.draw(textInfo.textLosing);
+}

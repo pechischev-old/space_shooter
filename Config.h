@@ -67,7 +67,7 @@ const static float SPEED_BOSS = 150;
 
 const static int TIME_CREATE_ENEMY = 2;
 
-const static double TIME_CREATE_BULLET_ENEMY = 0.2;
+const static float TIME_CREATE_BULLET_ENEMY = 0.2f;
 
 const static float DISTANCE_FOR_ATACK = 500.f;
 
@@ -91,7 +91,7 @@ const static sf::String NAME_KAMIKAZE_ENEMY = "kamikaze";
 const static int RATE_HEALTH_BOSS = 50;
 //-----------------------------Для астероидов  ---------------------------------
 
-const static double TIME_CREATE_ASTEROID = 1.1;
+const static float TIME_CREATE_ASTEROID = 1.1f;
 
 const static sf::String NAME_ASTEROID = "asteroid";
 
@@ -168,7 +168,7 @@ enum MenuSelector {
 
 const static int COUNT_STRING_IN_MENU = 5;
 
-const static float RATE_LINE_SPACING = 1;
+const static float RATE_LINE_SPACING = 1.f;
 
 const static sf::String TEXT_HEALTH = L"Жизнь: ";
 
@@ -181,15 +181,15 @@ const static sf::String TEXT_CONTINUE = L"Продолжить";
 const static sf::String TEXT_RECORDS = L"Рекорды";
 const static sf::String TEXT_OPTIONS = L"Настройки";
 const static sf::String TEXT_EXIT = L"Выход";
-const static sf::String TEXT_ABOUT_RECORD = L"Вы поставили новый рекорд. Введите свое имя для записи";
+const static sf::String TEXT_ABOUT_LOSING = L"Вы проиграли. Нажмите Esc для выхода в меню";
 const static sf::String TEXT_SCORE = L"Ваш счет: ";
 
 
 const static sf::String PATH_TO_FONT = "resourse/fonts/Ubuntu-R.ttf";
 
 const static sf::String PATH_TO_RED_BULLET = "resourse/images/laser-red.png";
-
 const static sf::String PATH_TO_BLUE_BULLET = "resourse/images/laser-blue.png";
+const static sf::String PATH_TO_GREEN_BULLET = "resourse/images/laser-green.png";
 
 const static sf::String PATH_TO_EXPLOSION = "resourse/images/explosion_2.png";
 

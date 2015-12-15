@@ -6,28 +6,31 @@ void Bonus::AddBonus(Vector2f getPosition, TextureGame & textureGame) {
 	timeCreateBonus += clock.restart();
 	if (timeCreateBonus.asSeconds() > TIME_CREATE_BONUS) {
 		Direction dir = DOWN; 
-		int objectSize = SpecifySizeBonus();
+		typeBonus = static_cast<TypeBonuses> (SpecifySizeBonus());
 		String name;
 		Texture *texture = NULL;
-		if (objectSize == 1) {
+		switch (typeBonus)
+		{
+		case Bonus::REPAIR:
 			name = REPAIR_IMAGE;
 			texture = &textureGame.repairTexture;
-		}
-		else if (objectSize == 2) {
+			break;
+		case Bonus::DECREASE:
 			name = DECREASE_IMAGE;
 			texture = &textureGame.decreaseTexture;
-		}
-		else if (objectSize == 3) {
+			break;
+		case Bonus::INCREASE_DAMAGE:
 			name = INCREASE_DAMAGE_IMAGE;
 			texture = &textureGame.increaseTexture;
-		}
-		else if (objectSize == 4) {
+			break;
+		case Bonus::INVULNERABILITY:
 			name = INVULNERABILITY_IMAGE;
 			texture = &textureGame.invulnerabilityTexture;
-		}
-		else if (objectSize == 5) {
+			break;
+		case Bonus::BOMB:
 			name = BOMB_IMAGE;
 			texture = &textureGame.bombTexture;
+			break;
 		}
 		Entity addBonus(getPosition.x, getPosition.y, name, *texture);
 		addBonus.direction = dir; // присваивает сгенерированное направление
@@ -50,13 +53,11 @@ void Bonus::GetMoveEveryBonus(const Time & deltaTime, RenderWindow & window) {
 }
 
 int SpecifySizeBonus() {
-	srand(unsigned int(time(NULL)));
 	int point = 1 + rand() % 5;
 	return point;
 }
 
 int IssuanceProbability() {
-	srand(unsigned int(time(NULL)));
 	int point = 1 + rand() % 4;
 	return point;
 }
