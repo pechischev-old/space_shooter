@@ -43,7 +43,7 @@ void Asteroid::AddAsteroid(TextureGame & textureGame, RenderWindow & window) {
 			break;
 		}
 		
-		Entity addAsteroid(getPosition.x, getPosition.y, name, *texture);
+		Entity addAsteroid(getPosition, name, *texture);
 		addAsteroid.direction = dir; // присваивает сгенерированное направление
 		addAsteroid.speed = float(speed);
 		addAsteroid.damage = float(damage);
@@ -55,24 +55,25 @@ void Asteroid::AddAsteroid(TextureGame & textureGame, RenderWindow & window) {
 }
 
 void Asteroid::GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame) {
-	for (list<Entity>::iterator it = asteroids.begin(); it != asteroids.end();) {
-		it->MoveObject(deltaTime);
-		InitRotateAsteroid(*it);
-		it->CheckForCollisions(window);
-		if (it->health <= 0) {
-			it->Explosion(deltaTime, textureGame.explosionTexture);
-			
+	for (auto &it : asteroids) {
+		it.MoveObject(deltaTime);
+		InitRotateAsteroid(it);
+		it.CheckForCollisions(window);
+		if (it.health <= 0) {
+			it.Explosion(deltaTime, textureGame.explosionTexture);	
 		}
-		if (!it->isLife) {
-			if (it->isKilled) {  // выпадение бонуса
-				if (CheckProbably())
-					bonus.AddBonus(Vector2f(it->x, it->y), textureGame);
-			}
-			delete it->sprite;
-			it = asteroids.erase(it);
-		}
-		else  ++it;
 	}
+	auto updatedEnd = std::remove_if(asteroids.begin(), asteroids.end(), [&](Entity &entity) {
+		if (!entity.isLife) {
+			if (entity.isKilled) {  // выпадение бонуса
+				if (CheckProbably())
+					bonus.AddBonus(entity.position, textureGame);
+			}
+			delete entity.sprite;
+		}
+		return !entity.isLife;
+	});
+	asteroids.erase(updatedEnd, asteroids.end());
 }
 
 void Asteroid::InitRotateAsteroid(Entity & asteroid) {

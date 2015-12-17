@@ -36,7 +36,7 @@ void Bonus::AddBonus(Vector2f getPosition, TextureGame & textureGame) {
 			texture = &textureGame.bombTexture;
 			break;
 		}
-		Entity addBonus(getPosition.x, getPosition.y, name, *texture);
+		Entity addBonus(getPosition, name, *texture);
 		addBonus.direction = dir; // присваивает сгенерированное направление
 		addBonus.speed = SPEED_BONUS;
 		bonuses.push_back(addBonus);
@@ -45,15 +45,17 @@ void Bonus::AddBonus(Vector2f getPosition, TextureGame & textureGame) {
 }
 
 void Bonus::GetMoveEveryBonus(const Time & deltaTime, RenderWindow & window) {
-	for (list<Entity>::iterator it = bonuses.begin(); it != bonuses.end();) {
-		it->MoveObject(deltaTime);
-		it->CheckForCollisions(window);
-		if (!it->isLife) {
-			delete it->sprite;
-			it = bonuses.erase(it);
-		}
-		else  ++it;
+	for (auto &it : bonuses) {
+		it.MoveObject(deltaTime);
+		it.CheckForCollisions(window);
 	}
+	auto updatedEnd = std::remove_if(bonuses.begin(), bonuses.end(), [&](Entity &entity) {
+		if (!entity.isLife) {
+			delete entity.sprite;
+		}
+		return !entity.isLife;
+	});
+	bonuses.erase(updatedEnd, bonuses.end());
 }
 
 int IssuanceProbability() {

@@ -14,19 +14,17 @@ using namespace sf;
 using namespace std;
 
 struct Entity {
-	Entity(float x, float y, String Name, Texture & texture);
-	float x;
-	float y;
-	float width;
-	float height;
+	Entity(Vector2f position, String Name, Texture & texture);
+	Vector2f position;
+	Vector2f sizeObject;
 	float health; // здоровье сущности
 	float damage; // урон который наносит сущность
 	float speed; // скорость сущности
-	Direction direction, rememberDir;
+	Direction direction;
 	String name;
 	Sprite *sprite;
 	bool isLife;
-	bool isKilled = false;
+	bool isKilled;
 	float CurrentFrame = 0;
 	void Explosion(const Time & deltaTime, Texture & texture);
 	void CheckForCollisions(RenderWindow & window);

@@ -4,41 +4,44 @@ using namespace std;
 using namespace sf;
 
 void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer, int & point) {
-	for (list<Entity>::iterator it = enemyShip.begin(); it != enemyShip.end();) {
-		if (it->name != NAME_BOSS ) {
-			SetMove(window, *it);
+
+	for (auto &it : enemyShip) {
+		if (it.name != NAME_BOSS ) {
+			SetMove(window, it);
 		}
-		it->MoveObject(deltaTime);
-		UpdateDirection(window, *it);
-		if (it->name == NAME_KAMIKAZE_ENEMY) {
-			MoveKamikaze(deltaTime, posPlayer, *it);
+		it.MoveObject(deltaTime);
+		UpdateDirection(window, it);
+		if (it.name == NAME_KAMIKAZE_ENEMY) {
+			MoveKamikaze(deltaTime, posPlayer, it);
 		}
-		if (it->health <= 0 && it->name == NAME_BOSS) {
+		if (it.health <= 0 && it.name == NAME_BOSS) {
 			bossState.isBoss = false;
 			bossState.isRage = false;
 		}
-		if (it->name != NAME_BOSS) {
-			if (it->name != NAME_KAMIKAZE_ENEMY)
-				it->SetRotationObject(posPlayer);
+		if (it.name != NAME_BOSS) {
+			if (it.name != NAME_KAMIKAZE_ENEMY)
+				it.SetRotationObject(posPlayer);
 		}
 		else { // дл€ босса
-			BorderChecks(*it, window.getSize()); //‘ункци€ движени€ - по€влени€
+			BorderChecks(it, window.getSize()); //‘ункци€ движени€ - по€влени€
 		}
-		it->CheckForCollisions(window);
-		if (it->health <= 0) {
-			it->Explosion(deltaTime, textureGame.explosionTexture);
+		it.CheckForCollisions(window);
+		if (it.health <= 0) {
+			it.Explosion(deltaTime, textureGame.explosionTexture);
 		}
-		if (!it->isLife) {
-			if (it->isKilled) {  // выпадение бонуса
+	}
+	auto updatedEnd = std::remove_if(enemyShip.begin(), enemyShip.end(), [&](Entity &entity) {
+		if (!entity.isLife) {
+			if (entity.isKilled) {  // выпадение бонуса
 				if (CheckProbably())
-					bonus.AddBonus(Vector2f(it->x, it->y), textureGame);
+					bonus.AddBonus(entity.position, textureGame);
 				--point;
 			}
-			delete it->sprite;
-			it = enemyShip.erase(it);
+			delete entity.sprite;
 		}
-		else  ++it;
-	}
+		return !entity.isLife;
+	});
+	enemyShip.erase(updatedEnd, enemyShip.end());
 }
 
 void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window) {
@@ -94,7 +97,7 @@ void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window) {
 				else
 					dir = static_cast<Direction>(GetDirection(dir));
 				getPositionEnemy = GetRandomPosition(dir, window);
-				Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, typeEnemy, *texture);
+				Entity addEnemy(getPositionEnemy, typeEnemy, *texture);
 				addEnemy.health = float(health);
 				addEnemy.speed = float(SPEED_ENEMY);
 				if (typeEnemy == NAME_TOWER_ENEMY) {
@@ -115,7 +118,7 @@ void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window) {
 	}
 	if (bossState.isBoss && !bossState.isOneBoss) { // переделать
 		Vector2f getPositionEnemy = { 650, 350 };
-		Entity addEnemy(getPositionEnemy.x, getPositionEnemy.y, NAME_BOSS, textureGame.enemyBossTexture);
+		Entity addEnemy(getPositionEnemy, NAME_BOSS, textureGame.enemyBossTexture);
 		addEnemy.direction = UP;
 		addEnemy.damage = float(damage);
 		addEnemy.health = float(health) * RATE_HEALTH_BOSS;
@@ -130,9 +133,9 @@ void Enemy::AddBulletEnemy(Entity & enemy, Vector2f posPlayer, Texture & texture
 	Vector2f posEnemy = enemy.sprite->getPosition();
 	float timeCreate = TIME_CREATE_BULLET_ENEMY;
 	if (enemy.name == NAME_TOWER_ENEMY)
-		timeCreate = 0.7f;
+		timeCreate = TIME_CREATE_ROCKET;
 	if (timeCreateBullet.asSeconds() > timeCreate) {
-		Shoot addBullet(posEnemy.x, posEnemy.y, enemy.width, enemy.height, LEFT, texture, NAME_BULLET);
+		Shoot addBullet(posEnemy, enemy.sizeObject, LEFT, texture, NAME_BULLET);
 		if (enemy.name != NAME_TOWER_ENEMY && !bossState.isRage) {
 			addBullet.isOtherBullet = true;
 			addBullet.rememPos = posPlayer;
@@ -148,7 +151,7 @@ void Enemy::AddBulletEnemy(Entity & enemy, Vector2f posPlayer, Texture & texture
 }
 
 void Enemy::BorderChecks(Entity & entity, Vector2u sizeWindow) {
-	float height = entity.height;
+	float height = entity.sizeObject.y;
 	float top = entity.sprite->getGlobalBounds().top;
 	float bottom = top + height;
 	
@@ -195,8 +198,8 @@ void Enemy::MoveKamikaze(const Time & deltaTime, Vector2f posPlayer, Entity & en
 	if (enemy.health > 0) {
 		Vector2f posEnemy = enemy.sprite->getPosition();
 		float distance = sqrt((posPlayer.x - posEnemy.x)*(posPlayer.x - posEnemy.x) + (posPlayer.x - posEnemy.y)*(posPlayer.x - posEnemy.y));
-		posEnemy.x += 5 * (posPlayer.x - posEnemy.x) / distance;  
-		posEnemy.y += 5 * (posPlayer.y - posEnemy.y) / distance;
+		posEnemy.x += SPEED_KAMIKAZE * (posPlayer.x - posEnemy.x) / distance;  
+		posEnemy.y += SPEED_KAMIKAZE * (posPlayer.y - posEnemy.y) / distance;
 		enemy.sprite->setPosition(posEnemy.x, posEnemy.y);
 	}
 }
@@ -204,7 +207,7 @@ void Enemy::MoveKamikaze(const Time & deltaTime, Vector2f posPlayer, Entity & en
 void Enemy::UpdateDirection(RenderWindow & window, Entity & enemy) {
 	Vector2f position = enemy.sprite->getPosition();
 	Vector2u sizeWindow = window.getSize();
-	Vector2f sizeEnemy = { enemy.width, enemy.height };
+	Vector2f sizeEnemy = enemy.sizeObject;
 	if ((position.y - sizeEnemy.y / 2) <= 0 && enemy.direction == UP) {
 		enemy.direction = DOWN;
 	}
@@ -302,27 +305,27 @@ void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame
 	if (enemy.timeCreateBulletEnemy.asSeconds() > time) {
 		switch (enemy.selector) {
 		case ELECTRICAL: {
-			Shoot addBullet(posEnemy.x, posEnemy.y, boss.width, boss.height, LEFT, textureGame.electricBullet, NAME_ELECTRIC_BULLET);
+			Shoot addBullet(posEnemy, boss.sizeObject, LEFT, textureGame.electricBullet, NAME_ELECTRIC_BULLET);
 			enemy.bulletEnemy.push_back(addBullet);
 			break; }
 		case TRIPLE_SHOT: {	
-			Shoot addBullet1(posEnemy.x, posEnemy.y - 30, boss.width, boss.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
-			Shoot addBullet2(posEnemy.x, posEnemy.y, boss.width, boss.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
-			Shoot addBullet3(posEnemy.x, posEnemy.y + 30, boss.width, boss.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
+			Shoot addBullet1(Vector2f(posEnemy.x, posEnemy.y - 30), boss.sizeObject, LEFT, textureGame.redLaserTexture, NAME_BULLET);
+			Shoot addBullet2(posEnemy, boss.sizeObject, LEFT, textureGame.redLaserTexture, NAME_BULLET);
+			Shoot addBullet3(Vector2f(posEnemy.x, posEnemy.y + 30), boss.sizeObject, LEFT, textureGame.redLaserTexture, NAME_BULLET);
 			enemy.bulletEnemy.push_back(addBullet1);
 			enemy.bulletEnemy.push_back(addBullet2);
 			enemy.bulletEnemy.push_back(addBullet3);
 			break; }
 		case POWERFUL_SHOOTING: {
-			Shoot addBullet(posEnemy.x, posEnemy.y, boss.width, boss.height, LEFT, textureGame.blueLaserTexture, NAME_BULLET);
+			Shoot addBullet(posEnemy, boss.sizeObject, LEFT, textureGame.blueLaserTexture, NAME_BULLET);
 			addBullet.sprite->setScale(4, 4);
 			addBullet.damage = int(boss.damage) * 2;
 			enemy.bulletEnemy.push_back(addBullet);
 			break; }
 		case CROSS_FIRE: {
-			Shoot addBullet1(posEnemy.x, posEnemy.y, boss.width, boss.height, UP_LEFT, textureGame.redLaserTexture, NAME_BULLET);
-			Shoot addBullet2(posEnemy.x, posEnemy.y, boss.width, boss.height, DOWN_LEFT, textureGame.redLaserTexture, NAME_BULLET);
-			Shoot addBullet3(posEnemy.x, posEnemy.y, boss.width, boss.height, LEFT, textureGame.redLaserTexture, NAME_BULLET);
+			Shoot addBullet1(posEnemy, boss.sizeObject, UP_LEFT, textureGame.redLaserTexture, NAME_BULLET);
+			Shoot addBullet2(posEnemy, boss.sizeObject, DOWN_LEFT, textureGame.redLaserTexture, NAME_BULLET);
+			Shoot addBullet3(posEnemy, boss.sizeObject, LEFT, textureGame.redLaserTexture, NAME_BULLET);
 			enemy.bulletEnemy.push_back(addBullet1);
 			enemy.bulletEnemy.push_back(addBullet2);
 			enemy.bulletEnemy.push_back(addBullet3);
@@ -332,7 +335,7 @@ void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame
 	}
 }
 
-bool IsEnterField(Vector2f & playerPos, Entity & enemy) { // помен€ть с учетом вращени€
+bool IsEnterField(Vector2f & playerPos, Entity & enemy) { 
 	Vector2f posEnemy = enemy.sprite->getPosition(),
 		posPlayer = playerPos;
 	float angle = enemy.sprite->getRotation();
@@ -341,7 +344,7 @@ bool IsEnterField(Vector2f & playerPos, Entity & enemy) { // помен€ть с учетом в
 	return rect.contains(posPlayer);
 }
 
-bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow) { // помен€ть с учетом вращени€
+bool IsSeePlayer(Vector2f & playerPos, Entity & enemy, Vector2u & sizeWindow) { 
 	Vector2f posEnemy = enemy.sprite->getPosition(),
 		posPlayer = playerPos;
 	float angle = enemy.sprite->getRotation();

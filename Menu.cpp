@@ -13,7 +13,7 @@ void ProcessEventsMenu(RenderWindow & window, Menu & menu, GlobalBool & globalBo
 			}
 		}
 		if (menu.menuSelector == RECORDS) {
-			menu.stateMenu.isRecords = true;
+			menu.stateMenu.isInstruction = true;
 			menu.stateMenu.isMainMenu = false;
 		}
 		if (menu.menuSelector == OPTIONS) {
@@ -33,30 +33,31 @@ void ProcessEventsMenu(RenderWindow & window, Menu & menu, GlobalBool & globalBo
 	else if (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape && !menu.stateMenu.isMainMenu) {
 		menu.stateMenu.isOptions = false;
 		menu.stateMenu.isMainMenu = true;
-		menu.stateMenu.isRecords = false;
+		menu.stateMenu.isInstruction = false;
 	}
 }
 
 void InitMenu(Menu & menu, RenderWindow & window, TextureMenu & textureMenu, TextWithInfo & text) {
 	textureMenu.LoadingFromFileTextureForMenu();
-	menu.field.setTexture(textureMenu.fieldTexture);
+	menu.background.setTexture(textureMenu.fieldTexture);
+	menu.instruction.boxInstruction.setTexture(textureMenu.instructionTexture);
 	UpdateTextMenu(window, text);
 }
 
 void UpdateMenu(Menu & menu, RenderWindow & window, TextWithInfo & text) {
-	menu.field.setTextureRect(IntRect(0, 0, window.getSize().x, window.getSize().y));
+	menu.background.setTextureRect(IntRect(0, 0, window.getSize().x, window.getSize().y));
 	UpdateTextMenu(window, text);
 	SelectButtons(window, text, menu.menuSelector);
 }
 
 void RenderMenu(Menu & menu, RenderWindow & window, TextWithInfo & text) {
 	window.clear();
-	window.draw(menu.field);
+	window.draw(menu.background);
 	if (menu.stateMenu.isMainMenu) {
 		DrawTextToMenu(text, window);
 	}
-	if (menu.stateMenu.isRecords) {
-
+	if (menu.stateMenu.isInstruction) {
+		window.draw(menu.instruction.boxInstruction);
 	}
 	if (menu.stateMenu.isOptions) {
 

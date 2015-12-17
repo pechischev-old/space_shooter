@@ -48,5 +48,5 @@ struct Player
 
 void InitializePlayer(Player & player, TextureGame & textureGame);
 void Control(Player & player, Event & event);
-void MovePlayer(Player & player, const Time & deltaTime);
+void MovePlayer(Player & player, const Time & deltaTime, RenderWindow & window);
 void ResetPlayer(Player & player, TextureGame & textureGame);

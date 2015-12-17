@@ -27,7 +27,6 @@ void Game::IncreaseCharacteristicsObjects() {
 			countEnemy += INCREASED_COUNT_ENEMY;
 			player->point = countEnemy;
 			player->levelGame += 1;
-			player->ship->health = float(player->maxHealth); // восстановление здоровья
 			//-------- увеличение количества кораблей врагов
 			enemy->numberEnemy.numberEasyEnemy += 1;
 			if (player->levelGame >= 2)
@@ -357,7 +356,7 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 
 		}
 		else {
-			MovePlayer(player, deltaTime); // задает координаты движения
+			MovePlayer(player, deltaTime, window); // задает координаты движения
 			player.ship->sprite->move(Border(*player.ship, window));
 			player.ChangeWeapons(game.textureGame, pos);
 			player.ship->SetRotationObject(pos);

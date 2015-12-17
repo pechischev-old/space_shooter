@@ -40,7 +40,7 @@ const static float MAX_TIME_RECOVERY_MOVE = 3;
 
 static const int SPEED_OTHER_BULLET = 20;
 
-static const int SPEED_ROCKET = 6;
+static const int SPEED_ROCKET = 8;
 
 static const int BORDER_CREATE = 80;
 
@@ -55,13 +55,16 @@ const static int FIRST_EVER_HEALTH_ENEMY = 100;
 
 const static int POINT_FOR_RAGE = 30;
 
-const static int SPEED_ENEMY = 150;
+const static int SPEED_ENEMY = 300;
 
-const static double SPEED_HARD_ENEMY = 4.0;
+const static double SPEED_HARD_ENEMY = 7.0;
 
 const static float SPEED_BOSS = 150;
 
+const static int SPEED_KAMIKAZE = 7;
+
 const static int TIME_CREATE_ENEMY = 2;
+const static float TIME_CREATE_ROCKET = 0.45f;
 
 const static float TIME_CREATE_BULLET_ENEMY = 0.2f;
 
@@ -69,7 +72,7 @@ const static float DISTANCE_FOR_ATACK = 500.f;
 
 static const int COUNT_EASY_ENEMY = 3;
 static const int COUNT_MIDDLE_ENEMY = 0;
-static const int COUNT_TOWER_ENEMY = 0;
+static const int COUNT_TOWER_ENEMY = 1;
 static const int COUNT_KAMIKAZE_ENEMY = 0;
 
 const static sf::String NAME_EASY_ENEMY = "easyEnemy";
@@ -187,7 +190,7 @@ const static sf::String TEXT_LEVEL = L"Уровень ";
 
 const static sf::String TEXT_NEW_GAME = L"Новая игра";
 const static sf::String TEXT_CONTINUE = L"Продолжить";
-const static sf::String TEXT_RECORDS = L"Рекорды";
+const static sf::String TEXT_INSTRUCTION = L"Как играть";
 const static sf::String TEXT_OPTIONS = L"Настройки";
 const static sf::String TEXT_EXIT = L"Выход";
 const static sf::String TEXT_ABOUT_LOSING = L"Вы проиграли. Нажмите Esc для выхода в меню";
@@ -243,6 +246,8 @@ const static sf::String PATH_EMPTY_BAR = "resourse/GUI/EmptyBar.png";
 const static sf::String PATH_RAGE_BAR = "resourse/GUI/YellowBar.png";
 
 const static sf::String PATH_FIELD = "resourse/images/map.png";
+
+const static sf::String PATH_INSTRUCTION = "resourse/images/instruction.png";
 
 //--------------------------------------------------------------
 

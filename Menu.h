@@ -13,14 +13,14 @@ using namespace sf;
 using namespace std;
 
 struct StateMenu {
-	bool isRecords = false;
+	bool isInstruction = false;
 	bool isOptions = false;
 	bool isMainMenu = true;
 	bool isNewGame = false;
 };
 
-struct Records {
-	Sprite boxRecords;
+struct Instruction {
+	Sprite boxInstruction;
 };
 
 struct Options {
@@ -31,9 +31,8 @@ struct Menu {
 	MenuSelector menuSelector = NO_SELECT;
 	TextureMenu textureMenu;
 	StateMenu stateMenu;
-	Sprite field;
-	Sprite boxMenu;
-	Records records;
+	Sprite background;
+	Instruction instruction;
 	Options options;
 	function<void()> restart;
 };

@@ -15,7 +15,7 @@ struct TextWithInfo {
 	Text textNumber;
 	Text textNewGame;
 	Text textContinue;
-	Text textRecords;
+	Text textInstruction;
 	Text textOption;
 	Text textExit;
 	Text textScore;

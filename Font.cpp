@@ -14,7 +14,7 @@ void InitializeText(TextWithInfo & textInfo) {
 	InitString(textInfo.textNumber, String(""), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textNewGame, String(TEXT_NEW_GAME), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textContinue, String(TEXT_CONTINUE), textInfo.font, textInfo.sizeText);
-	InitString(textInfo.textRecords, String(TEXT_RECORDS), textInfo.font, textInfo.sizeText);
+	InitString(textInfo.textInstruction, String(TEXT_INSTRUCTION), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textOption, String(TEXT_OPTIONS), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textExit, String(TEXT_EXIT), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textLosing, String(TEXT_ABOUT_LOSING), textInfo.font, textInfo.sizeText);
@@ -34,15 +34,15 @@ float GetWidth(Text & text) {
 }
 
 void UpdateTextWithHealth(TextWithInfo & textInfo, Player & player, RenderWindow & window) {
-	ostringstream countHealthStr, countPoint;
+	
+	String countHealthStr;
 	if (player.ship->health >= 0)
-		countHealthStr << player.ship->health;
+		countHealthStr = to_string(int(player.ship->health));
 	else
-		countHealthStr << 0;
-	countPoint << player.point;
-	textInfo.textPlayerHealth.setString(TEXT_HEALTH + countHealthStr.str());
+		countHealthStr = "0";
+	textInfo.textPlayerHealth.setString(TEXT_HEALTH + countHealthStr);
 	textInfo.textPlayerHealth.setPosition(10, 10);
-	textInfo.textNumber.setString(TEXT_POINT + countPoint.str());
+	textInfo.textNumber.setString(TEXT_POINT + to_string(player.point));
 	textInfo.textNumber.setPosition(250, 10); // сделать зависимость от размеров окна и длины предыдущей строки
 	textInfo.textLevel.setString(TEXT_LEVEL + to_string(player.levelGame));
 	float width = GetWidth(textInfo.textLevel);
@@ -64,7 +64,7 @@ void SelectButtons(RenderWindow & window, TextWithInfo & textInfo, MenuSelector 
 	selector = NO_SELECT;
 	SelectTextWithMouse(window, textInfo.textNewGame, selector, NEW_GAME);
 	SelectTextWithMouse(window, textInfo.textContinue, selector, CONTINUE);
-	SelectTextWithMouse(window, textInfo.textRecords, selector, RECORDS);
+	SelectTextWithMouse(window, textInfo.textInstruction, selector, RECORDS);
 	SelectTextWithMouse(window, textInfo.textOption, selector, OPTIONS);
 	SelectTextWithMouse(window, textInfo.textExit, selector, EXIT);
 }
@@ -77,9 +77,9 @@ void UpdateTextMenu(RenderWindow & window, TextWithInfo & textInfo) {
 	ReferenceLinePosition(window.getSize(), textInfo.textContinue, pos, textInfo.sizeText);
 
 	pos = textInfo.textContinue.getPosition();
-	ReferenceLinePosition(window.getSize(), textInfo.textRecords, pos, textInfo.sizeText);
+	ReferenceLinePosition(window.getSize(), textInfo.textInstruction, pos, textInfo.sizeText);
 
-	pos = textInfo.textRecords.getPosition();
+	pos = textInfo.textInstruction.getPosition();
 	ReferenceLinePosition(window.getSize(), textInfo.textOption, pos, textInfo.sizeText);
 
 	pos = textInfo.textOption.getPosition();
@@ -95,7 +95,7 @@ void DrawTextToGame(TextWithInfo & textInfo, RenderWindow & window) {
 void DrawTextToMenu(TextWithInfo & textInfo, RenderWindow & window) {
 	window.draw(textInfo.textNewGame);
 	window.draw(textInfo.textContinue);
-	window.draw(textInfo.textRecords);
+	window.draw(textInfo.textInstruction);
 	window.draw(textInfo.textOption);
 	window.draw(textInfo.textExit);
 }

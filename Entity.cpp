@@ -4,24 +4,22 @@
 using namespace sf;
 using namespace std;
 
-Entity::Entity(float x, float y, String Name, Texture & texture) {
-	this->x = x; 
-	this->y = y;
+Entity::Entity(Vector2f position, String Name, Texture & texture) {
+	this->position = position;
 	name = Name;
 	sprite = new Sprite;
 	sprite->setTexture(texture);
-	width = float(texture.getSize().x);
-	height = float(texture.getSize().y);
-	sprite->setTextureRect(IntRect(0, 0, int(width), int(height)));
-	sprite->setOrigin(width / 2, height / 2);
-	sprite->setPosition(x, y);
+	sizeObject = Vector2f(texture.getSize());
+	sprite->setTextureRect(IntRect(0, 0, int(sizeObject.x), int(sizeObject.y)));
+	sprite->setOrigin(sizeObject.x / 2, sizeObject.y / 2);
+	sprite->setPosition(position);
 	isLife = true;
+	isKilled = false;
 	health = 100;
 }
 
 void Entity::Explosion(const Time & deltaTime, Texture & texture) { // изменить название функции
-	x = sprite->getPosition().x;
-	y = sprite->getPosition().y;
+	position = sprite->getPosition();
 	delete(sprite);
 	sprite = new Sprite;
 	CurrentFrame += SPEED_FRAMES * deltaTime.asSeconds();
@@ -30,7 +28,7 @@ void Entity::Explosion(const Time & deltaTime, Texture & texture) { // изменить 
 		sprite->setOrigin(WIDTH_EXPLOSION / 2, HEIGTH_EXPLOSION / 2);
 		sprite->setScale(2.5, 2.5);
 		sprite->setTextureRect(IntRect(WIDTH_EXPLOSION * int(CurrentFrame), 0, WIDTH_EXPLOSION, HEIGTH_EXPLOSION));
-		sprite->setPosition(x, y);
+		sprite->setPosition(position);
 	}
 	else {
 		isKilled = true;
@@ -42,22 +40,23 @@ void Entity::Explosion(const Time & deltaTime, Texture & texture) { // изменить 
 void Entity::CheckForCollisions(RenderWindow & window) {
 	//----------------- Коллизии --------------------------
 	// если уходит за экран, то прекращает свое существование
-	if (sprite->getPosition().x < 0 - width) {
+	if (sprite->getPosition().x < 0 - sizeObject.x) {
 		isLife = false;
 	}
-	if (sprite->getPosition().y < 0 - height) {
+	if (sprite->getPosition().y < 0 - sizeObject.y) {
 		isLife = false;
 	}
-	if (sprite->getPosition().x >= window.getSize().x + width) {
+	if (sprite->getPosition().x >= window.getSize().x + sizeObject.x) {
 		isLife = false;
 	}
-	if (sprite->getPosition().y >= window.getSize().y + height) {
+	if (sprite->getPosition().y >= window.getSize().y + sizeObject.y) {
 		isLife = false;
 	}
 }
 
 void Entity::MoveObject(const Time & deltaTime) {
-	if (health > 0) {
+	if (health > 0 ) { // todo: simplify this code using sf::Vector2f to store speed.
+	
 		Vector2f movement = sprite->getPosition();
 		switch (direction) {
 		case UP: movement.y = -speed;
@@ -72,28 +71,26 @@ void Entity::MoveObject(const Time & deltaTime) {
 		case RIGHT: movement.x = speed;
 			movement.y = 0;
 			break;
-		case UP_LEFT: movement.x = -speed;
-			movement.y = -speed;
+		case UP_LEFT: movement.x = -speed / sqrt(2.f);
+			movement.y = -speed / sqrt(2.f);
 			break;
-		case UP_RIGHT: movement.x = speed;
-			movement.y = -speed;
+		case UP_RIGHT: movement.x = speed / sqrt(2.f);
+			movement.y = -speed / sqrt(2.f);
 			break;
-		case DOWN_RIGHT: movement.x = speed;
-			movement.y = speed;
+		case DOWN_RIGHT: movement.x = speed / sqrt(2.f);
+			movement.y = speed / sqrt(2.f);
 			break;
-		case DOWN_LEFT: movement.x = -speed;
-			movement.y = speed;
+		case DOWN_LEFT: movement.x = -speed / sqrt(2.f);
+			movement.y = speed / sqrt(2.f);
 			break;
 		default:
 			movement.x = 0;
 			movement.y = 0;
 			break;
 		}
-
-		x = movement.x * deltaTime.asSeconds();
-		y = movement.y * deltaTime.asSeconds();
-
-		sprite->move(x, y);
+		position = movement * deltaTime.asSeconds();
+		if (name != NAME_PLAYER_SHIP)
+			sprite->move(position);
 	}
 }
 
@@ -104,10 +101,10 @@ void Entity::SetRotationObject(Vector2f posPoint) {
 
 Vector2f Border(Entity & object, RenderWindow & window) {
 	Vector2f limit(0.f, 0.f);
-	float heigth = object.height,
-		width = object.width,
-		X = object.x,
-		Y = object.y;
+	float heigth = object.sizeObject.y,
+		width = object.sizeObject.x,
+		X = object.position.x,
+		Y = object.position.y;
 	Vector2f posObject = object.sprite->getPosition();
 
 	if (window.getSize().x <= posObject.x + width / 2) {

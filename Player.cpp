@@ -4,7 +4,7 @@ using namespace sf;
 using namespace std;
 
 void InitializePlayer(Player & player, TextureGame & textureGame) {
-	player.ship = new Entity(SCRN_WIDTH / 2, SCRN_HEIGTH / 2, NAME_PLAYER_SHIP, textureGame.playerTexture);
+	player.ship = new Entity(Vector2f(SCRN_WIDTH / 2, SCRN_HEIGTH / 2), NAME_PLAYER_SHIP, textureGame.playerTexture);
 	player.ship->health = float(player.maxHealth);
 	player.playerState.isAlive = true;
 	player.ship->damage = float(player.maxDamage);
@@ -21,7 +21,7 @@ void Player::AddBullet(Texture & texture, Vector2f posPoint, float time, String 
 		timeCreateBullet += clock.restart(); 
 		if (timeCreateBullet.asSeconds() > time) { // Зависимость появления пули от времени
 			directionShoot = RIGHT;
-			Shoot addBullet(ship->sprite->getPosition().x, ship->sprite->getPosition().y, ship->width, ship->height, directionShoot, texture, name);
+			Shoot addBullet(ship->sprite->getPosition(), ship->sizeObject, directionShoot, texture, name);
 			addBullet.damage = int(ship->damage);
 			addBullet.sprite->setScale(float(scaleBullet), float(scaleBullet));
 			addBullet.isOtherBullet = true;
@@ -48,31 +48,40 @@ void Control(Player & player, Event & event) {
 	if (player.ship->health > 0 && player.playerState.isMove) {
 		if (Keyboard::isKeyPressed(Keyboard::W) && Keyboard::isKeyPressed(Keyboard::A)) {
 			player.direction = UP_LEFT;
+			player.ship->direction = UP_LEFT;
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::W) && Keyboard::isKeyPressed(Keyboard::D)) {
 			player.direction = UP_RIGHT;
+			player.ship->direction = UP_RIGHT;
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::S) && Keyboard::isKeyPressed(Keyboard::A)) {
 			player.direction = DOWN_LEFT;
+			player.ship->direction = DOWN_LEFT;
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::S) && Keyboard::isKeyPressed(Keyboard::D)) {
 			player.direction = DOWN_RIGHT;
+			player.ship->direction = DOWN_RIGHT;
 			//----------------------------- По вертикали или горизантали ----------------------------
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::W)) {
 			player.direction = UP;
+			player.ship->direction = UP;
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::S)) {
 			player.direction = DOWN;
+			player.ship->direction = DOWN;
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::D)) {
 			player.direction = RIGHT;
+			player.ship->direction = RIGHT;
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::A)) {
 			player.direction = LEFT;
+			player.ship->direction = LEFT;
 		}
 		else {
 			player.direction = NONE;
+			player.ship->direction = NONE;
 		}
 		if (event.type == Event::MouseWheelMoved) {
 			if (event.mouseWheel.delta == 1) {
@@ -95,6 +104,7 @@ void Control(Player & player, Event & event) {
 	}
 	else {
 		player.direction = NONE;
+		player.ship->direction = NONE;
 	}
 }
 
@@ -105,7 +115,7 @@ void Player::ChangeWeapons(TextureGame & textureGame, Vector2f posPoint) {
 		}
 		else if (gun == 1) { // двойные снаряды
 			AddBullet(textureGame.redLaserTexture, posPoint, float(TIME_CREATE_BULLET), NAME_BULLET);
-			AddBullet(textureGame.redLaserTexture, posPoint, float(TIME_CREATE_BULLET), NAME_BULLET);
+			AddBullet(textureGame.redLaserTexture, Vector2f(posPoint.x - 20, posPoint.y - 20), float(TIME_CREATE_BULLET), NAME_BULLET);
 		}
 		else if (gun == 2) { // электрический луч
 			AddBullet(textureGame.electricBullet, posPoint, float(TIME_CREATE_BULLET - 1), NAME_ELECTRIC_BULLET);
@@ -114,38 +124,9 @@ void Player::ChangeWeapons(TextureGame & textureGame, Vector2f posPoint) {
 
 }
 
-void MovePlayer(Player & player, const Time & deltaTime) {
-	
-	Vector2f movement(0.f, 0.f);
-	switch (player.direction) {
-	case UP: movement.y -= SPEED_HERO;
-		break;
-	case DOWN: movement.y += SPEED_HERO;
-		break;
-	case LEFT: movement.x -= SPEED_HERO;
-		break;
-	case RIGHT: movement.x += SPEED_HERO;
-		break;
-	case UP_LEFT: movement.x -= SPEED_HERO;
-		movement.y -= SPEED_HERO;
-		break;
-	case UP_RIGHT: movement.x += SPEED_HERO;
-		movement.y -= SPEED_HERO;
-		break;
-	case DOWN_RIGHT: movement.x += SPEED_HERO;
-		movement.y += SPEED_HERO;
-		break;
-	case DOWN_LEFT: movement.x -= SPEED_HERO;
-		movement.y += SPEED_HERO;
-		break;
-	default:
-		movement.x = 0;
-		movement.y = 0;
-		break;
-	}
-	player.ship->x = movement.x * deltaTime.asSeconds();
-	player.ship->y = movement.y * deltaTime.asSeconds();
-
+void MovePlayer(Player & player, const Time & deltaTime, RenderWindow & window) {
+	player.ship->MoveObject(deltaTime);
+	player.ship->sprite->move(Border(*player.ship, window));
 }
 
 void ResetPlayer(Player & player, TextureGame & textureGame) {
@@ -161,4 +142,8 @@ void ResetPlayer(Player & player, TextureGame & textureGame) {
 	player.ship->isKilled = false;
 	player.gun = 0;
 	player.levelGame = 1;
+	player.playerState.isIncreaseDamage = false;
+	player.playerState.isInvulnerability = false;
+	player.playerState.isDecrease = false; 
+	
 }

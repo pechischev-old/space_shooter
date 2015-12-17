@@ -47,5 +47,6 @@ struct TextureGame {
 
 struct TextureMenu {
 	Texture fieldTexture;
+	Texture instructionTexture;
 	void LoadingFromFileTextureForMenu();
 };

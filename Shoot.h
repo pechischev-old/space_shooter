@@ -14,10 +14,9 @@ using namespace sf;
 using namespace std;
 
 struct Shoot {
-	Shoot(float X, float Y, float WIDTH, float  HEIGTH, Direction dir, Texture & texture, String Name);
+	Shoot(Vector2f position, Vector2f sizeObject, Direction dir, Texture & texture, String Name);
 	Vector2f position;
 	Vector2f oldPosition;
-	//float x, y, dx, dy;
 	Direction dir;
 	Sprite *sprite;
 	String name;
