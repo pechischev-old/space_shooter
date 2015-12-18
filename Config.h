@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-
+#include "Math.h"
 #include <string>
 
 struct GlobalBool {

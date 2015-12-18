@@ -103,17 +103,11 @@ void Shoot::MoveBullet(const Time & deltaTime) {
 }
 
 void Shoot::MoveBulletHardEnemy(const Time & deltaTime, Vector2f posObject, int speed) {
-	float dX = oldPosition.x;
-	float dY = oldPosition.y;
-	if (isRocket) {
-		dX = position.x;
-		dY = position.y;
-	}
-	float distance = sqrt((posObject.x - dX)*(posObject.x - dX) + (posObject.y - dY)*(posObject.y - dY));
-	position.x += speed * (posObject.x - dX) / distance;
-	position.y += speed * (posObject.y - dY) / distance;
+	Vector2f newPosition = isRocket ? position : oldPosition;
+	position.x += speed * mathFunction.NormalizeVector(posObject, newPosition).x;
+	position.y += speed * mathFunction.NormalizeVector(posObject, newPosition).y;
 	sprite->setPosition(position);
-	sprite->setRotation(float(atan2((posObject.y - dY), (posObject.x - dX)) * 180 / M_PI));
+	sprite->setRotation(mathFunction.CalculationRotate(posObject, newPosition));
 }
 
 void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot> & bullets, TextureGame & textureGame, Vector2f posPlayer) {

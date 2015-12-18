@@ -55,8 +55,7 @@ void Entity::CheckForCollisions(RenderWindow & window) {
 }
 
 void Entity::MoveObject(const Time & deltaTime) {
-	if (health > 0 ) { // todo: simplify this code using sf::Vector2f to store speed.
-	
+	if (health > 0 ) { 	
 		Vector2f movement = sprite->getPosition();
 		switch (direction) {
 		case UP: movement.y = -speed;
@@ -95,8 +94,9 @@ void Entity::MoveObject(const Time & deltaTime) {
 }
 
 void Entity::SetRotationObject(Vector2f posPoint) {
-	Vector2f posEnemy = sprite->getPosition();
-	sprite->setRotation(float(atan2((posPoint.y - posEnemy.y), (posPoint.x - posEnemy.x)) * 180 / M_PI));
+	Vector2f posObject = sprite->getPosition();
+	
+	sprite->setRotation(mathFunction.CalculationRotate(posPoint, posObject));
 }
 
 Vector2f Border(Entity & object, RenderWindow & window) {

@@ -197,10 +197,9 @@ void Enemy::CalmBoss() {
 void Enemy::MoveKamikaze(const Time & deltaTime, Vector2f posPlayer, Entity & enemy) {
 	if (enemy.health > 0) {
 		Vector2f posEnemy = enemy.sprite->getPosition();
-		float distance = sqrt((posPlayer.x - posEnemy.x)*(posPlayer.x - posEnemy.x) + (posPlayer.x - posEnemy.y)*(posPlayer.x - posEnemy.y));
-		posEnemy.x += SPEED_KAMIKAZE * (posPlayer.x - posEnemy.x) / distance;  
-		posEnemy.y += SPEED_KAMIKAZE * (posPlayer.y - posEnemy.y) / distance;
-		enemy.sprite->setPosition(posEnemy.x, posEnemy.y);
+		posEnemy.x += SPEED_KAMIKAZE *  mathFunction.NormalizeVector(posPlayer, posEnemy).x;
+		posEnemy.y += SPEED_KAMIKAZE *  mathFunction.NormalizeVector(posPlayer, posEnemy).x;
+		enemy.sprite->setPosition(posEnemy);
 	}
 }
 

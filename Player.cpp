@@ -145,5 +145,5 @@ void ResetPlayer(Player & player, TextureGame & textureGame) {
 	player.playerState.isIncreaseDamage = false;
 	player.playerState.isInvulnerability = false;
 	player.playerState.isDecrease = false; 
-	
+	player.ship->sprite->setColor(Color::White);
 }
