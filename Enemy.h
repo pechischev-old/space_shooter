@@ -7,9 +7,6 @@
 #include <iostream>
 #include <sstream>
 #include <list>
-#include <cstdlib>
-#include <random> 
-#include <ctime> // содержит time()
 
 #include "Entity.h"
 #include "Config.h"
@@ -57,7 +54,8 @@ struct Enemy {
 		EASY = 1,
 		MIDDLE,
 		KAMIKAZE,
-		TOWER
+		TOWER,
+		sizeTypeEnemy = 4
 	};
 	TypeEnemy idEnemy;
 	Selector selector = TRIPLE_SHOT;

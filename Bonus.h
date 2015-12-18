@@ -16,7 +16,8 @@ struct Bonus {
 		DECREASE,
 		INCREASE_DAMAGE,
 		INVULNERABILITY,
-		BOMB
+		BOMB,
+		sizeTypeBonuses = 5
 	};
 	TypeBonuses typeBonus;
 	Clock clock;
@@ -26,6 +27,4 @@ struct Bonus {
 	void GetMoveEveryBonus(const Time & deltaTime, RenderWindow & window);
 };
 
-void InitializeBonus(Bonus & bonus);
-int IssuanceProbability(); // задание вероятности выпадения
 bool CheckProbably();  

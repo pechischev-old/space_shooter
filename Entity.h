@@ -1,9 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-#define _USE_MATH_DEFINES
 
-#include <math.h>
 #include <iostream>
 #include <list>
 

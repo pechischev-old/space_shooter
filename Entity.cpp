@@ -95,8 +95,7 @@ void Entity::MoveObject(const Time & deltaTime) {
 
 void Entity::SetRotationObject(Vector2f posPoint) {
 	Vector2f posObject = sprite->getPosition();
-	
-	sprite->setRotation(mathFunction.CalculationRotate(posPoint, posObject));
+	sprite->setRotation(Math::CalculateRotate(posPoint, posObject));
 }
 
 Vector2f Border(Entity & object, RenderWindow & window) {

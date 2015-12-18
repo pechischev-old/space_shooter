@@ -45,19 +45,6 @@ void Enemy::UpdateStateEveryEnemy(const Time & deltaTime, RenderWindow & window,
 }
 
 void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window) {
-	auto GetTypeEnemy = [&]() {
-		random_device rd;
-		mt19937 gen(rd());
-		uniform_int_distribution<> dist(1, 4);
-		return dist(gen);
-	};
-
-	auto GetFirstDirection = [&]() {
-		random_device rd;
-		mt19937 gen(rd());
-		uniform_int_distribution<> dist(1, 4);
-		return dist(gen);
-	};
 
 	timeCreateEnemy += clock.restart();
 	if (!bossState.isBoss) {
@@ -66,7 +53,7 @@ void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window) {
 			Vector2f getPositionEnemy;
 			String typeEnemy;
 			Texture *texture = NULL;
-			idEnemy = static_cast<TypeEnemy> (GetTypeEnemy());
+			idEnemy = static_cast<TypeEnemy> (Math::GetRandomNumerForSection(1, sizeTypeEnemy));
 			int countEnemy = 0;
 			switch (idEnemy)
 			{
@@ -93,7 +80,7 @@ void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window) {
 			}
 			for (int i = 1; i <= countEnemy; ++i) {
 				if (i == 1)
-					dir = static_cast<Direction>(GetFirstDirection());
+					dir = static_cast<Direction>(Math::GetRandomNumerForSection(1, 4));
 				else
 					dir = static_cast<Direction>(GetDirection(dir));
 				getPositionEnemy = GetRandomPosition(dir, window);
@@ -197,8 +184,8 @@ void Enemy::CalmBoss() {
 void Enemy::MoveKamikaze(const Time & deltaTime, Vector2f posPlayer, Entity & enemy) {
 	if (enemy.health > 0) {
 		Vector2f posEnemy = enemy.sprite->getPosition();
-		posEnemy.x += SPEED_KAMIKAZE *  mathFunction.NormalizeVector(posPlayer, posEnemy).x;
-		posEnemy.y += SPEED_KAMIKAZE *  mathFunction.NormalizeVector(posPlayer, posEnemy).x;
+		posEnemy.x += SPEED_KAMIKAZE *  Math::Normalize(posPlayer, posEnemy).x;
+		posEnemy.y += SPEED_KAMIKAZE *  Math::Normalize(posPlayer, posEnemy).y;
 		enemy.sprite->setPosition(posEnemy);
 	}
 }
@@ -240,10 +227,7 @@ void Enemy::SetMove(RenderWindow & window, Entity & enemy) {
 
 Direction GetDirection(Direction oldDir) {
 	Direction dir;
-	random_device rd;
-	mt19937 gen(rd());
-	uniform_int_distribution<> dist(1, 3);
-	int selectHand = dist(gen);
+	int selectHand = Math::GetRandomNumerForSection(1, 3);
 	if (oldDir == UP) {
 		if (selectHand == 1) dir = RIGHT;
 		if (selectHand == 2) dir = DOWN;
@@ -272,26 +256,20 @@ Direction GetDirection(Direction oldDir) {
 Vector2f GetRandomPosition(Direction & selectHand, RenderWindow & window) {
 	Vector2f getPosit;
 	Vector2u sizeWindow = window.getSize();
-	random_device rd;
-	mt19937 gen(rd());
 	if (selectHand == RIGHT) { // слева
 	getPosit.x = 0;
-	uniform_int_distribution<> dist(BORDER_CREATE, (sizeWindow.y - BORDER_CREATE));
-	getPosit.y = float(dist(gen));
+	getPosit.y = float(Math::GetRandomNumerForSection(BORDER_CREATE, (sizeWindow.y - BORDER_CREATE)));
 	}
 	else if (selectHand == DOWN ) { // сверху
-	uniform_int_distribution<> dist(BORDER_CREATE, (sizeWindow.x - BORDER_CREATE));
-	getPosit.x = float(dist(gen));
+	getPosit.x = float(Math::GetRandomNumerForSection(BORDER_CREATE, (sizeWindow.x - BORDER_CREATE)));
 	getPosit.y = 0;
 	}
 	else if (selectHand == LEFT) { // справа
 	getPosit.x = float(sizeWindow.x);
-	uniform_int_distribution<> dist(BORDER_CREATE, (sizeWindow.y - BORDER_CREATE));
-	getPosit.y = float(dist(gen));
+	getPosit.y = float(Math::GetRandomNumerForSection(BORDER_CREATE, (sizeWindow.y - BORDER_CREATE)));
 	}
 	else if (selectHand == UP) { // снизу
-	uniform_int_distribution<> dist(BORDER_CREATE, (sizeWindow.x - BORDER_CREATE));
-	getPosit.x = float(dist(gen));
+	getPosit.x = float(Math::GetRandomNumerForSection(BORDER_CREATE, (sizeWindow.x - BORDER_CREATE)));
 	getPosit.y = float(sizeWindow.y);
 	}
 	return getPosit;

@@ -110,18 +110,16 @@ void Control(Player & player, Event & event) {
 
 void Player::ChangeWeapons(TextureGame & textureGame, Vector2f posPoint) {
 	if (playerState.isShoot) {
-		if (gun == 0) { // обычные снаряды
+		if (gun == 0) { 
 			AddBullet(textureGame.blueLaserTexture, posPoint, float(TIME_CREATE_BULLET), NAME_BULLET);
 		}
-		else if (gun == 1) { // двойные снаряды
+		else if (gun == 1) { 
 			AddBullet(textureGame.redLaserTexture, posPoint, float(TIME_CREATE_BULLET), NAME_BULLET);
-			AddBullet(textureGame.redLaserTexture, Vector2f(posPoint.x - 20, posPoint.y - 20), float(TIME_CREATE_BULLET), NAME_BULLET);
 		}
-		else if (gun == 2) { // электрический луч
-			AddBullet(textureGame.electricBullet, posPoint, float(TIME_CREATE_BULLET - 1), NAME_ELECTRIC_BULLET);
+		else if (gun == 2) {
+			AddBullet(textureGame.greenLaserTexture, posPoint, float(TIME_CREATE_BULLET), NAME_BULLET);
 		}
 	}
-
 }
 
 void MovePlayer(Player & player, const Time & deltaTime, RenderWindow & window) {

@@ -3,14 +3,10 @@
 using namespace std;
 
 void Bonus::AddBonus(Vector2f getPosition, TextureGame & textureGame) {
-	auto SpecifySizeBonus  = [&]() {
-		int point = 1 + rand() % 5;
-		return point;
-	};
 	timeCreateBonus += clock.restart();
 	if (timeCreateBonus.asSeconds() > TIME_CREATE_BONUS) {
 		Direction dir = DOWN; 
-		typeBonus = static_cast<TypeBonuses> (SpecifySizeBonus());
+		typeBonus = static_cast<TypeBonuses> (Math::GetRandomNumerForSection(1, sizeTypeBonuses));
 		String name;
 		Texture *texture = NULL;
 		switch (typeBonus)
@@ -58,13 +54,8 @@ void Bonus::GetMoveEveryBonus(const Time & deltaTime, RenderWindow & window) {
 	bonuses.erase(updatedEnd, bonuses.end());
 }
 
-int IssuanceProbability() {
-	int point = 1 + rand() % 4;
-	return point;
-}
-
 bool CheckProbably() {
-	if (IssuanceProbability() == 4)
+	if (Math::GetRandomNumerForSection(1, 4) == 4) // задается вероятность выпадения 
 		return true;
 	return false;
 }

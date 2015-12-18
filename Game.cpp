@@ -10,7 +10,6 @@ void InitializeGame(Game & game) {
 	game.asteroid = new Asteroid;
 	game.bonus = new Bonus;
 	game.star = new Star;
-	srand(unsigned int(time(NULL)));
 	game.textureGame.LoadingFromFileTexture();
 	InitializePlayer(*game.player, game.textureGame);
 	InitializeText(*game.textInfo);

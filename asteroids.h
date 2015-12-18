@@ -2,7 +2,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <list>
-#include <cstdlib>
 
 #include "Entity.h"
 #include "Enemy.h"
@@ -18,7 +17,8 @@ struct Asteroid {
 	enum TypeAsteroid {
 		SMALL = 1,
 		MIDDLE,
-		BIG
+		BIG,
+		sizeTypeAsteroid = 3
 	};
 	TypeAsteroid typeAsteroid;
 	float timeToCreateAsteroid = float(TIME_CREATE_ASTEROID);

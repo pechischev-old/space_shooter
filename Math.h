@@ -4,13 +4,13 @@
 #define _USE_MATH_DEFINES
 
 #include <math.h>
+#include <random> 
 
 using namespace sf;
 
 struct Math {
-	float CalculationDistance(Vector2f posObject1, Vector2f posObject2);
-	Vector2f NormalizeVector(Vector2f posObject1, Vector2f posObject2);
-	float CalculationRotate(Vector2f posObject1, Vector2f posObject2);
+	static float CalculateDistance(Vector2f posObject1, Vector2f posObject2);
+	static Vector2f Normalize(Vector2f posObject1, Vector2f posObject2);
+	static float CalculateRotate(Vector2f posObject1, Vector2f posObject2);
+	static int GetRandomNumerForSection(int begin, int end);
 };
-
-static Math mathFunction;

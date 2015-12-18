@@ -12,10 +12,6 @@ void LoadStarInList(Star & star, const Time & deltaTime, RenderWindow & window, 
 }
 
 void Star::AddStar(TextureGame & textureGame, RenderWindow & window) {
-	auto SetRandomSpeed = [&]() {
-		int speed = 270 + rand() % 400;
-		return speed;
-	};
 	if (stars.size() < 40) {
 		timeCreateStar += clock.restart();
 		if (timeCreateStar.asSeconds() > 0.7) {
@@ -23,12 +19,11 @@ void Star::AddStar(TextureGame & textureGame, RenderWindow & window) {
 			Vector2f setPosition = GetRandomPosition(dir, window);
 			Entity addStar(setPosition, NAME_STAR, textureGame.starTexture);
 			addStar.direction = LEFT;
-			addStar.speed = float(SetRandomSpeed());
+			addStar.speed = float(Math::GetRandomNumerForSection(270, 400));
 			stars.push_back(addStar);
 			timeCreateStar = Time::Zero;
 		}
 	}
-
 }
 
 void Star::UpdateStateStar(const Time & deltaTime, RenderWindow & window) {

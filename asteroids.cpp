@@ -4,10 +4,6 @@ using namespace sf;
 using namespace std;
 
 void Asteroid::AddAsteroid(TextureGame & textureGame, RenderWindow & window) {
-	auto SpecifySize = [&]() {
-		int point = 1 + rand() % 3;
-		return point;
-	};
 	timeCreateAsteroid += clock.restart();
 	if (timeCreateAsteroid.asSeconds() > timeToCreateAsteroid) {
 		Direction dir = LEFT; 
@@ -17,7 +13,7 @@ void Asteroid::AddAsteroid(TextureGame & textureGame, RenderWindow & window) {
 		int damage;
 		String name;
 		Texture *texture = NULL;
-		typeAsteroid = static_cast<TypeAsteroid> (SpecifySize());
+		typeAsteroid = static_cast<TypeAsteroid> (Math::GetRandomNumerForSection(1, sizeTypeAsteroid));
 		switch (typeAsteroid)
 		{
 		case Asteroid::SMALL:
