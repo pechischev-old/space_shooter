@@ -3,7 +3,7 @@
 using namespace sf;
 using namespace std;
 
-void InitializeGame(Game & game) {
+void InitializeGame(Game & game, SSound & sSound) {
 	game.player = new Player;
 	game.enemy = new Enemy;
 	game.textInfo = new TextWithInfo;
@@ -11,7 +11,7 @@ void InitializeGame(Game & game) {
 	game.bonus = new Bonus;
 	game.star = new Star;
 	game.textureGame.LoadingFromFileTexture();
-	InitializePlayer(*game.player, game.textureGame);
+	InitializePlayer(*game.player, game.textureGame, sSound);
 	InitializeText(*game.textInfo);
 }
 
@@ -193,7 +193,8 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 	}
 	// Обработка подбирания бонусов
 	for (auto &bonus : bonus->bonuses) {
-		if (hasIntersection(*player->ship->sprite, *bonus.sprite)) {
+		if (hasIntersection(*player->ship->sprite, *bonus.sprite) && player->ship->health > 0) {
+			player->takeBonus.play();
 			if (bonus.name == REPAIR_IMAGE) {
 				player->playerState.isRepair = true;
 			}
@@ -323,7 +324,7 @@ void processEventsGame(Game & game, Event & event, RenderWindow & window)
 	
 }
 
-void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, GlobalBool & globalBool)
+void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, GlobalBool & globalBool, SSound & sSound)
 {
 	if (!game.isPause && game.player->ship->isLife) {
 		Player & player = *game.player;
@@ -345,14 +346,14 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 		UpdateTextWithHealth(*game.textInfo, *game.player, window);
 		//---------------- Функции звезд -------------------
 		//LoadStarInList(star, deltaTime, window, *game.textureGame); // добавить загрузочный экран
-		star.AddStar(game.textureGame, window);
+		star.AddStar(game.textureGame, window, sSound);
 		star.UpdateStateStar(deltaTime, window);
 		//---------------- Функции игрока ------------------
 		Vector2f posPlayer = player.ship->sprite->getPosition();
 		if (player.ship->health <= 0) {
 			player.ship->direction = NONE;
 			player.ship->Explosion(deltaTime, game.textureGame.explosionTexture);
-
+			player.PlaySoundAtDead();
 		}
 		else {
 			MovePlayer(player, deltaTime, window); // задает координаты движения
@@ -360,17 +361,19 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 			player.ChangeWeapons(game.textureGame, pos);
 			player.ship->SetRotationObject(pos);
 			player.RecoveryMove();
+			UpdateVolume(player.takeBonus, SIZE_VOLUME_TAKE_BONUS);
+			UpdateVolume(player.ship->shootSound, SIZE_VOLUME_SHOOT);
 		}
 		UpdateStateBullet(deltaTime, window, player.bullet, game.textureGame, posPlayer);
 		//---------------- Функции противников -------------
-		enemy.UpdateStateEveryEnemy(deltaTime, window, bonus, game.textureGame, posPlayer, player.point);
-		enemy.AddEnemy(game.textureGame, window);
+		enemy.UpdateStateEveryEnemy(deltaTime, window, bonus, game.textureGame, posPlayer, player.point, sSound);
+		enemy.AddEnemy(game.textureGame, window, sSound);
 		enemy.CalmBoss();
 		UpdateStateBullet(deltaTime, window, enemy.bulletEnemy, game.textureGame, posPlayer);
 		//--------------- Функции астероидов ---------------
 		if (!enemy.bossState.isBoss)
-			asteroid.AddAsteroid(game.textureGame, window);
-		asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus, game.textureGame);
+			asteroid.AddAsteroid(game.textureGame, window, sSound);
+		asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus, game.textureGame, sSound);
 		//---------------- Функции бонусов -----------------
 		bonus.GetMoveEveryBonus(deltaTime, window);
 	}

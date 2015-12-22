@@ -2,7 +2,7 @@
 
 using namespace std;
 
-void Bonus::AddBonus(Vector2f getPosition, TextureGame & textureGame) {
+void Bonus::AddBonus(Vector2f getPosition, TextureGame & textureGame, SSound & sSound) {
 	timeCreateBonus += clock.restart();
 	if (timeCreateBonus.asSeconds() > TIME_CREATE_BONUS) {
 		Direction dir = DOWN; 
@@ -32,7 +32,7 @@ void Bonus::AddBonus(Vector2f getPosition, TextureGame & textureGame) {
 			texture = &textureGame.bombTexture;
 			break;
 		}
-		Entity addBonus(getPosition, name, *texture);
+		Entity addBonus(getPosition, name, *texture, sSound);
 		addBonus.direction = dir; // присваивает сгенерированное направление
 		addBonus.speed = SPEED_BONUS;
 		bonuses.push_back(addBonus);
@@ -41,17 +41,15 @@ void Bonus::AddBonus(Vector2f getPosition, TextureGame & textureGame) {
 }
 
 void Bonus::GetMoveEveryBonus(const Time & deltaTime, RenderWindow & window) {
-	for (auto &it : bonuses) {
-		it.MoveObject(deltaTime);
-		it.CheckForCollisions(window);
-	}
-	auto updatedEnd = std::remove_if(bonuses.begin(), bonuses.end(), [&](Entity &entity) {
-		if (!entity.isLife) {
-			delete entity.sprite;
+	for (list<Entity>::iterator it = bonuses.begin(); it != bonuses.end();) {
+		it->MoveObject(deltaTime);
+		it->CheckForCollisions(window);
+		if (!it->isLife) {
+			delete it->sprite;
+			it = bonuses.erase(it);
 		}
-		return !entity.isLife;
-	});
-	bonuses.erase(updatedEnd, bonuses.end());
+		else  ++it;
+	}
 }
 
 bool CheckProbably() {

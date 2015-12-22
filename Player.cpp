@@ -3,13 +3,14 @@
 using namespace sf;
 using namespace std;
 
-void InitializePlayer(Player & player, TextureGame & textureGame) {
-	player.ship = new Entity(Vector2f(SCRN_WIDTH / 2, SCRN_HEIGTH / 2), NAME_PLAYER_SHIP, textureGame.playerTexture);
+void InitializePlayer(Player & player, TextureGame & textureGame, SSound & sSound) {
+	player.ship = new Entity(Vector2f(SCRN_WIDTH / 2, SCRN_HEIGTH / 2), NAME_PLAYER_SHIP, textureGame.playerTexture, sSound);
 	player.ship->health = float(player.maxHealth);
 	player.playerState.isAlive = true;
 	player.ship->damage = float(player.maxDamage);
 	player.ship->speed = SPEED_HERO;
 	player.playerState.isMove = true;
+	player.takeBonus.setBuffer(sSound.takeBonusSound);
 }
 
 void Player::CheckPlayerLife() {
@@ -20,8 +21,9 @@ void Player::AddBullet(Texture & texture, Vector2f posPoint, float time, String 
 	if (playerState.isShoot) {
 		timeCreateBullet += clock.restart(); 
 		if (timeCreateBullet.asSeconds() > time) { // «ависимость по€влени€ пули от времени
+			ship->shootSound.play();
 			directionShoot = RIGHT;
-			Shoot addBullet(ship->sprite->getPosition(), ship->sizeObject, directionShoot, texture, name);
+			Shoot addBullet(ship->sprite->getPosition(), directionShoot, texture, name);
 			addBullet.damage = int(ship->damage);
 			addBullet.sprite->setScale(float(scaleBullet), float(scaleBullet));
 			addBullet.isOtherBullet = true;
@@ -120,6 +122,11 @@ void Player::ChangeWeapons(TextureGame & textureGame, Vector2f posPoint) {
 			AddBullet(textureGame.greenLaserTexture, posPoint, float(TIME_CREATE_BULLET), NAME_BULLET);
 		}
 	}
+}
+
+void Player::PlaySoundAtDead() {
+	if (ship->explosionSound.getStatus() != ship->explosionSound.Playing)
+		ship->explosionSound.play();
 }
 
 void MovePlayer(Player & player, const Time & deltaTime, RenderWindow & window) {

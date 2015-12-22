@@ -60,10 +60,10 @@ struct Enemy {
 	TypeEnemy idEnemy;
 	Selector selector = TRIPLE_SHOT;
 		int selectorShooting = 0;
-	void AddEnemy(TextureGame & textureGame, RenderWindow & window);
+	void AddEnemy(TextureGame & textureGame, RenderWindow & window, SSound & sSound);
 	void AddBulletEnemy(Entity & enemy, Vector2f posPlayer, Texture & texture, Time & timeCreateBullet);
 
-	void UpdateStateEveryEnemy(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer, int & point);
+	void UpdateStateEveryEnemy(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer, int & point, SSound & sSound);
 
 	void Evasion(Vector2f posBullet, Entity & entity, Vector2u sizeWindow);
 	void BorderChecks(Entity & entity, Vector2u sizeWindow);

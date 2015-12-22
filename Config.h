@@ -72,7 +72,7 @@ const static float DISTANCE_FOR_ATACK = 500.f;
 
 static const int COUNT_EASY_ENEMY = 3;
 static const int COUNT_MIDDLE_ENEMY = 0;
-static const int COUNT_TOWER_ENEMY = 1;
+static const int COUNT_TOWER_ENEMY = 0;
 static const int COUNT_KAMIKAZE_ENEMY = 0;
 
 const static sf::String NAME_EASY_ENEMY = "easyEnemy";
@@ -251,3 +251,14 @@ const static sf::String PATH_INSTRUCTION = "resourse/images/instruction.png";
 
 //--------------------------------------------------------------
 
+static float SIZE_VOLUME_SHOOT = 10.f;
+static float SIZE_VOLUME_EXPLOSION = 15.f;
+static float SIZE_VOLUME_TAKE_BONUS = 50.f;
+
+const static sf::String PATH_SHOOT_SOUND = "resourse/Music/laser1.ogg";
+
+const static sf::String PATH_EXPLOSION_SOUND = "resourse/Music/explosion5.ogg";
+
+const static sf::String PATH_MOUSECLICK_SOUND = "resourse/Music/mouseclick.wav";
+
+const static sf::String PATH_PICK_UP_BONUS_SOUND = "resourse/Music/pick_up_bonus.ogg";

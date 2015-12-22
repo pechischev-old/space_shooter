@@ -39,6 +39,7 @@ struct Menu {
 
 void InitMenu(Menu & menu, RenderWindow & window, TextureMenu & textureMenu, TextWithInfo & text);
 void ProcessEventsMenu(RenderWindow & window, Menu & menu, GlobalBool & globalBool, Event & event);
+void UpdateInstruction(Instruction & instruction, RenderWindow & window);
 void UpdateMenu(Menu & menu, RenderWindow & window, TextWithInfo & text);
 void RenderMenu(Menu & menu, RenderWindow & window, TextWithInfo & text);
 

@@ -4,7 +4,7 @@
 using namespace sf;
 using namespace std;
 
-Entity::Entity(Vector2f position, String Name, Texture & texture) {
+Entity::Entity(Vector2f position, String Name, Texture & texture, SSound & sSound) {
 	this->position = position;
 	name = Name;
 	sprite = new Sprite;
@@ -16,6 +16,8 @@ Entity::Entity(Vector2f position, String Name, Texture & texture) {
 	isLife = true;
 	isKilled = false;
 	health = 100;
+	shootSound.setBuffer(sSound.shootBuffer);
+	explosionSound.setBuffer(sSound.explosionBuffer);
 }
 
 void Entity::Explosion(const Time & deltaTime, Texture & texture) { // изменить название функции

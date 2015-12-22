@@ -22,7 +22,7 @@ struct Asteroid {
 	};
 	TypeAsteroid typeAsteroid;
 	float timeToCreateAsteroid = float(TIME_CREATE_ASTEROID);
-	void AddAsteroid(TextureGame & textureGame, RenderWindow & window);
-	void GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame);
+	void AddAsteroid(TextureGame & textureGame, RenderWindow & window, SSound & sSound);
+	void GetMoveEveryAsteroid(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, SSound & sSound);
 	void InitRotateAsteroid(Entity & asteroid);
 };

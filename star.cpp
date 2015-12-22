@@ -11,13 +11,13 @@ void LoadStarInList(Star & star, const Time & deltaTime, RenderWindow & window, 
 	isEndLoading = true;
 }
 
-void Star::AddStar(TextureGame & textureGame, RenderWindow & window) {
+void Star::AddStar(TextureGame & textureGame, RenderWindow & window, SSound & sSound) {
 	if (stars.size() < 40) {
 		timeCreateStar += clock.restart();
 		if (timeCreateStar.asSeconds() > 0.7) {
 			Direction dir = LEFT;
 			Vector2f setPosition = GetRandomPosition(dir, window);
-			Entity addStar(setPosition, NAME_STAR, textureGame.starTexture);
+			Entity addStar(setPosition, NAME_STAR, textureGame.starTexture, sSound);
 			addStar.direction = LEFT;
 			addStar.speed = float(Math::GetRandomNumerForSection(270, 400));
 			stars.push_back(addStar);

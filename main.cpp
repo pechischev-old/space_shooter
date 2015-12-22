@@ -6,6 +6,7 @@
 
 #include "Game.h"
 #include "Menu.h"
+#include "Music.h"
 
 using namespace sf;
 using namespace std;
@@ -13,7 +14,7 @@ using namespace std;
 
 const Time TIME_PER_FRAME = seconds(1.f / 60.f);
 
-void processEvents(RenderWindow & window, Menu & menu, Game & game, GlobalBool & globalBool) {
+void processEvents(RenderWindow & window, Menu & menu, Game & game, GlobalBool & globalBool, SSound & sSound) {
 	Event event;
 	while (window.pollEvent(event))
 	{
@@ -34,13 +35,15 @@ void processEvents(RenderWindow & window, Menu & menu, Game & game, GlobalBool &
 
 }
 
-int CallGame(GlobalBool & globalBool, Menu & menu)
+int CallGame(GlobalBool & globalBool, Menu & menu, SSound & sSound)
 {
 	
 	RenderWindow window(VideoMode(SCRN_WIDTH, SCRN_HEIGTH), TITLE_GAME);
 	
 	Game *game = new Game();
-	InitializeGame(*game);
+	
+	sSound.LoadSound();
+	InitializeGame(*game, sSound);
 	InitMenu(menu, window, menu.textureMenu, *game->textInfo);
 
 	Clock clock;
@@ -58,12 +61,12 @@ int CallGame(GlobalBool & globalBool, Menu & menu)
 		while (timeSinceLastUpdate > TIME_PER_FRAME)
 		{
 			timeSinceLastUpdate -= TIME_PER_FRAME;
-			processEvents(window, menu, *game, globalBool);
+			processEvents(window, menu, *game, globalBool, sSound);
 			if (globalBool.g_isMenu) {
 				UpdateMenu(menu, window, *game->textInfo);
 			}
 			else {
-				updateGame(*game, TIME_PER_FRAME, window, globalBool);
+				updateGame(*game, TIME_PER_FRAME, window, globalBool, sSound);
 			}
 		}
 		if (globalBool.g_isMenu) {
@@ -81,8 +84,9 @@ int CallGame(GlobalBool & globalBool, Menu & menu)
 int main()
 {
 	Menu menu;
+	SSound sSound;
 	GlobalBool globalBool; // обявление глобальных булевских переменных
-	CallGame(globalBool, menu);
+	CallGame(globalBool, menu, sSound);
 
 	return 0;
 }

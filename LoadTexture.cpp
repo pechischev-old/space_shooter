@@ -37,5 +37,5 @@ void TextureGame::LoadingFromFileTexture() {
 
 void TextureMenu::LoadingFromFileTextureForMenu() {
 	fieldTexture.loadFromFile(PATH_FIELD);
-	//instructionTexture.loadFromFile(PATH_INSTRUCTION);
+	instructionTexture.loadFromFile(PATH_INSTRUCTION);
 }

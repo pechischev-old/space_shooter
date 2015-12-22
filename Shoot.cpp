@@ -4,12 +4,12 @@
 using namespace sf;
 using namespace std;
 
-Shoot::Shoot(Vector2f position, Vector2f sizeObject, Direction direction, Texture & texture, String Name) {
+Shoot::Shoot(Vector2f position, Direction direction, Texture & texture, String Name) {
 	sprite = new Sprite;
 	sprite->setTexture(texture);
 	sprite->setOrigin(float(texture.getSize().x) / 2, float(texture.getSize().y) / 2);
 	sprite->setScale(2, 2);
-	sprite->setPosition(position.x + sizeObject.x / 2, position.y + sizeObject.y / 2);
+	sprite->setPosition(position.x, position.y);
 	dir = direction;
 	name = Name;
 	this->position = position;
@@ -111,38 +111,37 @@ void Shoot::MoveBulletHardEnemy(const Time & deltaTime, Vector2f posObject, int 
 }
 
 void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot> & bullets, TextureGame & textureGame, Vector2f posPlayer) {
-	for (auto  &it : bullets) {
-		it.CheckForCollisions(window);
-		if (it.isOtherBullet && !it.isExplosion) {
-			it.MoveBulletHardEnemy(deltaTime, it.rememPos, SPEED_OTHER_BULLET);
+	for (list<Shoot>::iterator it = bullets.begin(); it != bullets.end();) {
+		it->CheckForCollisions(window);
+		if (it->isOtherBullet && !it->isExplosion) {
+			it->MoveBulletHardEnemy(deltaTime, it->rememPos, SPEED_OTHER_BULLET);
 		}
-		else if ( it.isRocket && !it.isExplosion) {
-			it.MoveBulletHardEnemy(deltaTime, posPlayer, SPEED_ROCKET);
+		else if ( it->isRocket && !it->isExplosion) {
+			it->MoveBulletHardEnemy(deltaTime, posPlayer, SPEED_ROCKET);
 		}
 		else {
-			it.MoveBullet(deltaTime);
+			it->MoveBullet(deltaTime);
 		}
-		if (it.isExplosion) {
-			it.dir = NONE;
-			if (it.name != NAME_ELECTRIC_BULLET) {
-				it.Explosion(deltaTime, textureGame.explosionBulletTexture);
+		if (it->isExplosion) {
+			it->dir = NONE;
+			if (it->name != NAME_ELECTRIC_BULLET) {
+				it->Explosion(deltaTime, textureGame.explosionBulletTexture);
 			}
 			else {
-				it.life = false; // отдельная анимация 
+				it->life = false; // отдельная анимация 
 			}
 		}
-		if (it.name == NAME_ROCKET) {
-			it.life = it.health > 0;
+		if (it->name == NAME_ROCKET) {
+			it->life = it->health > 0;
 		}
+		if (!it->life) {
+			it->isExplosion = false;
+			delete it->sprite;
+			it = bullets.erase(it);
+		}
+		else  ++it;
 	}
-	auto updatedEnd = std::remove_if(bullets.begin(), bullets.end(), [&](Shoot & bullet) {
-		if (!bullet.life) {
-			bullet.isExplosion = false;
-			delete bullet.sprite;
-		}
-		return !bullet.life;
-	});
-	bullets.erase(updatedEnd, bullets.end());
+	
 }
 
 void ClearList(list<Shoot> & bullets) {

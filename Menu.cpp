@@ -37,10 +37,17 @@ void ProcessEventsMenu(RenderWindow & window, Menu & menu, GlobalBool & globalBo
 	}
 }
 
+void UpdateInstruction(Instruction & instruction, RenderWindow & window) {
+	Vector2u sizeWindow = window.getSize();
+	instruction.boxInstruction.setPosition(float(sizeWindow.x) / 2.f,  sizeWindow.y / 2.f);
+}
+
 void InitMenu(Menu & menu, RenderWindow & window, TextureMenu & textureMenu, TextWithInfo & text) {
 	textureMenu.LoadingFromFileTextureForMenu();
 	menu.background.setTexture(textureMenu.fieldTexture);
+	Vector2u sizeInstruction = textureMenu.instructionTexture.getSize();
 	menu.instruction.boxInstruction.setTexture(textureMenu.instructionTexture);
+	menu.instruction.boxInstruction.setOrigin(float(sizeInstruction.x) / 2.f, float(sizeInstruction.y / 2.f));
 	UpdateTextMenu(window, text);
 }
 
@@ -48,6 +55,8 @@ void UpdateMenu(Menu & menu, RenderWindow & window, TextWithInfo & text) {
 	menu.background.setTextureRect(IntRect(0, 0, window.getSize().x, window.getSize().y));
 	UpdateTextMenu(window, text);
 	SelectButtons(window, text, menu.menuSelector);
+	UpdateInstruction(menu.instruction, window);
+
 }
 
 void RenderMenu(Menu & menu, RenderWindow & window, TextWithInfo & text) {

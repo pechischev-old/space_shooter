@@ -1,18 +1,19 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-
+#include <SFML/Audio.hpp>
 
 #include <iostream>
 #include <list>
 
 #include "Config.h"
+#include "Music.h"
 #include "LoadTexture.h"
 
 using namespace sf;
 using namespace std;
 
 struct Entity {
-	Entity(Vector2f position, String Name, Texture & texture);
+	Entity(Vector2f position, String Name, Texture & texture, SSound & sSound);
 	Vector2f position;
 	Vector2f sizeObject;
 	float health; // здоровье сущности
@@ -31,6 +32,9 @@ struct Entity {
 	void SetRotationObject(Vector2f posPoint);
 	Time timeChangeDirection = Time::Zero; // для врагов
 	Time timeCreateBullet = Time::Zero; // для врагов
+
+	Sound explosionSound;
+	Sound shootSound;
 };
 
 

@@ -14,7 +14,7 @@ using namespace sf;
 using namespace std;
 
 struct Shoot {
-	Shoot(Vector2f position, Vector2f sizeObject, Direction dir, Texture & texture, String Name);
+	Shoot(Vector2f position, Direction dir, Texture & texture, String Name);
 	Vector2f position;
 	Vector2f oldPosition;
 	Direction dir;

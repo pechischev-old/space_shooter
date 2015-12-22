@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 #include "Config.h"
 #include "Player.h"
@@ -30,10 +31,10 @@ struct Game
 	void UseBonus(const Time & deltaTime, TextureGame & textureGame);
 };
 
-void InitializeGame(Game & game);
+void InitializeGame(Game & game, SSound & sSound);
 void ResetGame(Game & game);
 bool hasIntersection(Sprite & object1, Sprite & object2);
 void processEventsGame(Game & game, Event & event, RenderWindow & window);
-void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, GlobalBool & globalBool);
+void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, GlobalBool & globalBool, SSound & sSound);
 void renderGame(RenderWindow & window, Game & game);
 void Delete(Game & game);

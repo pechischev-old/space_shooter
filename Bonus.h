@@ -23,7 +23,7 @@ struct Bonus {
 	Clock clock;
 	Time timeCreateBonus = Time::Zero;
 	int probabilityOccurrence;
-	void AddBonus(Vector2f getPosition, TextureGame & textureGame);
+	void AddBonus(Vector2f getPosition, TextureGame & textureGame, SSound & sSound);
 	void GetMoveEveryBonus(const Time & deltaTime, RenderWindow & window);
 };
 
