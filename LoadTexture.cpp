@@ -16,8 +16,10 @@ void TextureGame::LoadingFromFileTexture() {
 	decreaseTexture.loadFromFile(PATH_DECREASE);
 	increaseTexture.loadFromFile(PATH_INCREASE_DAMAGE);
 	invulnerabilityTexture.loadFromFile(PATH_INVULNERABILITY);
-
 	repairTexture.loadFromFile(PATH_REPAIR);
+	tripleShotTexture.loadFromFile(PATH_TRIPLE_SHOT);
+	doubleShotTexture.loadFromFile(PATH_DOUBLE_SHOT);
+
 	starTexture.loadFromFile(PATH_STAR);
 
 	enemyBossTexture.loadFromFile(PATH_BOSS);
@@ -30,9 +32,6 @@ void TextureGame::LoadingFromFileTexture() {
 	explosionBulletTexture.loadFromFile(PATH_TO_EXPLOSION_BULLET);
 
 	healthBarTexture.loadFromFile(PATH_HEALTH_BAR);
-	emptyBarTexture.loadFromFile(PATH_EMPTY_BAR);
-	rageBarTexture.loadFromFile(PATH_RAGE_BAR);
-
 }
 
 void TextureMenu::LoadingFromFileTextureForMenu() {

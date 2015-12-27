@@ -15,7 +15,7 @@ Entity::Entity(Vector2f position, String Name, Texture & texture, SSound & sSoun
 	sprite->setPosition(position);
 	isLife = true;
 	isKilled = false;
-	health = 100;
+	health = 100.f;
 	shootSound.setBuffer(sSound.shootBuffer);
 	explosionSound.setBuffer(sSound.explosionBuffer);
 }

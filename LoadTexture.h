@@ -24,6 +24,8 @@ struct TextureGame {
 	Texture increaseTexture;
 	Texture invulnerabilityTexture;
 	Texture repairTexture;
+	Texture tripleShotTexture;
+	Texture doubleShotTexture;
 
 	Texture explosionTexture;
 	Texture explosionBulletTexture;
@@ -37,9 +39,7 @@ struct TextureGame {
 	Texture rocketTexture;
 
 	Texture healthBarTexture;
-	Texture emptyBarTexture;
-	Texture rageBarTexture;
-
+	
 	Texture fieldTexture;
 
 	void LoadingFromFileTexture();

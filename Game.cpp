@@ -13,11 +13,12 @@ void InitializeGame(Game & game, SSound & sSound) {
 	game.textureGame.LoadingFromFileTexture();
 	InitializePlayer(*game.player, game.textureGame, sSound);
 	InitializeText(*game.textInfo);
+	game.gui.InitGUI(game.textureGame);
 }
 
 void Game::IncreaseCharacteristicsObjects() {
 	if (player->point <= 0 ) { 
-		if (player->levelGame == MAX_LEVEL_GAME) {
+		if (player->levelGame == MAX_LEVEL_GAME && !isWin) {
 			enemy->bossState.isBoss = true;
 		}
 		else {
@@ -81,7 +82,7 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 			}
 			else if (enemyShip.name == NAME_TOWER_ENEMY || enemyShip.name == NAME_BOSS) {
 				if (enemy->bossState.isRage && enemyShip.name == NAME_BOSS)
-					SpecialShootingBoss(*enemy, enemyShip, textureGame);
+					SpecialShootingBoss(*enemy, enemyShip, textureGame, posPlayer);
 				else if (enemyShip.name == NAME_TOWER_ENEMY)
 					enemy->AddBulletEnemy(enemyShip, posPlayer, textureGame.rocketTexture, enemyShip.timeCreateBullet);
 				else if (enemyShip.name == NAME_BOSS)
@@ -111,11 +112,6 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 					}
 				}
 			}
-			/*if (it2.name == NAME_BOSS) {
-				if (IsEnterField(Vector2f(it.sprite->getPosition()), it2)) { // Проверка на вхождение пули в область видимости
-					//enemy->Evasion(Vector2f(it->sprite->getPosition()), *it2, window->getSize()); // Функция уклонения
-				}
-			}*/
 		}
 		//---------------------------- Обработка столкновения противника с астероидом ------------------------------
 		for (auto &asteroid : asteroid->asteroids) {
@@ -198,21 +194,48 @@ void Game::CheckForCollision(RenderWindow & window, const Time & deltaTime, Text
 			if (bonus.name == REPAIR_IMAGE) {
 				player->playerState.isRepair = true;
 			}
+			
 			if (bonus.name == INVULNERABILITY_IMAGE) {
 				player->playerState.isInvulnerability = true;
 				player->playerState.isDecrease = false;
 				player->playerState.isIncreaseDamage = false;
+				player->playerState.isDoubleShot = false;
+				player->playerState.isTripleShot = false;
+				timeUseBonus = 0;
 			}
 			if (bonus.name == INCREASE_DAMAGE_IMAGE) {
 				player->playerState.isIncreaseDamage = true;
 				player->playerState.isInvulnerability = false;
 				player->playerState.isDecrease = false;
+				player->playerState.isDoubleShot = false;
+				player->playerState.isTripleShot = false;
+				timeUseBonus = 0;
 			}
 			if (bonus.name == DECREASE_IMAGE) {
 				player->playerState.isIncreaseDamage = false;
 				player->playerState.isInvulnerability = false;
 				player->playerState.isDecrease = true;
+				player->playerState.isDoubleShot = false;
+				player->playerState.isTripleShot = false;
+				timeUseBonus = 0;
 			}
+			if (bonus.name == TRIPLE_SHOT_IMAGE) {
+				player->playerState.isIncreaseDamage = false;
+				player->playerState.isInvulnerability = false;
+				player->playerState.isDecrease = false;
+				player->playerState.isDoubleShot = false;
+				player->playerState.isTripleShot = true;
+				timeUseBonus = 0;
+			}
+			if (bonus.name == DOUBLE_SHOT_IMAGE) {
+				player->playerState.isIncreaseDamage = false;
+				player->playerState.isInvulnerability = false;
+				player->playerState.isDecrease = false;
+				player->playerState.isDoubleShot = true;
+				player->playerState.isTripleShot = false;
+				timeUseBonus = 0;
+			}
+			
 			if (bonus.name == BOMB_IMAGE) {
 				player->playerState.isBomb = true;
 			}
@@ -235,15 +258,17 @@ void Game::UseBonus(const Time & deltaTime, TextureGame & textureGame){
 		if (timeUseBonus > TIME_USE_INVULNERABILITY_IN_SECONDS) {
 			player->ship->sprite->setColor(Color::White);
 			playerState.isInvulnerability = false;
+			
 			timeUseBonus = 0;
 		}
 	}
+	else {
+		player->ship->sprite->setColor(Color::White);
+	}
 	if (playerState.isDecrease) { // уменьшение размеров
 		timeUseBonus += 1 * deltaTime.asSeconds();
-		player->ship->sprite->setColor(Color::Yellow);
 		player->ship->sprite->setScale(0.5, 0.5);
 		if (timeUseBonus > TIME_USE_DECREASE_IN_SECONDS) {
-			player->ship->sprite->setColor(Color::White);
 			playerState.isDecrease = false;
 			timeUseBonus = 0;
 		}
@@ -254,11 +279,9 @@ void Game::UseBonus(const Time & deltaTime, TextureGame & textureGame){
 	
 	if (playerState.isIncreaseDamage) { // увеличение урона
 		timeUseBonus += 1 * deltaTime.asSeconds();
-		player->ship->sprite->setColor(Color::Magenta);
 		player->scaleBullet = 3;
 		player->ship->damage = float(player->maxDamage) * 3;
 		if (timeUseBonus > TIME_USE_INCREASE_IN_SECONDS) {
-			player->ship->sprite->setColor(Color::White);
 			playerState.isIncreaseDamage = false;
 			timeUseBonus = 0;
 		}
@@ -277,6 +300,20 @@ void Game::UseBonus(const Time & deltaTime, TextureGame & textureGame){
 		}
 		playerState.isBomb = false;
 	}
+	if (playerState.isTripleShot) { // тройной выстрел
+		timeUseBonus += 1 * deltaTime.asSeconds();
+		if (timeUseBonus > TIME_USE_TRIPLE_SHOT_IN_SECONDS) {
+			playerState.isTripleShot = false;
+			timeUseBonus = 0;
+		}
+	}
+	if (playerState.isDoubleShot) { // двойной выстрел
+		timeUseBonus += 1 * deltaTime.asSeconds();
+		if (timeUseBonus > TIME_USE_DOUBLE_SHOT_IN_SECONDS) {
+			playerState.isDoubleShot = false;
+			timeUseBonus = 0;
+		}
+	}
 }
 
 void Game::DrawObjects(RenderWindow & window) { // Отрисовка объектов
@@ -288,11 +325,12 @@ void Game::DrawObjects(RenderWindow & window) { // Отрисовка объектов
 		window.draw(*it2.sprite);
 	for (Entity it4 : bonus->bonuses) // бонусы
 		window.draw(*it4.sprite);
+	for (Shoot it : player->bullet) // пули игрока
+		window.draw(*it.sprite);
+
 	if (player->ship->isLife) {
 		window.draw(*player->ship->sprite); // отрисовывается игрок пока он жив
 	}
-	for (Shoot it : player->bullet) // пули игрока
-		window.draw(*it.sprite);
 	for (Shoot it : enemy->bulletEnemy) // отрисовка вражеских пуль
 		window.draw(*it.sprite);
 }
@@ -305,9 +343,6 @@ void processEventsGame(Game & game, Event & event, RenderWindow & window)
 	//--------------------------- Выстрел --------------------------
 	if (player.ship->health > 0) {
 		if (Mouse::isButtonPressed(Mouse::Left)) {
-			player.playerState.isShoot = true;
-		}
-		if (Keyboard::isKeyPressed(Keyboard::Space)) {
 			player.playerState.isShoot = true;
 		}
 	}
@@ -326,7 +361,7 @@ void processEventsGame(Game & game, Event & event, RenderWindow & window)
 
 void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, GlobalBool & globalBool, SSound & sSound)
 {
-	if (!game.isPause && game.player->ship->isLife) {
+	if (!game.isPause && game.player->ship->isLife && !game.isWin) {
 		Player & player = *game.player;
 		Enemy & enemy = *game.enemy;
 		Asteroid & asteroid = *game.asteroid;
@@ -343,7 +378,7 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 		game.CheckForCollision(window, deltaTime, game.textureGame);
 		game.UseBonus(deltaTime, game.textureGame);
 		//---------------- Интерфейс -----------------------
-		UpdateTextWithHealth(*game.textInfo, *game.player, window);
+		UpdateTextGame(*game.textInfo, *game.player, window);
 		//---------------- Функции звезд -------------------
 		//LoadStarInList(star, deltaTime, window, *game.textureGame); // добавить загрузочный экран
 		star.AddStar(game.textureGame, window, sSound);
@@ -358,15 +393,15 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 		else {
 			MovePlayer(player, deltaTime, window); // задает координаты движения
 			player.ship->sprite->move(Border(*player.ship, window));
-			player.ChangeWeapons(game.textureGame, pos);
 			player.ship->SetRotationObject(pos);
 			player.RecoveryMove();
+			player.ChangeTypeFire(game.textureGame, pos);
 			UpdateVolume(player.takeBonus, SIZE_VOLUME_TAKE_BONUS);
 			UpdateVolume(player.ship->shootSound, SIZE_VOLUME_SHOOT);
 		}
 		UpdateStateBullet(deltaTime, window, player.bullet, game.textureGame, posPlayer);
 		//---------------- Функции противников -------------
-		enemy.UpdateStateEveryEnemy(deltaTime, window, bonus, game.textureGame, posPlayer, player.point, sSound);
+		enemy.UpdateStateEveryEnemy(deltaTime, window, bonus, game.textureGame, posPlayer, player.point, sSound, game.isWin);
 		enemy.AddEnemy(game.textureGame, window, sSound);
 		enemy.CalmBoss();
 		UpdateStateBullet(deltaTime, window, enemy.bulletEnemy, game.textureGame, posPlayer);
@@ -376,6 +411,10 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 		asteroid.GetMoveEveryAsteroid(deltaTime, window, bonus, game.textureGame, sSound);
 		//---------------- Функции бонусов -----------------
 		bonus.GetMoveEveryBonus(deltaTime, window);
+		//---------------------
+		UpdateHealthBar(game.gui.bar, player.ship->health, game.gui.healthBar.getGlobalBounds(), game.gui.healthBar);
+		game.gui.UpdateGUI(*game.textInfo, game.timeUseBonus, player.playerState, window);
+		
 	}
 }
 
@@ -388,6 +427,7 @@ void renderGame(RenderWindow & window, Game & game) {
 	if (!game.player->ship->isLife) {
 		OutputMessageAboutLosing(window, *game.textInfo);
 	}
+	game.gui.DrawGUI(*game.textInfo, game.player->playerState, window);
 	window.display();
 }
 

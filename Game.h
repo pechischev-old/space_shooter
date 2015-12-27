@@ -9,6 +9,7 @@
 #include "asteroids.h"
 #include "Bonus.h"
 #include "star.h"
+#include "GUI.h"
 
 using namespace sf;
 
@@ -21,10 +22,12 @@ struct Game
 	Bonus *bonus;
 	TextWithInfo *textInfo;
 	Star *star;
+	S_GUI gui;
 	Clock clock;
 	float timeUseBonus = 0;
 	int countEnemy = POINT_FOR_ADVANCE;
 	bool isPause = false;
+	bool isWin = false;
 	void CheckForCollision(RenderWindow & window, const Time & deltaTime, TextureGame & textureGame); // отвечает за проверку на столкновения
 	void DrawObjects(RenderWindow & window);
 	void IncreaseCharacteristicsObjects();

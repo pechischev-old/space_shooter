@@ -23,6 +23,8 @@ struct PlayerState {
 	bool isInvulnerability = false; // флаг неу€звимости
 	bool isDecrease = false; // флаг уменьшени€
 	bool isBomb = false; // флаг бомбы
+	bool isTripleShot = false;
+	bool isDoubleShot = false;
 	//---
 };
 
@@ -36,7 +38,6 @@ struct Player
 	Time timeRecoveryMove; 
 	Sound takeBonus;
 	int scaleBullet = 2;
-	int gun = 0;
 	std::list<Shoot> bullet;
 	int maxHealth = MAX_HEALTH;
 	int maxDamage = MAX_DAMAGE;
@@ -44,11 +45,10 @@ struct Player
 	int levelGame = 1;
 
 	//‘ункции дл€ игрока
-	void AddBullet(Texture & texture, Vector2f posPoint, float time, String name);
 	void CheckPlayerLife();
 	void RecoveryMove();
 	void PlaySoundAtDead();
-		void ChangeWeapons(TextureGame & textureGame, Vector2f posPoint);
+	void ChangeTypeFire(TextureGame & textureGame, Vector2f posPoint);
 };
 
 void InitializePlayer(Player & player, TextureGame & textureGame, SSound & sSound);

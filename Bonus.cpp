@@ -31,6 +31,14 @@ void Bonus::AddBonus(Vector2f getPosition, TextureGame & textureGame, SSound & s
 			name = BOMB_IMAGE;
 			texture = &textureGame.bombTexture;
 			break;
+		case Bonus::DOUBLE_SHOT:
+			name = DOUBLE_SHOT_IMAGE;
+			texture = &textureGame.doubleShotTexture;
+			break;
+		case Bonus::TRIPLE_SHOOT:
+			name = TRIPLE_SHOT_IMAGE;
+			texture = &textureGame.tripleShotTexture;
+			break;
 		}
 		Entity addBonus(getPosition, name, *texture, sSound);
 		addBonus.direction = dir; // присваивает сгенерированное направление
@@ -53,7 +61,5 @@ void Bonus::GetMoveEveryBonus(const Time & deltaTime, RenderWindow & window) {
 }
 
 bool CheckProbably() {
-	if (Math::GetRandomNumerForSection(1, 4) == 4) // задается вероятность выпадения 
-		return true;
-	return false;
+	return (Math::GetRandomNumerForSection(1, 4) == 4); // задается вероятность выпадения ;
 }

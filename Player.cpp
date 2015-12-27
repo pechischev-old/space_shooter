@@ -17,25 +17,6 @@ void Player::CheckPlayerLife() {
 	playerState.isAlive = ship->health > 0;
 }
 
-void Player::AddBullet(Texture & texture, Vector2f posPoint, float time, String name) {
-	if (playerState.isShoot) {
-		timeCreateBullet += clock.restart(); 
-		if (timeCreateBullet.asSeconds() > time) { // Зависимость появления пули от времени
-			ship->shootSound.play();
-			directionShoot = RIGHT;
-			Shoot addBullet(ship->sprite->getPosition(), directionShoot, texture, name);
-			addBullet.damage = int(ship->damage);
-			addBullet.sprite->setScale(float(scaleBullet), float(scaleBullet));
-			addBullet.isOtherBullet = true;
-			addBullet.rememPos = posPoint;
-			bullet.push_back(addBullet); // создание пули и занесение ее в список
-			timeCreateBullet = Time::Zero;
-		}
-		//------------------------------
-		playerState.isShoot = false;
-	}
-}
-
 void Player::RecoveryMove() {
 	if (!playerState.isMove) {
 		timeRecoveryMove += clock.restart();
@@ -43,6 +24,49 @@ void Player::RecoveryMove() {
 			playerState.isMove = true;
 			timeRecoveryMove = Time::Zero;
 		}
+	}
+}
+
+void  Player::ChangeTypeFire(TextureGame & textureGame, Vector2f posPoint) {
+	if (playerState.isShoot) {
+		timeCreateBullet += clock.restart();
+		if (timeCreateBullet.asSeconds() > TIME_CREATE_BULLET) { // Зависимость появления пули от времени
+			ship->shootSound.play();
+			Vector2f posShip = ship->sprite->getPosition();
+			int begin;
+			int count;
+			int diff;
+			Texture *texture = NULL;
+			if (playerState.isDoubleShot) {
+				begin = -1;
+				count = 2;
+				diff = 2;
+				texture = &textureGame.blueLaserTexture;
+			}
+			else if (playerState.isTripleShot) {
+				begin = -1;
+				count = 2;
+				diff = 1;
+				texture = &textureGame.greenLaserTexture;
+			}
+			else {
+				begin = 0;
+				count = 1;
+				diff = 1;
+				texture = &textureGame.blueLaserTexture;
+			}
+			for (int i = begin; i < count; i += diff) {
+				Shoot addBullet(Vector2f(posShip.x + i * 15, posShip.y + i * 15), RIGHT, *texture, NAME_BULLET);
+				addBullet.damage = int(ship->damage);
+				addBullet.isOtherBullet = true;
+				addBullet.rememPos = Vector2f(posPoint.x + i * 15, posPoint.y + i * 15);
+				addBullet.sprite->setScale(float(scaleBullet), float(scaleBullet));
+				bullet.push_back(addBullet); // создание пули и занесение ее в список
+			}
+			timeCreateBullet = Time::Zero;
+		}
+		//------------------------------
+		playerState.isShoot = false;
 	}
 }
 
@@ -85,42 +109,10 @@ void Control(Player & player, Event & event) {
 			player.direction = NONE;
 			player.ship->direction = NONE;
 		}
-		if (event.type == Event::MouseWheelMoved) {
-			if (event.mouseWheel.delta == 1) {
-				if (player.gun < 2) {
-					player.gun += 1;
-				}
-				else {
-					player.gun = 0;
-				}
-			}
-			if (event.mouseWheel.delta == -1) {
-				if (player.gun > 0) {
-					player.gun -= 1;
-				}
-				else {
-					player.gun = 2;
-				}
-			}
-		}
 	}
 	else {
 		player.direction = NONE;
 		player.ship->direction = NONE;
-	}
-}
-
-void Player::ChangeWeapons(TextureGame & textureGame, Vector2f posPoint) {
-	if (playerState.isShoot) {
-		if (gun == 0) { 
-			AddBullet(textureGame.blueLaserTexture, posPoint, float(TIME_CREATE_BULLET), NAME_BULLET);
-		}
-		else if (gun == 1) { 
-			AddBullet(textureGame.redLaserTexture, posPoint, float(TIME_CREATE_BULLET), NAME_BULLET);
-		}
-		else if (gun == 2) {
-			AddBullet(textureGame.greenLaserTexture, posPoint, float(TIME_CREATE_BULLET), NAME_BULLET);
-		}
 	}
 }
 
@@ -139,16 +131,21 @@ void ResetPlayer(Player & player, TextureGame & textureGame) {
 	player.maxDamage = MAX_DAMAGE;
 	player.ship->sprite->setPosition(SCRN_WIDTH / 2, SCRN_HEIGTH / 2);
 	player.ship->sprite->setTexture(textureGame.playerTexture);
+	Vector2u sizeTexture = textureGame.playerTexture.getSize();
+	player.ship->sprite->setOrigin(sizeTexture.x / 2.f, sizeTexture.y / 2.f);
 	player.ship->health = float(player.maxHealth);
 	player.playerState.isAlive = true;
 	player.ship->damage = float(player.maxDamage);
 	player.ship->isLife = true;
 	player.playerState.isMove = true;
 	player.ship->isKilled = false;
-	player.gun = 0;
 	player.levelGame = 1;
+
 	player.playerState.isIncreaseDamage = false;
 	player.playerState.isInvulnerability = false;
 	player.playerState.isDecrease = false; 
+	player.playerState.isTripleShot = false;
+	player.playerState.isDoubleShot = false;
+
 	player.ship->sprite->setColor(Color::White);
 }

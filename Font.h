@@ -11,7 +11,6 @@ using namespace std;
 
 struct TextWithInfo {
 	Font font;
-	Text textPlayerHealth;
 	Text textNumber;
 	Text textNewGame;
 	Text textContinue;
@@ -21,13 +20,14 @@ struct TextWithInfo {
 	Text textScore;
 	Text textLosing;
 	Text textLevel;
+	Text textTimeUseBonus;
 	int sizeText = 32;
 	
 };
 
 void InitializeText(TextWithInfo & textInfo);
 void InitString(Text & text, String & str, Font & font, int sizeText);
-void UpdateTextWithHealth(TextWithInfo & textInfo, Player & player, RenderWindow & window);
+void UpdateTextGame(TextWithInfo & textInfo, Player & player, RenderWindow & window);
 float GetWidth(Text & text);
 
 void ReferenceLinePosition(Vector2u sizeWindow, Text & text, Vector2f & posPrevText, int sizeText);

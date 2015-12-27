@@ -17,7 +17,9 @@ struct Bonus {
 		INCREASE_DAMAGE,
 		INVULNERABILITY,
 		BOMB,
-		sizeTypeBonuses = 5
+		TRIPLE_SHOOT,
+		DOUBLE_SHOT,
+		sizeTypeBonuses = 7
 	};
 	TypeBonuses typeBonus;
 	Clock clock;

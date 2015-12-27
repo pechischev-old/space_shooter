@@ -19,8 +19,8 @@ using namespace sf;
 enum Selector {
 	ELECTRICAL,
 	TRIPLE_SHOT,
-	POWERFUL_SHOOTING,
-	CROSS_FIRE
+	ROCKET_SHOOTING,
+
 };
 
 struct Enemy {
@@ -63,10 +63,8 @@ struct Enemy {
 	void AddEnemy(TextureGame & textureGame, RenderWindow & window, SSound & sSound);
 	void AddBulletEnemy(Entity & enemy, Vector2f posPlayer, Texture & texture, Time & timeCreateBullet);
 
-	void UpdateStateEveryEnemy(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer, int & point, SSound & sSound);
+	void UpdateStateEveryEnemy(const Time & deltaTime, RenderWindow & window, Bonus & bonus, TextureGame & textureGame, Vector2f posPlayer, int & point, SSound & sSound, bool & isWin);
 
-	void Evasion(Vector2f posBullet, Entity & entity, Vector2u sizeWindow);
-	void BorderChecks(Entity & entity, Vector2u sizeWindow);
 	void CalmBoss();
 	void SetMove(RenderWindow & window, Entity & enemy);
 	
@@ -74,7 +72,7 @@ struct Enemy {
 	void MoveKamikaze(const Time & deltaTime, Vector2f posPlayer, Entity & enemy);
 };
 
-void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame);
+void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame, Vector2f posPlayer);
 void ResetEnemy(Enemy & enemy);
 	Direction GetDirection(Direction dir);
 	Vector2f GetRandomPosition(Direction & selectHand, RenderWindow & window);

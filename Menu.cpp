@@ -54,7 +54,8 @@ void InitMenu(Menu & menu, RenderWindow & window, TextureMenu & textureMenu, Tex
 void UpdateMenu(Menu & menu, RenderWindow & window, TextWithInfo & text) {
 	menu.background.setTextureRect(IntRect(0, 0, window.getSize().x, window.getSize().y));
 	UpdateTextMenu(window, text);
-	SelectButtons(window, text, menu.menuSelector);
+	if (menu.stateMenu.isMainMenu)
+		SelectButtons(window, text, menu.menuSelector);
 	UpdateInstruction(menu.instruction, window);
 
 }

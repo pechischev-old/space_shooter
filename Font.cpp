@@ -10,7 +10,6 @@ void InitString(Text & text, String & str, Font & font, int sizeText) {
 
 void InitializeText(TextWithInfo & textInfo) {
 	textInfo.font.loadFromFile(PATH_TO_FONT);
-	InitString(textInfo.textPlayerHealth, String(""), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textNumber, String(""), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textNewGame, String(TEXT_NEW_GAME), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textContinue, String(TEXT_CONTINUE), textInfo.font, textInfo.sizeText);
@@ -20,6 +19,7 @@ void InitializeText(TextWithInfo & textInfo) {
 	InitString(textInfo.textLosing, String(TEXT_ABOUT_LOSING), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textScore, String(""), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textLevel, String(""), textInfo.font, textInfo.sizeText);
+	InitString(textInfo.textTimeUseBonus, String(""), textInfo.font, textInfo.sizeText);
 }
 
 void ReferenceLinePosition(Vector2u sizeWindow, Text & text, Vector2f & posPrevText, int sizeText) {
@@ -33,17 +33,11 @@ float GetWidth(Text & text) {
 	return text.getLocalBounds().width;
 }
 
-void UpdateTextWithHealth(TextWithInfo & textInfo, Player & player, RenderWindow & window) {
+void UpdateTextGame(TextWithInfo & textInfo, Player & player, RenderWindow & window) {
 	
 	String countHealthStr;
-	if (player.ship->health >= 0)
-		countHealthStr = to_string(int(player.ship->health));
-	else
-		countHealthStr = "0";
-	textInfo.textPlayerHealth.setString(TEXT_HEALTH + countHealthStr);
-	textInfo.textPlayerHealth.setPosition(10, 10);
 	textInfo.textNumber.setString(TEXT_POINT + to_string(player.point));
-	textInfo.textNumber.setPosition(250, 10); // сделать зависимость от размеров окна и длины предыдущей строки
+	textInfo.textNumber.setPosition(10, 10); 
 	textInfo.textLevel.setString(TEXT_LEVEL + to_string(player.levelGame));
 	float width = GetWidth(textInfo.textLevel);
 	float widthWindow = float(window.getSize().x);
@@ -87,7 +81,6 @@ void UpdateTextMenu(RenderWindow & window, TextWithInfo & textInfo) {
 }
 
 void DrawTextToGame(TextWithInfo & textInfo, RenderWindow & window) {
-	window.draw(textInfo.textPlayerHealth);
 	window.draw(textInfo.textNumber);
 	window.draw(textInfo.textLevel);
 }
