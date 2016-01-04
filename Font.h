@@ -19,6 +19,7 @@ struct TextWithInfo {
 	Text textExit;
 	Text textScore;
 	Text textLosing;
+	Text textWin;
 	Text textLevel;
 	Text textTimeUseBonus;
 	int sizeText = 32;
@@ -35,6 +36,6 @@ void SelectTextWithMouse(RenderWindow & window, Text & text, MenuSelector & sele
 void SelectButtons(RenderWindow & window, TextWithInfo & textInfo, MenuSelector & selector);
 void UpdateTextMenu(RenderWindow & window, TextWithInfo & textInfo);
 
-void OutputMessageAboutLosing(RenderWindow & window, TextWithInfo & textInfo);
+void OutputMessageAboutEndGame(RenderWindow & window, Text & text);
 void DrawTextToGame(TextWithInfo & textInfo, RenderWindow & window);
 void DrawTextToMenu(TextWithInfo & textInfo, RenderWindow & window);

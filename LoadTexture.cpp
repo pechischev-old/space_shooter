@@ -31,7 +31,6 @@ void TextureGame::LoadingFromFileTexture() {
 	explosionTexture.loadFromFile(PATH_TO_EXPLOSION);
 	explosionBulletTexture.loadFromFile(PATH_TO_EXPLOSION_BULLET);
 
-	healthBarTexture.loadFromFile(PATH_HEALTH_BAR);
 }
 
 void TextureMenu::LoadingFromFileTextureForMenu() {

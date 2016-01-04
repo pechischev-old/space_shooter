@@ -1,10 +1,9 @@
 #include "GUI.h"
 
-static const float RATIO_HEALTH = 287.f;
-static const float HEIGHT_BAR = 15.f;
 static const int INDENT = 5;
+static const Vector2f sizeBar = {301, 20};
 
-void S_GUI::InitGUI(TextureGame & textureGame) {
+void S_GUI::InitGUI(TextureGame & textureGame, RenderWindow & window) {
 	
 	decreaseSprite.setTexture(textureGame.decreaseTexture);
 	InitSpriteGUI(decreaseSprite, textureGame.decreaseTexture);
@@ -21,11 +20,13 @@ void S_GUI::InitGUI(TextureGame & textureGame) {
 	doubleShotSprite.setTexture(textureGame.doubleShotTexture);
 	InitSpriteGUI(doubleShotSprite, textureGame.doubleShotTexture);
 
-	healthBar.setTexture(textureGame.healthBarTexture);
-	InitSpriteGUI(healthBar, textureGame.healthBarTexture);
-	healthBar.setOrigin(0, 0);
 
-	bar.setFillColor(Color::Black);
+	emptyBar.setFillColor(Color(180, 180, 180, 100));
+	emptyBar.setSize(sizeBar);
+	emptyBar.setOutlineThickness(3);
+	emptyBar.setOutlineColor(Color(180, 180, 180));
+	bar.setFillColor(Color::Red);
+	UpdateStateBar(emptyBar, window);
 }
 
 void InitSpriteGUI(Sprite & sprite, Texture & texture) {
@@ -43,14 +44,16 @@ void UpdateState(Sprite & sprite, RenderWindow & window, Text & textTime) {
 	textTime.setPosition(sizeWindow.x - sizeText.x - 2 * sizeBonus.x - INDENT, sizeWindow.y - sizeText.y / 2.f - sizeBonus.y  - INDENT);
 }
 
-void UpdateStateBar(Sprite & sprite, RenderWindow & window) {
-	Vector2f sizeBar = Vector2f(sprite.getLocalBounds().width, sprite.getLocalBounds().height);
+void UpdateStateBar(RectangleShape & rect, RenderWindow & window) {
+	Vector2f sizeBar = rect.getSize();
 	Vector2u sizeWindow = window.getSize();
-	sprite.setPosition(INDENT * 2, sizeWindow.y - sizeBar.y - INDENT * 4.f);
+	rect.setPosition(INDENT * 2, sizeWindow.y - sizeBar.y - INDENT * 4.f);
 }
 
 void S_GUI::UpdateGUI(TextWithInfo & textGame, float timeUseBonus, PlayerState & state, RenderWindow & window) {
 	
+	UpdateStateBar(emptyBar, window);
+
 	if (state.isDecrease) {
 		UpdateState(decreaseSprite, window, textGame.textTimeUseBonus);
 		String timeStr = to_string(TIME_USE_DECREASE_IN_SECONDS - int(timeUseBonus));
@@ -75,18 +78,16 @@ void S_GUI::UpdateGUI(TextWithInfo & textGame, float timeUseBonus, PlayerState &
 		UpdateState(doubleShotSprite, window, textGame.textTimeUseBonus);
 		String timeStr = to_string(TIME_USE_DOUBLE_SHOT_IN_SECONDS - int(timeUseBonus));
 		textGame.textTimeUseBonus.setString(timeStr);
-	}
-
-	UpdateStateBar(healthBar, window);
+	}	
 }
 
-void UpdateHealthBar(RectangleShape & bar, float health, FloatRect & healthBar, Sprite & sprite) {
-	if (health > 0) {
-		if (health <= MAX_HEALTH) {
-			Vector2f sizeSprite = Vector2f(sprite.getLocalBounds().width / 2, sprite.getLocalBounds().height / 2);
-			bar.setPosition(sprite.getPosition().x + sizeSprite.x * 3 - 8.f, sprite.getPosition().y + sizeSprite.y - 3);
-			bar.setSize(Vector2f(-float((MAX_HEALTH - health) * RATIO_HEALTH / MAX_HEALTH), HEIGHT_BAR));
-		}
+void UpdateHealthBar(RectangleShape & bar, float health, RectangleShape & rect) {
+	
+	if (health <= MAX_HEALTH) {
+		Vector2f sizeSprite = rect.getSize();
+		health = (health > 0) ? health : 0;
+		bar.setPosition(rect.getPosition().x, rect.getPosition().y );
+		bar.setSize(Vector2f(float((health) * sizeSprite.x / MAX_HEALTH), sizeSprite.y));
 	}
 }
 
@@ -111,6 +112,6 @@ void S_GUI::DrawGUI(TextWithInfo & textGame, PlayerState & state, RenderWindow &
 		window.draw(tripleShotSprite);
 		window.draw(textGame.textTimeUseBonus);
 	}
-	window.draw(healthBar);
+	window.draw(emptyBar);
 	window.draw(bar);
 }

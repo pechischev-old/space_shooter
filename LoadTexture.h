@@ -37,8 +37,6 @@ struct TextureGame {
 	Texture greenLaserTexture;
 	Texture electricBullet;
 	Texture rocketTexture;
-
-	Texture healthBarTexture;
 	
 	Texture fieldTexture;
 

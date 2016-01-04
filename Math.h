@@ -5,6 +5,7 @@
 
 #include <math.h>
 #include <random> 
+#include <assert.h>
 
 using namespace sf;
 

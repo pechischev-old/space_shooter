@@ -13,7 +13,7 @@ using namespace sf;
 using namespace std;
 
 struct Entity {
-	Entity(Vector2f position, String Name, Texture & texture, SSound & sSound);
+	Entity(Vector2f position, String Name, Texture & texture, SSound & sSound, int maxCountFrame);
 	Vector2f position;
 	Vector2f sizeObject;
 	float health; // здоровье сущности
@@ -25,9 +25,11 @@ struct Entity {
 	bool isLife;
 	bool isKilled;
 	float CurrentFrame = 0;
+	float animationFrame = 2;
 	void Explosion(const Time & deltaTime, Texture & texture);
 	void CheckForCollisions(RenderWindow & window);
 	void MoveObject(const Time & deltaTime);
+	
 
 	void SetRotationObject(Vector2f posPoint);
 	Time timeChangeDirection = Time::Zero; // для врагов
@@ -37,6 +39,6 @@ struct Entity {
 	Sound shootSound;
 };
 
-
+void Animation(const Time & deltaTime, Entity & object, int beginFrame, int endFrame, float speedFrames, float & animationFrame);
 Vector2f Border(Entity & object, RenderWindow & window);
 void ClearListObject(list<Entity> & objects);

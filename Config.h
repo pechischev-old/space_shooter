@@ -16,7 +16,7 @@ static const  sf::String TITLE_GAME = "Main Game";
 
 static const  int POINT_FOR_ADVANCE = 15;
 
-static const  int MAX_LEVEL_GAME = 7;
+static const  int MAX_LEVEL_GAME = 15;
 
 //---------------------- Для игрока ------------------------------------
 
@@ -63,7 +63,7 @@ static const  float TIME_CREATE_BULLET_ENEMY = 0.2f;
 
 static const  float DISTANCE_FOR_ATACK = 500.f;
 
-static const int COUNT_EASY_ENEMY = 3;
+static const int COUNT_EASY_ENEMY = 2;
 static const int COUNT_MIDDLE_ENEMY = 0;
 static const int COUNT_TOWER_ENEMY = 0;
 static const int COUNT_KAMIKAZE_ENEMY = 0;
@@ -82,7 +82,7 @@ static const  sf::String NAME_BOSS = "boss";
 static const  int POINT_FOR_RAGE = 1500;
 static const int POINT_FOR_CALM = 150;
 static const  float SPEED_BOSS = 150;
-static const int HEALTH_BOSS = 10000;
+static const int HEALTH_BOSS = 100000;
 
 		// увеличение характеристик
 		static const  int INCREASED_DAMAGE_ENEMY = 5;
@@ -195,8 +195,8 @@ static const  sf::String TEXT_INSTRUCTION = L"Как играть";
 static const  sf::String TEXT_OPTIONS = L"Настройки";
 static const  sf::String TEXT_EXIT = L"Выход";
 static const  sf::String TEXT_ABOUT_LOSING = L"Вы проиграли. Нажмите Esc для выхода в меню";
+static const  sf::String TEXT_ABOUT_WIN = L"Вы выйграли! Нажмите Esc для выхода в меню";
 static const  sf::String TEXT_SCORE = L"Ваш счет: ";
-
 
 //---------------------
 static const  sf::String PATH_TO_EXPLOSION = "resourse/images/explosion_2.png";
@@ -225,7 +225,7 @@ static const  sf::String PATH_MIDDLE_ENEMY = "resourse/images/middleEnemy.png";
 static const  sf::String PATH_EASY_ENEMY = "resourse/images/enemy1.png";
 static const  sf::String PATH_BOSS = "resourse/images/boss2.png";
 //---------------------
-static const  sf::String PATH_PLAYER_SHIP = "resourse/images/sokol.png";
+static const  sf::String PATH_PLAYER_SHIP = "resourse/images/player.png";
 //---------------------
 static const  sf::String PATH_STAR = "resourse/images/star.png";
 //---------------------
@@ -237,14 +237,10 @@ static const  sf::String PATH_TO_GREEN_BULLET = "resourse/images/laser-green.png
 static const  sf::String PATH_ELECTRIC_BULLET = "resourse/images/electricBullet.png";
 static const  sf::String PATH_ROCKET = "resourse/images/rocket.png";
 //---------------------
-static const  sf::String PATH_HEALTH_BAR = "resourse/GUI/RedBar.png";
-//---------------------
 static const  sf::String PATH_FIELD = "resourse/images/map.png";
 //---------------------
 static const  sf::String PATH_INSTRUCTION = "resourse/images/instruction.png";
-
 //--------------------------------------------------------------
-
 static float SIZE_VOLUME_SHOOT = 5.5f;
 static float SIZE_VOLUME_EXPLOSION = 15.5f;
 static float SIZE_VOLUME_TAKE_BONUS = 10.5f;

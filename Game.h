@@ -34,7 +34,7 @@ struct Game
 	void UseBonus(const Time & deltaTime, TextureGame & textureGame);
 };
 
-void InitializeGame(Game & game, SSound & sSound);
+void InitializeGame(Game & game, SSound & sSound, RenderWindow & window);
 void ResetGame(Game & game);
 bool hasIntersection(Sprite & object1, Sprite & object2);
 void processEventsGame(Game & game, Event & event, RenderWindow & window);

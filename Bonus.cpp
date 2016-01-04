@@ -40,7 +40,7 @@ void Bonus::AddBonus(Vector2f getPosition, TextureGame & textureGame, SSound & s
 			texture = &textureGame.tripleShotTexture;
 			break;
 		}
-		Entity addBonus(getPosition, name, *texture, sSound);
+		Entity addBonus(getPosition, name, *texture, sSound, 1);
 		addBonus.direction = dir; // присваивает сгенерированное направление
 		addBonus.speed = SPEED_BONUS;
 		bonuses.push_back(addBonus);

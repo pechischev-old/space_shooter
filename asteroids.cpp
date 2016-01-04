@@ -39,7 +39,7 @@ void Asteroid::AddAsteroid(TextureGame & textureGame, RenderWindow & window, SSo
 			break;
 		}
 		
-		Entity addAsteroid(getPosition, name, *texture, sSound);
+		Entity addAsteroid(getPosition, name, *texture, sSound, 1);
 		addAsteroid.direction = dir; // присваивает сгенерированное направление
 		addAsteroid.speed = float(speed);
 		addAsteroid.damage = float(damage);

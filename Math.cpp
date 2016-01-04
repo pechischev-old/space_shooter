@@ -19,6 +19,7 @@ float Math::CalculateRotate(Vector2f posObject1, Vector2f posObject2) {
 }
 
 int Math::GetRandomNumerForSection(int begin, int end) {
+	assert(begin < end);
 	random_device rd;
 	mt19937 gen(rd());
 	uniform_int_distribution<> dist(begin, end);

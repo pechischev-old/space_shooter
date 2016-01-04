@@ -17,6 +17,7 @@ void InitializeText(TextWithInfo & textInfo) {
 	InitString(textInfo.textOption, String(TEXT_OPTIONS), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textExit, String(TEXT_EXIT), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textLosing, String(TEXT_ABOUT_LOSING), textInfo.font, textInfo.sizeText);
+	InitString(textInfo.textWin, String(TEXT_ABOUT_WIN), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textScore, String(""), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textLevel, String(""), textInfo.font, textInfo.sizeText);
 	InitString(textInfo.textTimeUseBonus, String(""), textInfo.font, textInfo.sizeText);
@@ -94,8 +95,8 @@ void DrawTextToMenu(TextWithInfo & textInfo, RenderWindow & window) {
 }
 
 
-void OutputMessageAboutLosing(RenderWindow & window, TextWithInfo & textInfo) {
+void OutputMessageAboutEndGame(RenderWindow & window, Text & text) {
 	Vector2u sizeWindow = window.getSize();
-	textInfo.textLosing.setPosition(float(sizeWindow.x) / 2, float(sizeWindow.y) / 2);
-	window.draw(textInfo.textLosing);
+	text.setPosition(float(sizeWindow.x) / 2, float(sizeWindow.y) / 2);
+	window.draw(text);
 }

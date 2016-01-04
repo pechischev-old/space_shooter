@@ -31,7 +31,6 @@ struct Shoot {
 	bool isRocket = false;
 	bool life = true; //флаг жизни
 	void Explosion(const Time & deltaTime, Texture & texture);
-	void MoveBullet(const Time & deltaTime);
 	void CheckForCollisions(RenderWindow & window);
 	void MoveBulletHardEnemy(const Time & deltaTime, Vector2f posObject, int speed);
 };

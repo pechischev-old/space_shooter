@@ -56,52 +56,6 @@ void Shoot::Explosion(const Time & deltaTime, Texture & texture) { // изменить н
 
 }
 
-void Shoot::MoveBullet(const Time & deltaTime) {
-	Vector2f movement = sprite->getPosition();
-	switch (dir) {
-	case UP: movement.y = -SPEED_BULLET;
-		movement.x = 0;
-		sprite->setRotation(-90);
-		break;
-	case DOWN: movement.y = SPEED_BULLET;
-		movement.x = 0;
-		sprite->setRotation(90);
-		break;
-	case LEFT: movement.x = -SPEED_BULLET;
-		movement.y = 0;
-		sprite->setRotation(-180);
-		break;
-	case RIGHT: movement.x = SPEED_BULLET;
-		movement.y = 0;
-		break;
-	case UP_LEFT: movement.x = -SPEED_BULLET;
-		movement.y = -SPEED_BULLET;
-		sprite->setRotation(-135);
-		break;
-	case UP_RIGHT: movement.x = SPEED_BULLET;
-		movement.y = -SPEED_BULLET;
-		sprite->setRotation(-45);
-		break;
-	case DOWN_RIGHT: movement.x = SPEED_BULLET;
-		movement.y = SPEED_BULLET;
-		sprite->setRotation(45);
-		break;
-	case DOWN_LEFT: movement.x = -SPEED_BULLET;
-		movement.y = SPEED_BULLET;
-		sprite->setRotation(135);
-		break;
-	default:
-		movement.x = 0;
-		movement.y = 0;
-		break;
-	}
-
-	position.x = movement.x * deltaTime.asSeconds();
-	position.y = movement.y * deltaTime.asSeconds();
-
-	sprite->move(position);
-}
-
 void Shoot::MoveBulletHardEnemy(const Time & deltaTime, Vector2f posObject, int speed) {
 	Vector2f newPosition = isRocket ? position : oldPosition;
 	position.x += speed * Math::Normalize(posObject, newPosition).x;
@@ -116,11 +70,8 @@ void UpdateStateBullet(const Time & deltaTime, RenderWindow & window, list<Shoot
 		if (it->isOtherBullet && !it->isExplosion) {
 			it->MoveBulletHardEnemy(deltaTime, it->rememPos, SPEED_OTHER_BULLET);
 		}
-		else if ( it->isRocket && !it->isExplosion) {
+		else if (it->isRocket && !it->isExplosion) {
 			it->MoveBulletHardEnemy(deltaTime, posPlayer, SPEED_ROCKET);
-		}
-		else {
-			it->MoveBullet(deltaTime);
 		}
 		if (it->isExplosion) {
 			it->dir = NONE;

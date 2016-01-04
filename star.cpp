@@ -17,7 +17,7 @@ void Star::AddStar(TextureGame & textureGame, RenderWindow & window, SSound & sS
 		if (timeCreateStar.asSeconds() > 0.7) {
 			Direction dir = LEFT;
 			Vector2f setPosition = GetRandomPosition(dir, window);
-			Entity addStar(setPosition, NAME_STAR, textureGame.starTexture, sSound);
+			Entity addStar(setPosition, NAME_STAR, textureGame.starTexture, sSound, 1);
 			addStar.direction = LEFT;
 			addStar.speed = float(Math::GetRandomNumerForSection(270, 400));
 			stars.push_back(addStar);

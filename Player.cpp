@@ -4,7 +4,7 @@ using namespace sf;
 using namespace std;
 
 void InitializePlayer(Player & player, TextureGame & textureGame, SSound & sSound) {
-	player.ship = new Entity(Vector2f(SCRN_WIDTH / 2, SCRN_HEIGTH / 2), NAME_PLAYER_SHIP, textureGame.playerTexture, sSound);
+	player.ship = new Entity(Vector2f(SCRN_WIDTH / 2, SCRN_HEIGTH / 2), NAME_PLAYER_SHIP, textureGame.playerTexture, sSound, 15);
 	player.ship->health = float(player.maxHealth);
 	player.playerState.isAlive = true;
 	player.ship->damage = float(player.maxDamage);
@@ -37,6 +37,7 @@ void  Player::ChangeTypeFire(TextureGame & textureGame, Vector2f posPoint) {
 			int count;
 			int diff;
 			Texture *texture = NULL;
+			float angle = ship->sprite->getRotation();
 			if (playerState.isDoubleShot) {
 				begin = -1;
 				count = 2;
@@ -55,11 +56,13 @@ void  Player::ChangeTypeFire(TextureGame & textureGame, Vector2f posPoint) {
 				diff = 1;
 				texture = &textureGame.blueLaserTexture;
 			}
+		//	cout << Math::Normalize(posShip, posPoint).x << "  " << Math::Normalize(posShip, posPoint).y << endl;
+			Vector2f normalizePath = Math::Normalize(posShip, posPoint);
 			for (int i = begin; i < count; i += diff) {
 				Shoot addBullet(Vector2f(posShip.x + i * 15, posShip.y + i * 15), RIGHT, *texture, NAME_BULLET);
 				addBullet.damage = int(ship->damage);
 				addBullet.isOtherBullet = true;
-				addBullet.rememPos = Vector2f(posPoint.x + i * 15, posPoint.y + i * 15);
+				addBullet.rememPos = Vector2f(posPoint.x + i *20, posPoint.y + i * 20);
 				addBullet.sprite->setScale(float(scaleBullet), float(scaleBullet));
 				bullet.push_back(addBullet); // создание пули и занесение ее в список
 			}
@@ -87,7 +90,7 @@ void Control(Player & player, Event & event) {
 		else if (Keyboard::isKeyPressed(Keyboard::S) && Keyboard::isKeyPressed(Keyboard::D)) {
 			player.direction = DOWN_RIGHT;
 			player.ship->direction = DOWN_RIGHT;
-			//----------------------------- ѕо вертикали или горизантали ----------------------------
+			//----------------------------- ѕо вертикали или горизонтали ----------------------------
 		}
 		else if (Keyboard::isKeyPressed(Keyboard::W)) {
 			player.direction = UP;
@@ -108,11 +111,13 @@ void Control(Player & player, Event & event) {
 		else {
 			player.direction = NONE;
 			player.ship->direction = NONE;
+			player.ship->animationFrame = 0;
 		}
 	}
 	else {
 		player.direction = NONE;
 		player.ship->direction = NONE;
+		
 	}
 }
 

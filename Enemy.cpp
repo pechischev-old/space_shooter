@@ -84,7 +84,7 @@ void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window, SSound & 
 				else
 					dir = static_cast<Direction>(GetDirection(dir));
 				getPositionEnemy = GetRandomPosition(dir, window);
-				Entity addEnemy(getPositionEnemy, typeEnemy, *texture, sSound);
+				Entity addEnemy(getPositionEnemy, typeEnemy, *texture, sSound, 1);
 				addEnemy.health = float(health);
 				addEnemy.speed = float(SPEED_ENEMY);
 				if (typeEnemy == NAME_TOWER_ENEMY) {
@@ -105,7 +105,7 @@ void Enemy::AddEnemy(TextureGame & textureGame, RenderWindow & window, SSound & 
 	}
 	if (bossState.isBoss && !bossState.isOneBoss) { // переделать
 		Vector2f getPositionEnemy = { float(window.getSize().x) - 100, 350 };
-		Entity addEnemy(getPositionEnemy, NAME_BOSS, textureGame.enemyBossTexture, sSound);
+		Entity addEnemy(getPositionEnemy, NAME_BOSS, textureGame.enemyBossTexture, sSound, 1);
 		addEnemy.direction = static_cast<Direction>(Math::GetRandomNumerForSection(1, 4));;
 		addEnemy.damage = float(damage);
 		addEnemy.health = HEALTH_BOSS;
@@ -227,8 +227,6 @@ Direction GetDirection(Direction oldDir) {
 		if (selectHand == 2) dir = LEFT;
 		if (selectHand == 3) dir = UP;
 	}
-
-	
 	return dir;
 }
 
@@ -261,7 +259,7 @@ void SpecialShootingBoss(Enemy & enemy, Entity & boss, TextureGame & textureGame
 	if (enemy.timeCreateBulletEnemy.asSeconds() > time) {
 		switch (enemy.selector) {
 		case ELECTRICAL: {
-			Shoot addBullet(posEnemy, LEFT, textureGame.electricBullet, NAME_BULLET);
+			Shoot addBullet(posEnemy, LEFT, textureGame.electricBullet, NAME_ELECTRIC_BULLET);
 			addBullet.isOtherBullet = true;
 			addBullet.rememPos = posPlayer;
 			enemy.bulletEnemy.push_back(addBullet);

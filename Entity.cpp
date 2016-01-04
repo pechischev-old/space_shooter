@@ -4,12 +4,12 @@
 using namespace sf;
 using namespace std;
 
-Entity::Entity(Vector2f position, String Name, Texture & texture, SSound & sSound) {
+Entity::Entity(Vector2f position, String Name, Texture & texture, SSound & sSound, int maxCountFrame) {
 	this->position = position;
 	name = Name;
 	sprite = new Sprite;
 	sprite->setTexture(texture);
-	sizeObject = Vector2f(texture.getSize());
+	sizeObject = Vector2f(texture.getSize().x / maxCountFrame, texture.getSize().y);
 	sprite->setTextureRect(IntRect(0, 0, int(sizeObject.x), int(sizeObject.y)));
 	sprite->setOrigin(sizeObject.x / 2, sizeObject.y / 2);
 	sprite->setPosition(position);
@@ -24,7 +24,6 @@ void Entity::Explosion(const Time & deltaTime, Texture & texture) { // изменить 
 	position = sprite->getPosition();
 	delete(sprite);
 	sprite = new Sprite;
-	CurrentFrame += SPEED_FRAMES * deltaTime.asSeconds();
 	if (CurrentFrame <= NUMBER_OF_FRAMES) {
 		sprite->setTexture(texture);
 		sprite->setOrigin(WIDTH_EXPLOSION / 2, HEIGTH_EXPLOSION / 2);
@@ -36,7 +35,19 @@ void Entity::Explosion(const Time & deltaTime, Texture & texture) { // изменить 
 		isKilled = true;
 		isLife = false;
 	}
+	CurrentFrame += SPEED_FRAMES * deltaTime.asSeconds();
+}
 
+void Animation(const Time & deltaTime, Entity & object, int beginFrame, int endFrame, float speedFrames, float & animationFrame) {
+	
+	if (animationFrame <= endFrame) {
+		object.sprite->setTextureRect(IntRect(object.sizeObject.x * int(animationFrame), 0, object.sizeObject.x, object.sizeObject.y));
+		object.sprite->setOrigin(object.sizeObject.x / 2, object.sizeObject.y / 2);
+	}
+	else {
+		animationFrame = float(beginFrame);
+	}
+	animationFrame += speedFrames * deltaTime.asSeconds();
 }
 
 void Entity::CheckForCollisions(RenderWindow & window) {

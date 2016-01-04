@@ -6,9 +6,6 @@
 
 #include "Game.h"
 #include "Menu.h"
-#include "Music.h"
-
-using namespace sf;
 using namespace std;
 
 
@@ -43,7 +40,7 @@ int CallGame(GlobalBool & globalBool, Menu & menu, SSound & sSound)
 	Game *game = new Game();
 	
 	sSound.LoadSound();
-	InitializeGame(*game, sSound);
+	InitializeGame(*game, sSound, window);
 	InitMenu(menu, window, menu.textureMenu, *game->textInfo);
 
 	Clock clock;
@@ -52,7 +49,6 @@ int CallGame(GlobalBool & globalBool, Menu & menu, SSound & sSound)
 	menu.restart = [&]() {
 		ResetGame(*game);
 	};
-
 	window.setVerticalSyncEnabled(true);
 	
 	while (window.isOpen())
@@ -87,7 +83,6 @@ int main()
 	SSound sSound;
 	GlobalBool globalBool; // обявление глобальных булевских переменных
 	CallGame(globalBool, menu, sSound);
-
 	return 0;
 }
 

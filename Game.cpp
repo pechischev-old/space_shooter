@@ -3,7 +3,7 @@
 using namespace sf;
 using namespace std;
 
-void InitializeGame(Game & game, SSound & sSound) {
+void InitializeGame(Game & game, SSound & sSound, RenderWindow & window) {
 	game.player = new Player;
 	game.enemy = new Enemy;
 	game.textInfo = new TextWithInfo;
@@ -13,7 +13,7 @@ void InitializeGame(Game & game, SSound & sSound) {
 	game.textureGame.LoadingFromFileTexture();
 	InitializePlayer(*game.player, game.textureGame, sSound);
 	InitializeText(*game.textInfo);
-	game.gui.InitGUI(game.textureGame);
+	game.gui.InitGUI(game.textureGame, window);
 }
 
 void Game::IncreaseCharacteristicsObjects() {
@@ -392,13 +392,19 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 		}
 		else {
 			MovePlayer(player, deltaTime, window); // задает координаты движения
-			player.ship->sprite->move(Border(*player.ship, window));
 			player.ship->SetRotationObject(pos);
 			player.RecoveryMove();
 			player.ChangeTypeFire(game.textureGame, pos);
 			UpdateVolume(player.takeBonus, SIZE_VOLUME_TAKE_BONUS);
 			UpdateVolume(player.ship->shootSound, SIZE_VOLUME_SHOOT);
+			if (player.direction != NONE) {
+				Animation(deltaTime, *player.ship, 2, 15, 10, player.ship->animationFrame);
+			}
+			else {
+				Animation(deltaTime, *player.ship, 0, 1, 10, player.ship->animationFrame);
+			}
 		}
+		
 		UpdateStateBullet(deltaTime, window, player.bullet, game.textureGame, posPlayer);
 		//---------------- Функции противников -------------
 		enemy.UpdateStateEveryEnemy(deltaTime, window, bonus, game.textureGame, posPlayer, player.point, sSound, game.isWin);
@@ -412,7 +418,7 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 		//---------------- Функции бонусов -----------------
 		bonus.GetMoveEveryBonus(deltaTime, window);
 		//---------------------
-		UpdateHealthBar(game.gui.bar, player.ship->health, game.gui.healthBar.getGlobalBounds(), game.gui.healthBar);
+		UpdateHealthBar(game.gui.bar, player.ship->health, game.gui.emptyBar);
 		game.gui.UpdateGUI(*game.textInfo, game.timeUseBonus, player.playerState, window);
 		
 	}
@@ -420,12 +426,13 @@ void updateGame(Game & game, const Time & deltaTime, RenderWindow & window, Glob
 
 void renderGame(RenderWindow & window, Game & game) {
 	window.clear();
-	//if (!game.gameState.isLoading) {
 	game.DrawObjects(window);
 	DrawTextToGame(*game.textInfo, window);
-	//}
 	if (!game.player->ship->isLife) {
-		OutputMessageAboutLosing(window, *game.textInfo);
+		OutputMessageAboutEndGame(window, game.textInfo->textLosing);
+	}
+	else if (game.isWin) {
+		OutputMessageAboutEndGame(window, game.textInfo->textWin);
 	}
 	game.gui.DrawGUI(*game.textInfo, game.player->playerState, window);
 	window.display();
